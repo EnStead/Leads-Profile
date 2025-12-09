@@ -1,0 +1,98 @@
+@import url('https://fonts.googleapis.com/css2?family=Parkinsans:wght@300..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Borel&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import "tailwindcss";
+
+
+@theme {
+  --color-brand-primary: #151515;
+  --color-brand-subtext: #333333;
+  --color-brand-white: #FFFFFF;
+  --color-brand-black: #000000;
+  --color-brand-darkblue: #040A19;
+  --color-brand-blue: #2F6BFF;
+  --color-brand-purple: #5B2FFF;
+  --color-brand-stroke: #EDEDED;
+  --color-brand-sky: #F3F8FF;
+  --color-brand-offwhite: #F9F9F9;
+  --color-brand-green: #23AA25;
+  --color-brand-brown: #AA6923;
+  --color-brand-lightblue: #D5E1FF;
+  --color-brand-royalblue: #1C4099;
+  --color-brand-muted: #797979;
+  --color-brand-gray: #B2B2B2;
+
+
+
+  --color-brand-accent: #F7EAD7;
+  --color-brand-background1: #FAF8FE;
+  --color-brand-head: #151515;
+  --color-brand-planoff: #EAEAEA;
+  --color-brand-midtext: #F9A720;
+  --color-brand-planmid: #B2B2B2;
+  --color-brand-planbut: #C2ABF9;
+  --color-brand-plan2: #D5C4FB;
+  --color-brand-plan3: #76B1FF;
+  --color-brand-plan4: #74C460;
+  --color-brand-footnoti: #101828;
+  --color-brand-footnoti1: #667085;
+  --color-brand-orange: #EE542B;
+  --color-brand-darkpurple: #3F3062;
+  --color-brand-placeholder: #B2B2B2;
+  --color-brand-offpurple: #1F1731;
+  --color-brand-charcoal: #222222;
+  --color-brand-purp: #E7DEFC;
+  --color-brand-purpbg: #B091F7;
+  --color-brand-red: #F04D3E;
+  --color-brand-step: #7E60C4;
+  --color-brand-cloud: #53389E;
+  --color-brand-purUp: #6941C6;
+
+
+
+  
+
+  --font-sans: "Inter", sans-serif;
+  --font-park: "Parkinsans", serif;
+  --font-logo: "Borel", serif;
+
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+
+  --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-card: 0 6px 16px rgba(0, 0, 0, 0.1);
+
+  
+  --breakpoint-ssm: 27.813rem;
+  --breakpoint-xsm: 34.063rem;
+  --breakpoint-ml: 52.813rem;
+  --breakpoint-ls: 59.063rem;
+  --breakpoint-lss: 68.75rem;
+  --breakpoint-xls: 75rem;
+  /* --breakpoint-2xl: 100rem;
+  --breakpoint-3xl: 120rem; */
+
+
+}
+
+
+@layer base {
+  body {
+    @apply font-sans;
+    @apply bg-brand-sky
+  }
+  button {
+    @apply cursor-pointer;
+    @apply font-park;
+  }
+}
+
+
+/* Hide scrollbar but keep scroll functionality */
+.hide-scrollbar {
+  scrollbar-width: none; /* Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
