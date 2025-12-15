@@ -6,25 +6,103 @@ import { useDashboard } from '../../context/DashboardContext';
 import CardSkeleton from '../../utility/skeletons/CardSkeleton';
 import EmptyState from '../../utility/EmptyState';
 import Pagination from '../../utility/Pagination';
+import { useAuth } from '../../context/AuthContext';
+import { useState } from 'react';
+import api from '../../utility/Axios';
 
 
 
-const Cards = () => { 
+const Cards = ({searchTerm}) => { 
+
     const { allOrdersData, allOrdersLoading, allOrdersError,page,setPage  } = useDashboard();
 
-        // console.log(allOrdersData)
-        const formatDate = (dateString) => {
-            const options = {
-            year: "numeric",
-            month: "short",
-            day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-            };
-            return new Date(dateString).toLocaleString(undefined, options);
-        };
+    const filteredLeads = allOrdersData?.data.filter((order) => {
+        const term = searchTerm.toLowerCase();
 
-        if (allOrdersLoading) {
+        return (
+            order.customId?.toLowerCase().includes(term)
+        );
+    });
+
+    const { user } = useAuth(); //user
+    const [downloadingDay, setDownloadingDay] = useState(null);
+        
+    const downloadCSV = async (orderId) => {
+    try {
+        setDownloadingDay(orderId);
+
+        let allLeads = [];
+        let page = 1;
+        let hasMore = true;
+        const limit = 100; // safe page size
+
+        while (hasMore) {
+        const res = await api.get(
+            `/leads/order/${orderId}?page=${page}&limit=${limit}`,
+            {
+            headers: {
+                Authorization: `Bearer ${user?.token}`,
+            },
+            }
+        );
+
+        const leads = res.data.data;
+        const pagination = res.data.pagination;
+
+        allLeads = [...allLeads, ...leads];
+
+        if (!pagination || page >= pagination.pages) {
+            hasMore = false;
+        } else {
+            page++;
+        }
+        }
+
+        if (!allLeads.length) {
+        alert("No leads available for this order");
+        return;
+        }
+
+        const headers = Object.keys(allLeads[0]);
+        const csvRows = [
+        headers.join(","),
+        ...allLeads.map((lead) =>
+            headers.map((field) => `"${lead[field] ?? ""}"`).join(",")
+        ),
+        ];
+
+        const csvContent = csvRows.join("\n");
+        const blob = new Blob([csvContent], {
+        type: "text/csv;charset=utf-8;",
+        });
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `orders-${orderId}.csv`;
+        link.click();
+        URL.revokeObjectURL(url);
+
+    } catch (err) {
+        console.error("CSV download failed", err);
+        alert("Failed to download CSV. Make sure you are logged in.");
+    } finally {
+        setDownloadingDay(null);
+    }
+    };
+
+    const formatDate = (dateString) => {
+        const options = {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        };
+        return new Date(dateString).toLocaleString(undefined, options);
+    };
+
+    if (allOrdersLoading) {
       return (
       <section>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -42,15 +120,13 @@ const Cards = () => {
       return <p className="text-brand-red">Failed to load dashboard data.</p>;
     }
 
-
-
   return (
 
     <>
         {
-            !allOrdersData.data.length  ?  <EmptyState /> :
+            !filteredLeads.length  ?  <EmptyState /> :
             <section className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6'>
-                    {Array.isArray(allOrdersData?.data) && allOrdersData?.data.map((item) => (
+                    {Array.isArray(filteredLeads) && filteredLeads.map((item) => (
                         <div key={item._id} className="bg-transparent rounded-t-xl overflow-hidden relative">
                             <Link to={`/orders/${item._id}`}>
                                 {/* IMAGE */}
@@ -81,8 +157,21 @@ const Cards = () => {
                                                         View Details                                        
                                                     </Link>
                                                 </DropdownMenu.Item>
-                                                <DropdownMenu.Item className="px-3 py-2 text-sm border border-brand-white hover:bg-brand-sky cursor-pointer">
-                                                    Download as CSV
+                                                <DropdownMenu.Item
+                                                    disabled={!item.filled || downloadingDay === item._id}
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        downloadCSV(item._id);
+                                                    }}
+                                                    className={`px-3 py-2 text-sm border border-brand-white hover:bg-brand-sky cursor-pointer ${
+                                                        item.filled
+                                                        ? "text-brand-blue hover:text-blue-700"
+                                                        : "text-gray-400 cursor-not-allowed"
+                                                    }`}
+                                                >
+
+                                                    {downloadingDay === item._id ? "Downloading..." : "Download as CSV"}
                                                 </DropdownMenu.Item>
                                             </DropdownMenu.Content>
                                         </DropdownMenu.Portal>
@@ -91,7 +180,7 @@ const Cards = () => {
             
                                 <div>
                                     {/* Title */}
-                                    <h3 className=" font-semibold font-park text-brand-primary">{item.orderType}</h3>
+                                    <h3 className=" font-semibold font-park text-brand-primary">{item.customId}</h3>
             
                                     {/* Leads Progress */}
                                     <p className="text-sm font-medium text-brand-subtext mt-1">

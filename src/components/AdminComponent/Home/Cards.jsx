@@ -5,40 +5,39 @@ import Leads from '../../../assets/Leads.svg'
 import Head from '../../../assets/Head.svg'
 import { Dot,MoveRight,UserRound } from 'lucide-react';
 import { Link } from 'react-router';
-import { useState } from 'react';
+import { useDashboard } from '../../../context/DashboardContext'
+import CardSkeleton from '../../../utility/skeletons/CardSkeleton'
 
-const Cards = () => {
+
+const Cards = () => { 
+
+  const { adminDashboardData, adminDashboardLoading, adminDashboardError } = useDashboard();
+  
+    if (adminDashboardLoading) {
+        return (
+        <section>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <CardSkeleton />
+            <CardSkeleton />
+            <CardSkeleton />
+            <CardSkeleton />
+          </div>
+        </section>
+      );;
+    }
+
+
+    if (adminDashboardError) {
+      return <p className="text-brand-red">Failed to load dashboard data.</p>;
+    }
+
+    const processingOrders = adminDashboardData?.processingOrders;
+    const completedToday = adminDashboardData?.completedToday;
+    const leadsDeliveredToday = adminDashboardData?.leadsDeliveredToday;
 
   return (
     <section>
-      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4' >
-        {/* CARD 1 */}
-        <div className='bg-brand-white border border-brand-offwhite 
-          rounded-2xl py-8 px-4 w-full h-50 flex flex-col justify-between items-start '
-        >
-          <div className='flex items-center justify-start gap-4' >
-            <div className='p-1' >
-              <img src={Pending} alt="image" />
-            </div>
-            <h3 className='text-brand-primary font-semibold font-park'>
-              Pending Payment
-            </h3>
-
-          </div>
-
-          <div className='w-full'>
-            <div className='flex gap-4' >
-              <h2 className='text-brand-primary font-bold text-4xl font-park '>
-                248
-              </h2>
-            </div>
-            <div className='flex items-center justify-between mt-4 '>
-              <span className='text-brand-muted text-xs font-light'>Amount: <span className='text-brand-muted font-light'> ~ $750</span></span>
-              <Link className='text-brand-blue font-medium flex items-center gap-3'  >View Orders <MoveRight size={18}/></Link>
-            </div>
-          </div>
-
-        </div>
+      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4' >
 
         {/* CARD 2 */}
         <div className='bg-brand-white border border-brand-offwhite 
@@ -55,11 +54,11 @@ const Cards = () => {
 
           <div className='w-full'>
               <h2 className='text-brand-primary font-bold text-4xl font-park '>
-                12,842
+                {processingOrders}
               </h2>
             <div className='flex items-center justify-between mt-4 w-full '>
               <span className='text-brand-muted text-xs font-light'>Amount: <span className='text-brand-muted font-light'> ~ $750</span></span>
-              <Link className='text-brand-blue font-medium flex items-center gap-3'  >View Orders <MoveRight size={18}/></Link>
+              <Link to={'/admin/orders'} className='text-brand-blue font-medium flex items-center gap-3'  >View Orders <MoveRight size={18}/></Link>
             </div>
           </div>
         </div>
@@ -79,7 +78,7 @@ const Cards = () => {
 
           <div className=''>
             <h2 className='text-brand-primary font-bold text-4xl font-park '>
-              3
+              {completedToday}
             </h2>
             <div className='flex items-center gap-3 mt-4'>
               <img src={Head} alt="Image" />
@@ -105,7 +104,7 @@ const Cards = () => {
 
           <div className=''>
             <h2 className='text-brand-primary font-bold text-4xl font-park '>
-              3
+              {leadsDeliveredToday}
             </h2>
             <div className='flex items-center gap-3 mt-4'>
               <img src={Head} alt="Image" />

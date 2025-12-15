@@ -42,9 +42,17 @@ const handleSubmit = async (e) => {
       password: form.password,
     });
 
+
+    // Role validation
+    if (res.user.role !== "client") {
+      showToast('Unauthorized access', "error");
+      return;
+    }
+
     // ✅ Correct place to get the message
     const message = res.userData?.message || "Login successful";
     showToast(message);
+
 
     setTimeout(() => {
       navigate('/home');
@@ -59,14 +67,14 @@ const handleSubmit = async (e) => {
 
 
   return (
-    <section className='h-screen relative'
+    <section className='min-h-screen relative py-30'
       style={{
           backgroundImage: `url(${Image})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
       }}
-    >
+    > 
       <div className=' flex justify-center items-center h-full '>
 
 
@@ -105,7 +113,7 @@ const handleSubmit = async (e) => {
 
             {/* Password */} 
             <div className="flex flex-col relative">
-                <label className={`mb-1 font-medium text-lg  ${form.email?.trim() !== "" ? "text-brand-primary" : "text-brand-muted"}`}
+                <label className={`mb-1 font-medium text-lg  ${form.password?.trim() !== "" ? "text-brand-primary" : "text-brand-muted"}`}
                 >
                   Password
                 </label>
@@ -150,7 +158,7 @@ const handleSubmit = async (e) => {
           </p>
         </div>
       </div>
-        <p className='text-brand-darkblue font-medium absolute top-4 right-8 ' >
+        <p className='text-brand-darkblue font-medium text-[10px] lg:text-base absolute top-4 right-8 ' >
           © Leads Profile 2025
         </p>
 

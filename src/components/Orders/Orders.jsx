@@ -1,3 +1,4 @@
+import { useState } from "react";
 import SuccessModal from "../../utility/SuccessModal"
 import OrderModal from "../Transactions/OrderModal"
 import Cards from "./Cards"
@@ -8,9 +9,11 @@ const Orders = ({
     isModalOpen,setIsModalOpen,
     openSuccessModal,setOpenSuccessModal
 }) => {
+    const [searchTerm, setSearchTerm] = useState("");    
+    
   return (
-    <section className='bg-brand-sky min-h-[screen] p-10'>
-        <div className='flex justify-between items-center' >
+    <section className='bg-brand-sky min-h-[screen] p-5 xsm:p-10'>
+        <div className='xsm:flex justify-between items-center' >
             <div>
                 <h2 className='text-brand-primary font-park font-bold text-xl mb-2' >
                     Leads Orders
@@ -26,6 +29,8 @@ const Orders = ({
                     <input
                         type="text"
                         placeholder="Search by lead name or source"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
                         className="w-full px-4 py-2 border bg-brand-white border-t-0 border-x-0 rounded-xl  focus:outline-none focus:ring-2 focus:ring-brand-gray"
                     />
                 </div>
@@ -40,7 +45,7 @@ const Orders = ({
 
         
         <div className='pt-10'>
-            <Cards/>
+            <Cards searchTerm={searchTerm} />
         </div>
 
         <OrderModal

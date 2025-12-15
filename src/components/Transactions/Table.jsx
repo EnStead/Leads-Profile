@@ -1,5 +1,5 @@
 import { Ellipsis, Dot, } from 'lucide-react'
-import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu'; 
 import TableSkeleton from '../../utility/skeletons/TableSkeleton';
 import { useDashboard } from '../../context/DashboardContext';
 import Pagination from '../../utility/Pagination';
@@ -19,10 +19,17 @@ const getStatusColor = (status) => {
 };
 
 
-const Table = ({openAddModal,openOrderDetails,openViewLeads}) => {
+const Table = ({openAddModal,openOrderDetails,openViewLeads, searchTerm}) => {
     const { allOrdersData, allOrdersLoading, allOrdersError,page,setPage } = useDashboard();
-        // console.log(allOrdersData)
-        // console.log("Total pages:", allOrdersData?.pagination);
+    
+    const filteredOrders = allOrdersData?.data.filter((order) => {
+        const term = searchTerm.toLowerCase();
+
+        return (
+            order.customId?.toLowerCase().includes(term)
+        );
+    });
+
         const formatDate = (dateString) => {
             const options = {
             year: "numeric",
@@ -45,7 +52,7 @@ const Table = ({openAddModal,openOrderDetails,openViewLeads}) => {
     <section className='w-full h-full'>
 
         {
-            !allOrdersData?.data.length  ? <EmptyState /> :
+            !filteredOrders.length  ? <EmptyState /> :
             <div className="overflow-x-auto">
                 <table className="w-full border-collapse text-left">
                     <thead className="bg-brand-offwhite rounded-2xl">
@@ -61,9 +68,9 @@ const Table = ({openAddModal,openOrderDetails,openViewLeads}) => {
 
 
                     <tbody>
-                        {allOrdersData?.data.map((order) => (
+                        {filteredOrders.map((order) => (
                         <tr key={order._id} className="border-b border-brand-stroke">
-                            <td className="p-3 font-medium text-brand-subtext text-sm">{order._id}</td>
+                            <td className="p-3 font-medium text-brand-subtext text-sm">{order.customId}</td>
                             <td className="p-3 text-brand-muted font-light text-sm">{formatDate(order.createdAt)}</td>
                             <td className="p-3 text-brand-muted font-light text-sm">{order.orderType}</td>
                             <td className="p-3 text-brand-muted font-light text-sm">{order.quantity.toLocaleString()}</td>

@@ -1,5 +1,4 @@
 import * as Dialog from "@radix-ui/react-dialog";
-import TRON from '../../assets/TRON.svg'
 import Teams from '../../assets/Teams.svg'
 
 const STATUS_STEPS = [
@@ -11,7 +10,7 @@ const STATUS_STEPS = [
 
 
 
-const OrderDetailsModal = ({ open, onOpenChange, order }) => {
+const OrderDetailsModal = ({ open, onOpenChange, order,openViewLeads }) => {
 
     if (!order) {
     return null; // ⬅ prevents ALL errors until order loads
@@ -45,7 +44,7 @@ const OrderDetailsModal = ({ open, onOpenChange, order }) => {
           <button
             onClick={() => {
               onOpenChange(false);
-              order.goToLeads?.();
+              openViewLeads(order)
             }}
             className="w-full bg-brand-blue text-white py-3 rounded-xl font-semibold"
           >

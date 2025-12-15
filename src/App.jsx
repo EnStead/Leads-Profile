@@ -77,11 +77,9 @@ function App() {
                 <Route 
                   path="/*"
                   element={
-                    <AdminRoute>
-                      <DashboardProvider>
-                        <ProtectedRoutes />
-                      </DashboardProvider>
-                    </AdminRoute>
+                    <DashboardProvider>
+                      <ProtectedRoutes />
+                    </DashboardProvider>
                   }
                 />
               </Routes>

@@ -15,7 +15,7 @@ const Cards = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const openAddModal = () => {
     setIsModalOpen(true);
-  };
+  }; 
 
   
     if (dashboardLoading) {
@@ -111,13 +111,13 @@ const Cards = () => {
 
           </div>
 
-          <div className=''>
+          <div className='w-full'>
             <h2 className='text-brand-primary font-bold text-4xl font-park '>
               {activeOrders}
             </h2>
-            <div className='flex items-center gap-4 mt-4 text-sm' >
+            <div className='flex w-full justify-between items-center gap-4 mt-4 text-sm' >
               <p className='text-brand-brown font-light'>1 awaiting pricing</p>
-              <Link className='text-brand-blue font-medium flex items-center gap-3'  >View Orders <MoveRight size={18}/></Link>
+              <Link to={'/orders'} className='text-brand-blue font-medium flex items-center gap-3'  >View Orders <MoveRight size={18}/></Link>
             </div>
           </div>
 

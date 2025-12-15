@@ -1,17 +1,24 @@
-import { Navigate } from "react-router";
-import { useAuth } from "../context/AuthContext";
+import { Navigate, useLocation } from "react-router";
+import { useAdminAuth } from "../context/AdminContext";
 
 const AdminRoute = ({ children }) => {
-  const { user, authReady } = useAuth();
+  const { user, authReady } = useAdminAuth();
+  const location = useLocation();
 
-  if (!authReady) return null;
+  if (!authReady) return null; // Wait for context to load
 
-  // Not logged in → send to admin login
-  if (!user) return <Navigate to="/admin" />;
+  // Allow admin login page without auth
+  if (location.pathname === "/admin" || location.pathname === "/admin/") {
+    return children;
+  }
 
-  // If user is NOT admin → kick out
-  if (user.role !== "admin") return <Navigate to="/home" />;
+  // Block if not logged in
+  if (!user?.token) return <Navigate to="/admin" replace />;
 
+  // Block if logged in user is NOT an admin
+  if (user.user.role !== "admin") return <Navigate to="/admin" replace />;
+
+  // User is admin, allow access
   return children;
 };
 

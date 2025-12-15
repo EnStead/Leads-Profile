@@ -9,6 +9,7 @@ import { useState } from "react";
 import AdminRoute from "../utility/AdminRoute";
 import UserRoute from "../utility/UserRoute";
 
+
 const ProtectedRoutes = () => {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -86,7 +87,7 @@ const ProtectedRoutes = () => {
             element={
                 <UserRoute>
                     <Layout>
-                        <Transactions 
+                        <Transactions  
                             isModalOpen={isModalOpen} 
                             openAddModal={openAddModal} 
                             handlePaymentSubmit={handlePaymentSubmit} 
@@ -106,9 +107,9 @@ const ProtectedRoutes = () => {
         <Route
             path="/admin/*"
             element={
-            <AdminRoute>
-                <AdminComponent  />
-            </AdminRoute>
+                <AdminRoute>
+                    <AdminComponent  />
+                </AdminRoute>
             }
         />
     </Routes>

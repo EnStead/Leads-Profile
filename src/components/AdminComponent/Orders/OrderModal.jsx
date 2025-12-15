@@ -2,145 +2,115 @@ import React, { useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 
-const OrderModal = ({ open, onOpenChange, customer }) => {
-  const accountInfo = {
-    customerName: "Willow Garcia",
-    emailAddress: "carlos.mendez@gmail.com",
-    totalOrders: 10,
-    totalLeadsDelivered: 45670,
-    lastOrderDate: "Aug. 28, 2024"
+const OrderModal = ({ open, onOpenChange, order }) => {
+
+  if (!order) {
+    return null; // ⬅ prevents ALL errors until order loads
+  }
+
+  const formatDate = (dateString) => {
+      const options = {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      };
+      return new Date(dateString).toLocaleString(undefined, options);
   };
 
-  const orderHistory = [
-    {
-      id: "#LP-32892",
-      category: "Premium Banks",
-      quantity: 1500,
-      status: "In Progress",
-      date: "Aug. 28, 2024"
-    },
-    {
-      id: "#LP-32891",
-      category: "Mixed Banks",
-      quantity: 6500,
-      status: "Completed",
-      date: "Aug. 27, 2024"
-    },
-    {
-      id: "#LP-32893",
-      category: "Mixed Banks",
-      quantity: 3000,
-      status: "Completed",
-      date: "Aug. 12, 2024"
-    },
-    {
-      id: "#LP-32894",
-      category: "Mixed Banks",
-      quantity: 2000,
-      status: "Completed",
-      date: "Aug. 06, 2024"
-    },
-    {
-      id: "#LP-32895",
-      category: "Filter Banks",
-      quantity: 7500,
-      status: "Completed",
-      date: "Jul. 31, 2024"
-    },
-    {
-      id: "#LP-32896",
-      category: "Furniture",
-      quantity: 1200,
-      status: "Completed",
-      date: "Sept. 1, 2024"
-    },
-    {
-      id: "#LP-32897",
-      category: "Toys",
-      quantity: 4000,
-      status: "Completed",
-      date: "Sept. 5, 2024"
-    }
-  ];
+  const formatStatus = (status = "") => {
+  return status.replace(/_/g, " ");
+};
+
+
 
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50" />
 
-        <Dialog.Content className=" hide-scrollbar fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl w-[540px] max-h-[90vh] overflow-auto shadow-xl z-50 p-8">
+        <Dialog.Content 
+            className="  fixed left-1/2 top-1/2 z-50
+              w-[420px] xsm:w-[520px]
+              max-h-[90vh]
+              overflow-y-auto 
+              hide-scrollbar
+              -translate-x-1/2 -translate-y-1/2
+              bg-white rounded-2xl p-8 shadow-xl  
+            "    
+        >
           {/* Close Button */}
           <Dialog.Close className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 cursor-pointer">
             <X className="w-5 h-5" />
           </Dialog.Close>
 
           {/* Header */}
-          <Dialog.Title className="text-xl font-bold mb-1 text-brand-primary font-park" >
-            Account Information
+          <Dialog.Title className="text-xl font-bold text-center text-brand-primary font-park mb-4" >
+            Order Details
           </Dialog.Title>
-          <Dialog.Description>
-              
-          </Dialog.Description>
+            {/* Status */}
+            <Dialog.Description className="flex justify-center items-center text-sm mb-2">
+
+                <span
+                    className={`text-sm font-medium mr-1`}
+                >
+                  {
+                    order.status === "completed"
+                    ? "Paid"
+                    : order.status === "in progress" 
+                    ? "Paid"
+                    : order.status === "processing"
+                    ? "Paid"
+                    : "Paid"
+                  }
+                    
+                </span> {' '} || {' '}
+                <span
+                    className={`text-sm font-medium ml-1 capitalize ${
+                        order.status === "completed"
+                        ? "text-brand-green"
+                        : order.status === "in progress" || "in_progress"
+                        ? "text-brand-blue"
+                        : "text-brand-muted"
+                    }`}
+                >
+                {formatStatus(order.status)}
+                </span>
+
+            </Dialog.Description>
+
+            <div className="flex justify-between items-center my-4">
+                <p className="text-brand-primary font-park font-semibold">Order Summary</p>
+                <p className="text-brand-subtext">ID: <span className="font-medium" >{order._id}</span></p>
+            </div>
 
           {/* Account Details */}
-          <div className=" bg-brand-offwhite rounded-xl mb-6">
+          <div>
               <table className="w-full border-collapse text-sm ">        
                   <tbody>
                     <tr  className="border-b border-brand-stroke">
                         <td className="p-3  text-brand-muted">Customer Name</td>
-                        <td className="p-3 text-brand-primary font-semibold text-right">{accountInfo.customerName}</td>
+                        <td className="p-3 text-brand-primary font-semibold text-right">{order?.client.name}</td>
                     </tr>
                     <tr className="border-b border-brand-stroke">
-                        <td className="p-3 text-brand-muted">Email Address</td>
-                        <td className="p-3 text-brand-primary font-semibold text-right">{accountInfo.emailAddress}</td>
+                        <td className="p-3 text-brand-muted">Lead Quantity</td>
+                        <td className="p-3 text-brand-primary font-semibold text-right">{order.quantity.toLocaleString()}</td>
                     </tr>
                     <tr className="border-b border-brand-stroke">
-                        <td className="p-3 text-brand-muted">Total Orders</td>
-                        <td className="p-3 text-brand-primary font-semibold text-right">{accountInfo.totalOrders}</td>
+                        <td className="p-3 text-brand-muted">Bank Category</td>
+                        <td className="p-3 text-brand-primary font-semibold text-right">{order.orderType}</td>
                     </tr>
                     <tr  className="border-b border-brand-stroke">
-                        <td className="p-3 text-brand-muted">Total Leads Delivered</td>
-                        <td className="p-3 text-brand-primary font-semibold text-right">{accountInfo.totalLeadsDelivered.toLocaleString()}</td>
+                        <td className="p-3 text-brand-muted">Bank Names</td>
+                        <td className="p-3 text-brand-primary font-semibold text-right">{order.bank}</td>
                     </tr>
                     <tr  className="border-b border-brand-stroke">
-                        <td className="p-3 text-brand-muted">Last Order Date</td>
-                        <td className="p-3 text-brand-primary font-semibold text-right">{accountInfo.lastOrderDate}</td>
+                        <td className="p-3 text-brand-muted">Order Created</td>
+                        <td className="p-3 text-brand-primary font-semibold text-right">{formatDate(order.createdAt)}</td>
                     </tr>
                   </tbody>
               </table>    
           </div>
 
-          {/* Order History */}
-          <div>
-            <h3 className="text-lg text-brand-primary font-semibold font-park mb-4">Order History</h3>
-            
-            <div className="space-y-4">
-              {orderHistory.map((order) => (
-                <div key={order.id} className="pb-4 border-b border-brand-stroke last:border-b-0">
-                  <div className="flex justify-between items-start mb-1 ">
-                    <div>
-                      <h4 className="font-medium text-brand-subtext text-sm">
-                        Order {order.id}
-                      </h4>
-                      <p className="text-xs text-brand-subtext mt-1">
-                        Category: {order.category} || Quantity: {order.quantity.toLocaleString()}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <span className={`text-sm font-semibold ${
-                        order.status === "In Progress" 
-                          ? "text-brand-blue" 
-                          : "text-brand-green"
-                      }`}>
-                        {order.status}
-                      </span>
-                      <p className="text-xs font-light text-brand-muted mt-1">{order.date}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

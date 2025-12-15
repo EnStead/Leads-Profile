@@ -5,6 +5,7 @@ import SuccessModal from '../../utility/SuccessModal';
 import OrderDetailsModal from './OrderDetailsModal';
 import { useNavigate } from 'react-router';
 import { useDashboard } from '../../context/DashboardContext';
+import { useState } from 'react';
 
 const Transactions = ({
     handlePaymentSubmit,openAddModal,
@@ -17,10 +18,12 @@ const Transactions = ({
     const openViewLeads = (order) => {
       navigate(`/orders/${order._id}`);
     };
+    
+    const [searchTerm, setSearchTerm] = useState("");    
 
   return (
-    <section className='bg-brand-sky min-h-[screen] p-10'>
-        <div className='flex justify-between items-center' >
+    <section className='bg-brand-sky min-h-[screen] p-5 xsm:p-10'>
+        <div className='xsm:flex justify-between items-center' >
             <div>
                 <h2 className='text-brand-primary font-park font-bold text-xl mb-2' >
                     Order Transactions
@@ -36,6 +39,8 @@ const Transactions = ({
                     <input
                         type="text"
                         placeholder="Search by ID or leads..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
                         className="w-full px-4 py-2 pr-12 border bg-brand-white border-t-0 border-x-0 rounded-xl  focus:outline-none focus:ring-2 focus:ring-brand-gray"
                     />
                 </div>
@@ -48,25 +53,26 @@ const Transactions = ({
         </div>
 
         <div className='pt-10'>
-            <Table  openAddModal={openAddModal} openOrderDetails={openOrderDetails} openViewLeads={openViewLeads}  />
+            <Table  openAddModal={openAddModal} openOrderDetails={openOrderDetails} openViewLeads={openViewLeads} searchTerm={searchTerm}  />
         </div>
 
 
-        <OrderModal
+        {/* <OrderModal
           open={isModalOpen} onOpenChange={setIsModalOpen}
           handlePaymentSubmit={handlePaymentSubmit}
-        />
+        /> */}
 
         {/* STEP 2 — Success Modal */}
-        <SuccessModal
+        {/* <SuccessModal
             open={openSuccessModal}
             onOpenChange={setOpenSuccessModal}
-        />
+        /> */}
 
         <OrderDetailsModal
             open={openOrderModal}
             onOpenChange={setOpenOrderModal}
             order={selectedOrder}
+            openViewLeads={openViewLeads}
         />
 
         

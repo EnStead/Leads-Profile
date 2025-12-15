@@ -8,9 +8,9 @@ import TableSkeleton from '../../utility/skeletons/TableSkeleton';
 
 
 
-
+ 
 const getStatusColor = (status) => {
-    switch (status) {
+    switch (status) { 
     case "completed":
     return "bg-brand-green/10 text-brand-green capitalize" ;
     case "in progress":
@@ -56,13 +56,13 @@ const Table = ({openOrderDetails,openViewLeads}) => {
 return (
     <section className='bg-brand-white border border-brand-offwhite rounded-2xl p-4 w-full h-full'>
         <div className='flex justify-between mb-4' >
-            <div className='flex gap-4 w-fit items-center'>
-                <img src={Recent} alt="image" className='w-8' />
-                <h3 className='font-park text-brand-primary font-semibold w-fit '>
+            <div className='flex gap-2 lg:gap-4 w-fit items-center'>
+                <img src={Recent} alt="image" className='w-6 lg:w-8' />
+                <h3 className='font-park text-sm lg:text-base text-brand-primary font-semibold w-fit '>
                     Recent Orders
                 </h3>
             </div>
-            <Link className=' w-fit text-brand-blue font-medium flex items-center gap-3'> View All History <MoveRight/> </Link>
+            <Link to={'/transactions'} className='  w-fit text-brand-blue font-medium text-xs lg:text-base flex items-center gap-3'> View All History <span className='hidden lg:block'><MoveRight/></span> </Link>
         </div>
 
         <div className="overflow-x-auto">
@@ -91,7 +91,7 @@ return (
                     <tbody>
                         {recentOrders.map((order) => (
                         <tr key={order._id} className="border-b border-brand-stroke">
-                            <td className="p-3 font-medium text-brand-subtext text-sm">{order.id}</td>
+                            <td className="p-3 font-medium text-brand-subtext text-sm">{order.customId}</td>
                             <td className="p-3 text-brand-muted font-light text-sm">{order.orderType}</td>
                             <td className="p-3 text-brand-muted font-light text-sm">{order.quantity.toLocaleString()}</td>
                             <td className="p-3 text-sm">

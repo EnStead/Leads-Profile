@@ -38,10 +38,6 @@ const OrderDetails = () => {
     enabled: !!orderId
   });
 
-  // Automatically refetch when orderId changes
-  useEffect(() => {
-    if (orderId) refetchOrderDetails();
-  }, [orderId]);
 
   // --- Refresh button handler ---
   const refreshData = () => {
@@ -51,7 +47,59 @@ const OrderDetails = () => {
   // --- Last updated time ---
   const lastUpdated = OrderDetailsData?.[0]?.updatedAt
     ? new Date(OrderDetailsData[0].updatedAt).toLocaleString()
-    : "N/A";
+  : "N/A";
+
+  const [downloadingDay, setDownloadingDay] = useState(null); // stores the dayKey being downloaded    
+    
+  const downloadCSV = async (dayKey) => {
+    try {
+      setDownloadingDay(dayKey);
+
+      // Determine total leads from pagination
+      const totalLeads = OrderDetailsData?.pagination?.total || 1000; // fallback if unknown
+
+      const res = await api.get(
+        `/leads/order/${orderId}?page=1&limit=${totalLeads}`,
+        {
+          headers: {
+            Authorization: `Bearer ${user?.token}`,
+          },
+        }
+      );
+
+      const leads = res.data.data;
+
+      if (!leads.length) {
+        alert("No leads available for this day");
+        setDownloadingDay(null);
+        return;
+      }
+
+      const headers = Object.keys(leads[0]);
+      const csvRows = [
+        headers.join(","),
+        ...leads.map((lead) =>
+          headers.map((field) => `"${lead[field] ?? ""}"`).join(",")
+        ),
+      ];
+
+      const csvContent = csvRows.join("\n");
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `orders-${orderId}.csv`;
+      link.click();
+      URL.revokeObjectURL(url);
+
+    } catch (err) {
+      console.error("CSV download failed", err);
+      alert("Failed to download CSV. Make sure you are logged in.");
+    } finally {
+      setDownloadingDay(null);
+    }
+  };
+
 
   // --- Progress bar calculation ---
   const totalLeads = OrderDetailsData?.quantity;
@@ -65,7 +113,7 @@ const OrderDetails = () => {
   }
 
   return (
-    <section className="p-10">
+    <section className=" p-5 xsm:p-10">
       {/* BACK BUTTON */}
       <button
         onClick={() => navigate(-1)}
@@ -76,7 +124,7 @@ const OrderDetails = () => {
       </button>
 
       {/* HEADER */}
-      <div className="flex justify-between items-start mb-6">
+      <div className=" lg:flex justify-between items-start mb-6">
         <div>
           <h1 className="text-2xl font-bold font-park text-brand-primary">
             Leads for Order: {orderId}
@@ -93,7 +141,7 @@ const OrderDetails = () => {
         </div>
 
         {/* PROGRESS BAR + DOWNLOAD CSV */}
-        <div className="flex gap-4 items-center">
+        <div className="flex gap-4 items-center lg:mt-0 mt-4">
           <div className="mt-2 w-40">
             <p className="font-medium text-brand-subtext">
               {filledLeads} / {totalLeads}
@@ -106,8 +154,14 @@ const OrderDetails = () => {
             </div>
           </div>
 
-          <button className="flex w-48 items-center justify-center gap-2 bg-brand-black text-brand-white px-4 py-2 rounded-xl text-sm font-semibold">
-            <Download size={16} /> Download CSV
+          <button 
+            onClick={() => downloadCSV(orderId)}
+            disabled={downloadingDay === orderId}
+            className={`flex w-48 items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold ${
+              downloadingDay === orderId ? "bg-gray-400 cursor-not-allowed" : "bg-brand-black text-white"
+            }`}
+          >
+            <Download size={16} />  {downloadingDay === orderId ? "Downloading..." : "Download CSV"}
           </button>
         </div>
       </div>

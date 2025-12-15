@@ -1,108 +1,113 @@
 import { Ellipsis, Dot, } from 'lucide-react'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+import { useDashboard } from '../../../context/DashboardContext';
+import TableSkeleton from '../../../utility/skeletons/TableSkeleton';
+import Pagination from '../../../utility/Pagination';
+import EmptyState from '../../../utility/EmptyState';
 
-
-const dummyOrders = [
-    { 
-    id: "#LP-1042",
-    request: "Chase, nationwide",
-    quantity: 1200,
-    status: "Completed",
-    amount: 300,
-    date: "11m ago",
-                //     id: "#LP-1045",
-            //     status: "Completed",
-            //     price: "300",
-            //     gateway: "Tron Network",
-            //     quantity: 500,
-            //     category: "Mixed Banks",
-            //     bankNames: "-",
-            //     createdAt: "22 Nov, 2025",
-            //     openPaymentModal: openAddModal,
-    },
-    {
-    id: "#LP-1043",
-    request: "Chase, nationwide",
-    quantity: 450,
-    status: "In Progress",
-    amount: 300,
-    date: "11m ago",
-    },
-    {
-    id: "#LP-1044",
-    request: "Chase, nationwide",
-    quantity: 980,
-    status: "Completed",
-    amount: 300,
-    date: "11m ago",
-    },
-    {
-    id: "#LP-1045",
-    date: "11m ago",
-    request: "Chase, nationwide",
-    quantity: 300,
-    amount: 300,
-    status: "Completed",
-},
-];
 
 
 const getStatusColor = (status) => {
     switch (status) {
-    case "Completed":
+    case "completed":
     return "bg-brand-green/10 text-brand-green";
-    case "In Progress":
+    case "in progress":
+    return "bg-brand-blue/10 text-brand-blue";
+    case "in_progress":
     return "bg-brand-blue/10 text-brand-blue";
     default:
     return "bg-gray-100 text-gray-600";
     }
 };
 
+const formatStatus = (status = "") => {
+  return status.replace(/_/g, " ");
+};
 
-const Table = ({openOrderDetails}) => {
+
+const Table = ({openOrderDetails,searchTerm}) => {
+
+    const {adminOrderData,adminOrderLoading,adminOrderError,page,setPage } = useDashboard();
+
+
+    const filteredOrders = adminOrderData?.data.filter((order) => {
+        const term = searchTerm.toLowerCase();
+
+        return (
+            order.client?.name?.toLowerCase().includes(term) ||
+            order._id?.toLowerCase().includes(term)
+        );
+    });
+
+    const formatDate = (dateString) => {
+        const options = {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        };
+        return new Date(dateString).toLocaleString(undefined, options);
+    };
+
+    if (adminOrderLoading) {
+        return <TableSkeleton rows={5} columns={7} />; 
+    }
+
+    if (adminOrderError) {
+        return <p className="text-brand-red">Failed to load recent orders</p>;
+    }
   return (
     <section className='w-full h-full'>
-        <div className="overflow-x-auto">
-            <table className="w-full border-collapse text-left">
-                <thead className="bg-brand-white rounded-2xl">
-                    <tr>
-                        <th className="p-3 font-medium text-sm text-brand-muted rounded-l-lg">Order ID</th>
-                        <th className="p-3 font-medium text-sm text-brand-muted rounded-l-lg">Date</th>
-                        <th className="p-3 font-medium text-sm text-brand-muted">Leads Request</th>
-                        <th className="p-3 font-medium text-sm text-brand-muted">Qty</th>
-                        <th className="p-3 font-medium text-sm text-brand-muted">Status</th>
-                        <th className="p-3 font-medium text-sm text-brand-muted text-right rounded-r-lg"></th>
-                    </tr>
-                </thead>
+        {
+            !filteredOrders.length  ? <EmptyState /> :
+            <div className="overflow-x-auto">
+                <table className="w-full border-collapse text-left">
+                    <thead className="bg-brand-white rounded-2xl">
+                        <tr>
+                            <th className="p-3 font-medium text-sm text-brand-muted rounded-l-lg">Order ID</th>
+                            <th className="p-3 font-medium text-sm text-brand-muted">Date</th>
+                            <th className="p-3 font-medium text-sm text-brand-muted">Customer Name</th>
+                            <th className="p-3 font-medium text-sm text-brand-muted">Leads Category</th>
+                            <th className="p-3 font-medium text-sm text-brand-muted">Qty</th>
+                            <th className="p-3 font-medium text-sm text-brand-muted">Status</th>
+                            <th className="p-3 font-medium text-sm text-brand-muted text-right rounded-r-lg"></th>
+                        </tr>
+                    </thead>
 
+                    <tbody>
+                        {filteredOrders.map((order) => (
+                        <tr key={order._id} className="border-b border-brand-stroke">
+                            <td className="p-3 font-medium text-brand-subtext text-sm">{order._id}</td>
+                            <td className="p-3 text-brand-muted font-light text-sm">{formatDate(order.createdAt)}</td>
+                            <td className="p-3 text-brand-muted font-light text-sm">{order.client?.name}</td>
+                            <td className="p-3 text-brand-muted font-light text-sm">{formatStatus(order.orderType)}</td>
+                            <td className="p-3 text-brand-muted font-light text-sm">{order.quantity.toLocaleString()}</td>
+                            <td className="p-3 text-sm">
+                                <span
+                                    className={`flex items-center w-fit px-3 py-1 rounded-full text-xs font-semibold capitalize ${getStatusColor(
+                                    order.status
+                                )}`}
+                                >
+                                    <Dot/>
+                                    {formatStatus(order.status)}
+                                </span>
+                            </td>
+                            <td className="p-3 text-right relative">
+                                <button onClick={() => openOrderDetails(order)} className='text-brand-blue font-semibold'>
+                                    View details 
+                                </button> 
+                            </td>
+                        </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        }
 
-                <tbody>
-                    {dummyOrders.map((order) => (
-                    <tr key={order.id} className="border-b border-brand-stroke">
-                        <td className="p-3 font-medium text-brand-subtext text-sm">{order.id}</td>
-                        <td className="p-3 text-brand-muted font-light text-sm">{order.date}</td>
-                        <td className="p-3 text-brand-muted font-light text-sm">{order.request}</td>
-                        <td className="p-3 text-brand-muted font-light text-sm">{order.quantity}</td>
-                        <td className="p-3 text-sm">
-                            <span
-                                className={`flex items-center w-fit px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(
-                                order.status
-                            )}`}
-                            >
-                                <Dot/>
-                                {order.status}
-                            </span>
-                        </td>
-                        <td className="p-3 text-right relative">
-                            <button onClick={openOrderDetails} className='text-brand-blue font-semibold'>
-                                View details 
-                            </button> 
-                        </td>
-                    </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
+      <Pagination
+        page={page}
+        totalPages={adminOrderData?.pagination.pages}
+        onPageChange={setPage}
+      />
     </section>
   )
 }
