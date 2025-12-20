@@ -3,6 +3,7 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import TableSkeleton from '../../utility/skeletons/TableSkeleton';
 import { useDashboard } from '../../context/DashboardContext';
 import Pagination from '../../utility/Pagination';
+import EmptyState from '../../utility/EmptyState';
 
 
 const getStatusColor = (status) => {
