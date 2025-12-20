@@ -2,7 +2,7 @@ import { Link } from "react-router";
 import { useDashboard } from "../../../context/DashboardContext";
 import Pagination from "../../../utility/Pagination";
 import CardSkeleton from "../../../utility/skeletons/CardSkeleton";
-import api from "../../../utility/Axios";
+import api from "../../../utility/axios";
 import { useAdminAuth } from "../../../context/AdminContext";
 import { useState } from "react";
 import EmptyState from "../../../utility/EmptyState";

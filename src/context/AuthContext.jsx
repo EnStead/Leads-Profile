@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import api from "../utility/Axios";
+import api from "../utility/axios";
 
 const AuthContext = createContext();
 
@@ -34,6 +34,7 @@ export const AuthProvider = ({ children }) => {
       setError(null);
 
       const response = await api.post("/auth/sign-up", signupData);
+
 
       const extractedUser = {
         user: response.data.data.user,

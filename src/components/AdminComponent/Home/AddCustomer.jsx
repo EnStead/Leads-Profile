@@ -1,6 +1,6 @@
 import { Dialog } from 'radix-ui'
 import { useState } from 'react';
-import api from '../../../utility/Axios';
+import api from '../../../utility/axios';
 import { useAdminAuth } from '../../../context/AdminContext';
 import ToastPop from '../../../utility/ToastPop';
 import { useDashboard } from '../../../context/DashboardContext';

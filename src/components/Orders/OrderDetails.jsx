@@ -2,7 +2,7 @@ import { useNavigate, useParams } from "react-router";
 import { useEffect, useState } from "react";
 import { ArrowLeft, RotateCw, Download } from "lucide-react";
 import { useDashboard } from "../../context/DashboardContext";
-import api from "../../utility/Axios";
+import api from "../../utility/axios";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../../context/AuthContext";
 import Pagination from "../../utility/Pagination";

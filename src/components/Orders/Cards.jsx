@@ -8,7 +8,7 @@ import EmptyState from '../../utility/EmptyState';
 import Pagination from '../../utility/Pagination';
 import { useAuth } from '../../context/AuthContext';
 import { useState } from 'react';
-import api from '../../utility/Axios';
+import api from '../../utility/axios';
 
 
 

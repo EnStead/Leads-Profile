@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { ArrowLeft, RotateCw , Download } from "lucide-react";
 import { useAdminAuth } from "../../../context/AdminContext";
 import { useQuery } from "@tanstack/react-query";
-import api from "../../../utility/Axios";
+import api from "../../../utility/axios";
 import Pagination from "../../../utility/Pagination";
 
 const LeadsDetails = () => {
@@ -98,6 +98,33 @@ const LeadsDetails = () => {
       setDownloadingDay(null);
     }
   };
+
+  // ---- FORMATTERS ----
+
+// 1. Number with commas (e.g. 1400000 → 1,400,000)
+const formatNumber = (value) => {
+  if (!value && value !== 0) return "-";
+  return Number(value).toLocaleString();
+};
+
+// 2. Date formatter (1962-01-16T23:00:00.000Z → Jan 16, 1962)
+const formatDate = (date) => {
+  if (!date) return "-";
+  return new Date(date).toLocaleDateString("en-US", {
+    month: "short",
+    day: "2-digit",
+    year: "numeric",
+  });
+};
+
+// 3. Source formatter (job_income → Job Income)
+const formatSource = (value) => {
+  if (!value) return "-";
+  return value
+    .replace(/_/g, " ")
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+};
+
 
 
   if (leadsDetailsError) {
@@ -210,10 +237,10 @@ const LeadsDetails = () => {
                             <td className="p-3 font-light text-brand-subtext text-sm">{lead.state}</td>
                             <td className="p-3 font-light text-brand-subtext text-sm">{lead.zipCode}</td>
                             <td className="p-3 font-light text-brand-subtext text-sm">{lead.bankName}</td>
-                            <td className="p-3 font-light text-brand-subtext text-sm">{lead.incomeSource}</td>
-                            <td className="p-3 font-light text-brand-subtext text-sm">{lead.monthlyNetIncome}</td>
+                            <td className="p-3 font-light text-brand-subtext text-sm">{formatSource(lead.incomeSource)}</td>
+                            <td className="p-3 font-light text-brand-subtext text-sm">{formatNumber(lead.monthlyNetIncome)}</td>
                             <td className="p-3 font-light text-brand-subtext text-sm">{lead.rentOrOwn}</td>
-                            <td className="p-3 font-light text-brand-subtext text-sm">{lead.birthday}</td>
+                            <td className="p-3 font-light text-brand-subtext text-sm">{formatDate(lead.birthday)}</td>
                         </tr>
                     ))
                     )}

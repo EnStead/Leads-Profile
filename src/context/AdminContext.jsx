@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import api from "../utility/Axios";
+import api from "../utility/axios";
 
 const AdminContext = createContext();
 

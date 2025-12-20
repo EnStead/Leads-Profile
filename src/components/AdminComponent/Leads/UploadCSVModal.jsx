@@ -3,7 +3,7 @@ import { useState } from "react";
 import Papa from "papaparse";
 import * as XLSX from "xlsx";
 import { Upload } from "lucide-react";
-import api from "../../../utility/Axios";
+import api from "../../../utility/axios";
 import { useAdminAuth } from "../../../context/AdminContext";
 import { useDashboard } from "../../../context/DashboardContext";
 import ToastPop from "../../../utility/ToastPop";

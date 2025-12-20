@@ -4,7 +4,7 @@ import * as Select from "@radix-ui/react-select";
 import * as RadioGroup from "@radix-ui/react-radio-group";
 import { ChevronDown, X } from "lucide-react";
 import { useDashboard } from "../../../context/DashboardContext";
-import api from "../../../utility/Axios";
+import api from "../../../utility/axios";
 import { useAdminAuth } from "../../../context/AdminContext";
 import ToastPop from "../../../utility/ToastPop";
 

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Image from '../../assets/ForgotBg.jpg'
 import Logo from '../../assets/Logo.svg'
 import { Link, useNavigate } from 'react-router';
-import api from "../../utility/Axios";
+import api from '../../utility/axios';
 
 const ForgotPassword = () => {
 

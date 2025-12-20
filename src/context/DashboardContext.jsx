@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from "react";
-import api from "../utility/Axios";
+import api from "../utility/axios";
 import { useAuth } from "./AuthContext";
 import { useAdminAuth } from "./AdminContext";
 import { useQuery } from "@tanstack/react-query";
