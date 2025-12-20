@@ -15,7 +15,7 @@ import api from '../../utility/Axios';
 const Cards = ({searchTerm}) => { 
 
     const { allOrdersData, allOrdersLoading, allOrdersError,page,setPage  } = useDashboard();
-
+    // console.log(allOrdersData)
     const filteredLeads = allOrdersData?.data.filter((order) => {
         const term = searchTerm.toLowerCase();
 

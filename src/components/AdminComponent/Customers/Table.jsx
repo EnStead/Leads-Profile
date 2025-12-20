@@ -80,7 +80,7 @@ const Table = ({openDetailsModal, onOpenChange, searchTerm }) => {
                                           View Details
                                       </DropdownMenu.Item>
 
-                                      <DropdownMenu.Item  onClick={onOpenChange}     
+                                      <DropdownMenu.Item  onClick={()=> onOpenChange(order._id)}     
                                           className="px-3 py-2 text-sm text-brand-red hover:bg-brand-red/10 cursor-pointer"
                                       >
                                           Delete Customer

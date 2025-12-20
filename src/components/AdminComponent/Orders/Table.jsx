@@ -28,7 +28,7 @@ const formatStatus = (status = "") => {
 const Table = ({openOrderDetails,searchTerm}) => {
 
     const {adminOrderData,adminOrderLoading,adminOrderError,page,setPage } = useDashboard();
-
+    console.log(adminOrderData);
 
     const filteredOrders = adminOrderData?.data.filter((order) => {
         const term = searchTerm.toLowerCase();
@@ -76,7 +76,7 @@ const Table = ({openOrderDetails,searchTerm}) => {
                     <tbody>
                         {filteredOrders.map((order) => (
                         <tr key={order._id} className="border-b border-brand-stroke">
-                            <td className="p-3 font-medium text-brand-subtext text-sm">{order._id}</td>
+                            <td className="p-3 font-medium text-brand-subtext text-sm">{order.customId}</td>
                             <td className="p-3 text-brand-muted font-light text-sm">{formatDate(order.createdAt)}</td>
                             <td className="p-3 text-brand-muted font-light text-sm">{order.client?.name}</td>
                             <td className="p-3 text-brand-muted font-light text-sm">{formatStatus(order.orderType)}</td>

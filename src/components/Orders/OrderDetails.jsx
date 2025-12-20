@@ -113,7 +113,7 @@ const OrderDetails = () => {
   }
 
   return (
-    <section className=" p-5 xsm:p-10">
+    <section >
       {/* BACK BUTTON */}
       <button
         onClick={() => navigate(-1)}

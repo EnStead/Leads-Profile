@@ -41,15 +41,15 @@ const ProtectedRoutes = () => {
             element={
                 <UserRoute>
                     <Layout>
-                    <Home                     
-                        isModalOpen={isModalOpen} 
-                        openAddModal={openAddModal} 
-                        setIsModalOpen={setIsModalOpen}
-                        openOrderDetails={openOrderDetails}
-                        selectedOrder={selectedOrder}
-                        setOpenOrderModal={setOpenOrderModal}
-                        openOrderModal={openOrderModal}
-                    />
+                        <Home                     
+                            isModalOpen={isModalOpen} 
+                            openAddModal={openAddModal} 
+                            setIsModalOpen={setIsModalOpen}
+                            openOrderDetails={openOrderDetails}
+                            selectedOrder={selectedOrder}
+                            setOpenOrderModal={setOpenOrderModal}
+                            openOrderModal={openOrderModal}
+                        />
                     </Layout>
                 </UserRoute>
             }

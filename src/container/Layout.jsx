@@ -11,10 +11,12 @@ const Layout = ({isScrolled, children, openAddModal,
         openAddModal={openAddModal} 
         setIsModalOpen={setIsModalOpen}
       />
-        <main>{children}</main>
+      <div className='cnt'>
+        <main className='p-5 xsm:p-10' >{children}</main>
+      </div>
 
     </>
   )
 }
 
-export default Layout
+export default Layout 

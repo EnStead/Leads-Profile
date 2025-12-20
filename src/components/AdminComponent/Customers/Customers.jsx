@@ -8,17 +8,15 @@ const Customers = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [searchTerm, setSearchTerm] = useState("");
-    const [open, setOpen] = useState(false);
+    const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+   const [selectedCustomerId, setSelectedCustomerId] = useState(null); // <-- new
     const openDetailsModal = (order) => {
         setIsModalOpen(true);
         setSelectedOrder(order);
     };
-    const openDeleteModal = () => {
-        setOpen(true);
-    };
-    const handleConfirmDelete = () => {
-        console.log("Customer deleted!");
-        // Add your delete logic here
+    const openDeleteModal = (customerId) => {
+        setSelectedCustomerId(customerId); // <-- store the ID
+        setIsDeleteOpen(true);
     };
 
   return (
@@ -59,9 +57,9 @@ const Customers = () => {
         />
 
         <DeleteModal
-            open={open} 
-            onOpenChange={setOpen}
-            onConfirmDelete={handleConfirmDelete}
+            open={isDeleteOpen} 
+            onOpenChange={setIsDeleteOpen}
+            userId={selectedCustomerId} 
         />
 
     </section>

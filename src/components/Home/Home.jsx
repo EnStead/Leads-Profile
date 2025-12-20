@@ -15,7 +15,7 @@ const Home = ({openOrderDetails,openOrderModal,selectedOrder,setOpenOrderModal})
     };
 
   return (
-    <section className='bg-brand-sky min-h-[89.3vh] p-5 xsm:p-10' >
+    <section className='bg-brand-sky min-h-[89.3vh]' >
       {/* TOP CARDS */}
       <Cards/>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4 lg:grid-rows-2">

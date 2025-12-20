@@ -101,7 +101,7 @@ const OrderModal = ({ open, onOpenChange, order }) => {
                     </tr>
                     <tr  className="border-b border-brand-stroke">
                         <td className="p-3 text-brand-muted">Bank Names</td>
-                        <td className="p-3 text-brand-primary font-semibold text-right">{order.bank}</td>
+                        <td className="p-3 text-brand-primary font-semibold text-right">{order.banks}</td>
                     </tr>
                     <tr  className="border-b border-brand-stroke">
                         <td className="p-3 text-brand-muted">Order Created</td>

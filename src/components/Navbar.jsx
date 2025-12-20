@@ -63,8 +63,8 @@ const Navbar = ({
             ? "fixed top-0 shadow h-22 left-0 right-0"
             : "relative bg-brand-white h-21"
         }`}
-      >
-        <div className="flex justify-between items-center py-4">
+      > 
+        <div className="cnt_nav flex justify-between items-center">
           {/* Logo */}
           <div className="text-3xl ml-4 xsm:ml-0 text-brand-blue font-normal tracking-wide font-logo">
             <Link to="/home">Leads Profile</Link>
@@ -79,7 +79,7 @@ const Navbar = ({
                   className={({ isActive }) =>
                     `relative inline-block transition ${
                       isActive
-                        ? "text-brand-darkblue py-1 px-4 font-medium after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:h-1 after:top-14 after:bg-brand-darkblue"
+                        ? "text-brand-darkblue py-1 px-4 font-medium after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:h-1 after:top-11 after:bg-brand-darkblue"
                         : "text-brand-subtext p-0 font-light"
                     }`
                   }

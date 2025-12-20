@@ -98,3 +98,15 @@
 .hide-scrollbar::-webkit-scrollbar {
   display: none; /* Chrome, Safari */
 }
+
+
+@media (min-width:1920px) {
+  .cnt{
+    max-width: 1440px !important;
+    margin: auto !important;
+  }
+  .cnt_nav{
+    max-width: 1370px !important;
+    margin: auto !important;
+  }
+}

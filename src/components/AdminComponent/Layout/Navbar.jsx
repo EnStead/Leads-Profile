@@ -58,7 +58,7 @@ const Navbar = ({ isScrolled, openAddModal, onOpenChange, isModalOpen, setIsModa
             : "relative bg-brand-white h-21"
         }`}
       >
-        <div className="flex justify-between items-center py-4">
+        <div className=" cnt_nav flex justify-between items-center py-4">
           {/* Logo */}
           <div className="text-3xl ml-4 xsm:ml-0 text-brand-primary font-normal tracking-wide font-logo">
             <Link to="/admin/dashboard">Leads Profile</Link>

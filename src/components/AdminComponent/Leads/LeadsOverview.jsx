@@ -5,6 +5,7 @@ import CardSkeleton from "../../../utility/skeletons/CardSkeleton";
 import api from "../../../utility/Axios";
 import { useAdminAuth } from "../../../context/AdminContext";
 import { useState } from "react";
+import EmptyState from "../../../utility/EmptyState";
 
 
 
@@ -196,16 +197,16 @@ const LeadsOverview = ({searchTerm}) => {
 
                         {/* Row 3 */}
                         <div className="grid grid-cols-2 gap-6">
-                            <div className="bg-brand-offwhite rounded-lg p-2">
+                            {/* <div className="bg-brand-offwhite rounded-lg p-2">
                             <p className="text-xs text-brand-muted mb-1">Lead Conversion Rate (%)</p>
                             <p className="font-bold font-park text-brand-primary">
-                                {/* {overviewStats.leadConversionRate} */}
+                                {overviewStats.leadConversionRate}
                             </p>
-                            </div>
+                            </div> */}
                             <div className="bg-brand-offwhite rounded-lg">
                             <p className="text-xs text-brand-muted mb-1">Total Customer</p>
                             <p className="font-bold font-park text-brand-primary">
-                                {/* {overviewStats.totalCustomers.toLocaleString()} */}
+                                {allLeadsData.overview.totalClients.toLocaleString()}
                             </p>
                             </div>
                         </div>

@@ -22,7 +22,7 @@ const Transactions = ({
     const [searchTerm, setSearchTerm] = useState("");    
 
   return (
-    <section className='bg-brand-sky min-h-[screen] p-5 xsm:p-10'>
+    <section className='bg-brand-sky min-h-[screen]'>
         <div className='xsm:flex justify-between items-center' >
             <div>
                 <h2 className='text-brand-primary font-park font-bold text-xl mb-2' >
