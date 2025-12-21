@@ -63,12 +63,12 @@ const Cards = () => {
                 {todaysLeads}
               </h2>
               <p className='text-brand-purple flex items-center w-fit font-medium text-xs rounded-xl pr-2 h-6 my-auto bg-brand-purple/10'>
-                <Dot/> Live
+                {/* <Dot/> Live */}
               </p>
             </div>
             <div className='flex items-center gap-3 mt-4'>
               <img src={Head} alt="Image" />
-              <span className='text-brand-green font-sm font-medium'>+30% <span className='text-brand-muted font-light'>vs yesterday</span></span>
+              <span className='text-brand-green font-sm font-medium'>0% <span className='text-brand-muted font-light'>vs yesterday</span></span>
             </div>
           </div>
 
@@ -116,7 +116,7 @@ const Cards = () => {
               {activeOrders}
             </h2>
             <div className='flex w-full justify-between items-center gap-4 mt-4 text-sm' >
-              <p className='text-brand-brown font-light'>1 awaiting pricing</p>
+              <p className='text-brand-brown font-light'>awaiting pricing</p>
               <Link to={'/orders'} className='text-brand-blue font-medium flex items-center gap-3'  >View Orders <MoveRight size={18}/></Link>
             </div>
           </div>

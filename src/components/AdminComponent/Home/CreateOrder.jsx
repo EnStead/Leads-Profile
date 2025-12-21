@@ -4,7 +4,7 @@ import * as Select from "@radix-ui/react-select";
 import * as RadioGroup from "@radix-ui/react-radio-group";
 import { ChevronDown, X } from "lucide-react";
 import { useDashboard } from "../../../context/DashboardContext";
-import api from "../../../utility/axios";
+import api from "../../../utility/Axios";
 import { useAdminAuth } from "../../../context/AdminContext";
 import ToastPop from "../../../utility/ToastPop";
 
@@ -68,7 +68,7 @@ const CreateOrder = ({ open, onOpenChange }) => {
 
   const resetForm = () => {
     setForm({
-      customerName: "",
+      customerName: undefined,
       leadQuantity: "",
       bankPreference: "mixed",
     });
@@ -203,7 +203,7 @@ const handleSubmit = async () => {
                         onValueChange={(value) => setForm({ ...form, customerName: value })}
                       >
                         <Select.Trigger className="w-full text-sm flex items-center justify-between px-4 py-3 border border-b-brand-gray bg-brand-white border-t-0 border-x-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-gray">
-                          <Select.Value placeholder="Who needs this order?" />
+                          <Select.Value className="block flex-1 min-w-0 truncate" placeholder="Who needs this order?" />
                           <Select.Icon>
                             <ChevronDown className="w-4 h-4" />
                           </Select.Icon>

@@ -9,14 +9,18 @@ import EmptyState from '../../utility/EmptyState';
 const getStatusColor = (status) => {
     switch (status) {
     case "completed":
-    return "bg-brand-green/10 text-brand-green capitalize" ;
+    return "bg-brand-green/10 text-brand-green";
     case "in progress":
-    return "bg-brand-blue/10 text-brand-blue capitalize";
-    case "pending":
-    return "bg-brand-brown/10 text-brand-brown capitalize";
+    return "bg-brand-blue/10 text-brand-blue";
+    case "in_progress":
+    return "bg-brand-blue/10 text-brand-blue";
     default:
     return "bg-gray-100 text-gray-600";
     }
+};
+
+const formatStatus = (status = "") => {
+  return status.replace(/_/g, " ");
 };
 
 
@@ -82,7 +86,7 @@ const Table = ({openAddModal,openOrderDetails,openViewLeads, searchTerm}) => {
                                 )}`}
                                 >
                                     <Dot/>
-                                    {order.status}
+                                    {formatStatus(order.status)}
                                 </span>
                             </td>
                             <td className="p-3 text-right relative">

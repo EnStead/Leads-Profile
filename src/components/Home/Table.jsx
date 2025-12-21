@@ -10,16 +10,20 @@ import TableSkeleton from '../../utility/skeletons/TableSkeleton';
 
  
 const getStatusColor = (status) => {
-    switch (status) { 
+    switch (status) {
     case "completed":
-    return "bg-brand-green/10 text-brand-green capitalize" ;
+    return "bg-brand-green/10 text-brand-green";
     case "in progress":
-    return "bg-brand-blue/10 text-brand-blue capitalize";
-    case "pending":
-    return "bg-brand-brown/10 text-brand-brown capitalize";
+    return "bg-brand-blue/10 text-brand-blue";
+    case "in_progress":
+    return "bg-brand-blue/10 text-brand-blue";
     default:
     return "bg-gray-100 text-gray-600";
     }
+};
+
+const formatStatus = (status = "") => {
+  return status.replace(/_/g, " ");
 };
 
 
@@ -101,7 +105,7 @@ return (
                                 )}`}
                                 >
                                     <Dot/>
-                                    {order.status}
+                                    {formatStatus(order.status)}
                                 </span>
                             </td>
                             <td className="p-3 text-brand-muted font-light text-sm">{timeAgo(order.updatedAt)}</td>
