@@ -168,7 +168,7 @@ const handleSubmit = async () => {
               overflow-y-auto 
               hide-scrollbar
               -translate-x-1/2 -translate-y-1/2
-              bg-white rounded-2xl p-8 shadow-xl  
+              bg-white rounded-2xl p-4 sxm:p-8 shadow-xl  
             "       
           >
             {/* CLOSE BUTTON */}
@@ -202,10 +202,10 @@ const handleSubmit = async () => {
                         value={form.customerName}
                         onValueChange={(value) => setForm({ ...form, customerName: value })}
                       >
-                        <Select.Trigger className="w-full text-sm flex items-center justify-between px-4 py-3 border border-b-brand-gray bg-brand-white border-t-0 border-x-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-gray">
-                          <Select.Value className="block flex-1 min-w-0 truncate" placeholder="Who needs this order?" />
-                          <Select.Icon>
-                            <ChevronDown className="w-4 h-4" />
+                        <Select.Trigger className="w-full relative truncate text-xs flex items-center justify-between px-4 py-3 border border-b-brand-gray bg-brand-white border-t-0 border-x-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-gray">
+                          <Select.Value className="block flex-1 min-w-0" placeholder="Who needs this order?" />
+                          <Select.Icon className="relative z-100">
+                            <ChevronDown className="w-4 h-4 z-40 relative" />
                           </Select.Icon>
                         </Select.Trigger>
                         <Select.Portal>
@@ -217,7 +217,7 @@ const handleSubmit = async () => {
                                   <Select.Item
                                     key={user._id}
                                     value={user._id}
-                                    className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded cursor-pointer outline-none"
+                                    className="px-4 py-2 text-xs text-gray-700 hover:bg-gray-100 rounded cursor-pointer outline-none "
                                   >
                                     <Select.ItemText>{user.name}</Select.ItemText>
                                   </Select.Item>
