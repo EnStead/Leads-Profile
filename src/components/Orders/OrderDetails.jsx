@@ -6,12 +6,15 @@ import api from "../../utility/axios";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../../context/AuthContext";
 import Pagination from "../../utility/Pagination";
+import { useQueryClient } from "@tanstack/react-query";
 
 const OrderDetails = () => {
   const navigate = useNavigate();
  const { id: orderId } = useParams();
  const { user } = useAuth();
  const [page, setPage] = useState(1);
+
+ const queryClient = useQueryClient();
 
 
   const fetchOrderDetails = async ({ queryKey }) => {
@@ -39,9 +42,13 @@ const OrderDetails = () => {
 
 
   // --- Refresh button handler ---
-  const refreshData = () => {
-    refetchOrderDetails();
-  };
+const refreshData = () => {
+  queryClient.invalidateQueries({
+    queryKey: ["orderDetails", orderId],
+  });
+  console.log("Fetching order details...");
+
+};
 
   // --- Last updated time ---
   const lastUpdated = OrderDetailsData?.[0]?.updatedAt
@@ -200,7 +207,7 @@ const OrderDetails = () => {
               onClick={refreshData}
               className="flex items-center font-park font-semibold gap-1 text-brand-blue hover:underline"
             >
-              <RotateCw size={14} /> Refresh Data
+              <RotateCw size={14} className={isFetching ? "animate-spin" : ""} /> Refresh Data
             </button>
           </p>
         </div>
