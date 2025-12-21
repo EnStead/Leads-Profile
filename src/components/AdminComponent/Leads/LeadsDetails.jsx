@@ -125,6 +125,24 @@ const formatSource = (value) => {
     .replace(/\b\w/g, (char) => char.toUpperCase());
 };
 
+    const timeAgo = (dateString) => {
+    const now = new Date();
+    const past = new Date(dateString);
+    const diff = (now - past) / 1000; // seconds
+
+    const minutes = Math.floor(diff / 60);
+    const hours = Math.floor(diff / 3600);
+    const days = Math.floor(diff / 86400);
+    const weeks = Math.floor(diff / 604800);
+
+    if (diff < 60) return "just now";
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    if (days < 7) return `${days}d ago`;
+    return `${weeks}w ago`;
+    };
+  
+
 
 
   if (leadsDetailsError) {
@@ -149,11 +167,11 @@ const formatSource = (value) => {
         <div className="flex justify-between items-end mb-4">
             <div>
             <h1 className="text-2xl font-bold font-park text-brand-primary">
-                Leads: PNC Bank – {orderId}
+                Leads: PNC Bank – {leadsDetailsData?.customId}
             </h1>
 
             <p className="text-sm text-brand-subtext flex items-center gap-3 mt-1">
-                Last Updated: {lastUpdated}
+                Last Updated: {timeAgo(leadsDetailsData?.lastUpdated)}
 
                 <button
                 onClick={refreshData}
