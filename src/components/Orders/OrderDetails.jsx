@@ -207,7 +207,7 @@ const refreshData = () => {
               onClick={refreshData}
               className="flex items-center font-park font-semibold gap-1 text-brand-blue hover:underline"
             >
-              <RotateCw size={14} className={isFetching ? "animate-spin" : ""} /> Refresh Data
+              <RotateCw size={14}/> Refresh Data
             </button>
           </p>
         </div>
