@@ -139,8 +139,22 @@ const OrderDetails = () => {
   return Number(value).toLocaleString();
 };
 
-  
-  
+    const timeAgo = (dateString) => {
+    const now = new Date();
+    const past = new Date(dateString);
+    const diff = (now - past) / 1000; // seconds
+
+    const minutes = Math.floor(diff / 60);
+    const hours = Math.floor(diff / 3600);
+    const days = Math.floor(diff / 86400);
+    const weeks = Math.floor(diff / 604800);
+
+    if (diff < 60) return "just now";
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    if (days < 7) return `${days}d ago`;
+    return `${weeks}w ago`;
+    };
   
   // --- Progress bar calculation ---
   const totalLeads = OrderDetailsData?.quantity;
@@ -178,10 +192,10 @@ const OrderDetails = () => {
       <div className=" lg:flex justify-between items-start mb-6">
         <div>
           <h1 className="text-2xl font-bold font-park text-brand-primary">
-            Leads for Order: {orderId}
+            Leads for Order: {OrderDetailsData?.customId}
           </h1>
           <p className="text-sm text-brand-subtext flex items-center gap-3 mt-1">
-            Last Updated: {lastUpdated}
+            Last Updated: {timeAgo(OrderDetailsData?.lastUpdated)}
             <button
               onClick={refreshData}
               className="flex items-center font-park font-semibold gap-1 text-brand-blue hover:underline"
@@ -244,7 +258,7 @@ const OrderDetails = () => {
               ].map((header) => (
                 <th
                   key={header}
-                  className="p-3 font-medium text-sm text-brand-muted"
+                  className="p-3 font-medium text-sm text-brand-muted text-left"
                 >
                   {header}
                 </th>
@@ -276,7 +290,7 @@ const OrderDetails = () => {
               </tr>
             ) : (
               OrderDetailsData.data.map((lead, i) => (
-                <tr key={i} className="border-b border-brand-stroke">
+                <tr key={i} className="border-b border-brand-stroke capitalize">
                   <td className="p-3 font-light text-brand-subtext text-sm">
                     {lead.firstName}
                   </td>

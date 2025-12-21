@@ -94,7 +94,7 @@ return (
                     </tbody> : 
                     <tbody>
                         {recentOrders.map((order) => (
-                        <tr key={order._id} className="border-b border-brand-stroke">
+                        <tr key={order._id} className="border-b border-brand-stroke capitalize">
                             <td className="p-3 font-medium text-brand-subtext text-sm">{order.customId}</td>
                             <td className="p-3 text-brand-muted font-light text-sm">{order.orderType}</td>
                             <td className="p-3 text-brand-muted font-light text-sm">{order.quantity.toLocaleString()}</td>

@@ -74,14 +74,14 @@ const Table = ({openAddModal,openOrderDetails,openViewLeads, searchTerm}) => {
 
                     <tbody>
                         {filteredOrders.map((order) => (
-                        <tr key={order._id} className="border-b border-brand-stroke">
+                        <tr key={order._id} className="border-b border-brand-stroke capitalize">
                             <td className="p-3 font-medium text-brand-subtext text-sm">{order.customId}</td>
                             <td className="p-3 text-brand-muted font-light text-sm">{formatDate(order.createdAt)}</td>
                             <td className="p-3 text-brand-muted font-light text-sm">{order.orderType}</td>
                             <td className="p-3 text-brand-muted font-light text-sm">{order.quantity.toLocaleString()}</td>
                             <td className="p-3 text-sm">
                                 <span
-                                    className={`flex items-center w-fit px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(
+                                    className={`flex items-center w-fit px-3 py-1 rounded-full text-xs capitalize font-semibold ${getStatusColor(
                                     order.status
                                 )}`}
                                 >

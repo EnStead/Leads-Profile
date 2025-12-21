@@ -206,7 +206,7 @@ const formatSource = (value) => {
                         "Rent/Own",
                         "Birthday",
                     ].map((header) => (
-                        <th key={header} className="p-3 font-medium text-sm text-brand-muted rounded-l-lg">
+                        <th key={header} className="p-3 font-medium text-sm text-brand-muted text-left rounded-l-lg">
                         {header}
                         </th>
                     ))}
@@ -228,7 +228,7 @@ const formatSource = (value) => {
                     </tr>
                     ) : (
                     leadsDetailsData.data.map((lead, i) => (
-                        <tr key={i} className="border-b border-brand-stroke">
+                        <tr key={i} className="border-b border-brand-stroke capitalize">
                             <td className="p-3 font-light text-brand-subtext text-sm">{lead.firstName}</td>
                             <td className="p-3 font-light text-brand-subtext text-sm">{lead.lastName}</td>
                             <td className="p-3 font-light text-brand-subtext text-sm">{lead.email}</td>
