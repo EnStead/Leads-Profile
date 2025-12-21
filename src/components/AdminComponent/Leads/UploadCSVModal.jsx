@@ -173,6 +173,8 @@ const UploadCSVModal = ({ open, onOpenChange }) => {
   const [progress, setProgress] = useState(0);
   const [toastMsg, setToastMsg] = useState("");
   const [toastType, setToastType] = useState("success");
+  const [processing, setProcessing] = useState(false);
+
 
   const showToast = (msg, type = "success") => {
     setToastMsg(msg);
@@ -180,6 +182,10 @@ const UploadCSVModal = ({ open, onOpenChange }) => {
   };
 
   const handleFile = async (file) => {
+      if (!file) return;
+
+  setProcessing(true);   // 🔑 START IMMEDIATELY
+  setProgress(0);
     try {
       let rows = [];
 
@@ -221,12 +227,14 @@ const UploadCSVModal = ({ open, onOpenChange }) => {
       await uploadLeads(leads);
     } catch (err) {
       showToast(err.message || "Invalid file structure", "error");
-    }
+    } finally {
+    setProcessing(false); // 🔑 STOP when upload starts/ends
+  }
   };
 
   const uploadLeads = async (data) => {
     setUploading(true);
-    setProgress(0);
+    // setProgress(0);
 
     try {
         await api.post(
@@ -272,7 +280,7 @@ const UploadCSVModal = ({ open, onOpenChange }) => {
             </Dialog.Title>
 
             <Dialog.Description className="text-center text-sm text-brand-subtext mb-6">
-              Upload CSV or Excel files
+              Upload Excel files
             </Dialog.Description>
 
             <label
@@ -281,9 +289,10 @@ const UploadCSVModal = ({ open, onOpenChange }) => {
                 e.preventDefault();
                 handleFile(e.dataTransfer.files[0]);
               }}
-              className={`flex flex-col items-center justify-center border-2 border-dashed rounded-xl p-10 cursor-pointer ${
-                uploading ? "opacity-50 pointer-events-none" : "hover:bg-gray-50"
-              }`}
+              className={`flex flex-col items-center justify-center border-2 border-dashed rounded-xl p-10 cursor-pointer
+                ${processing || uploading ? "opacity-50 pointer-events-none" : "hover:bg-gray-50"}
+              `}
+
             >
               <Upload className="mb-3 text-brand-muted" />
               <p className="text-sm">
@@ -302,18 +311,28 @@ const UploadCSVModal = ({ open, onOpenChange }) => {
               />
             </label>
 
-            {uploading && (
-              <div className="mt-6">
-                <div className="h-2 bg-gray-200 rounded-full">
-                  <div
-                    className="h-full bg-brand-blue"
-                    style={{ width: `${progress}%` }}
-                  />
-                </div>
-                <p className="text-xs text-center mt-2">
-                  Uploading... {progress}%
-                </p>
-              </div>
+            {(processing || uploading) && (
+  <div className="mt-6">
+    {processing && (
+      <p className="text-sm text-center text-brand-muted mb-2">
+        Processing file… Please wait
+      </p>
+    )}
+
+    {uploading && (
+      <>
+        <div className="h-2 bg-gray-200 rounded-full">
+          <div
+            className="h-full bg-brand-blue transition-all"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+        <p className="text-xs text-center mt-2">
+          Uploading... {progress}%
+        </p>
+      </>
+    )}
+  </div>
             )}
 
             <Dialog.Close className="absolute top-4 right-5 text-xl">

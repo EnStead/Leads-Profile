@@ -111,7 +111,7 @@ const LeadsOverview = ({searchTerm}) => {
   return (
     <div className="min-h-screen pt-8">
 
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className=" grid grid-cols-1 lg:grid-cols-3 gap-6">
         
             {/* Left Column - Leads List */}
             <div className="lg:col-span-2 space-y-4">
