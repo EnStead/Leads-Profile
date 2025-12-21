@@ -28,7 +28,6 @@ const formatStatus = (status = "") => {
 const Table = ({openOrderDetails,searchTerm}) => {
 
     const {adminOrderData,adminOrderLoading,adminOrderError,page,setPage } = useDashboard();
-    console.log(adminOrderData);
 
     const filteredOrders = adminOrderData?.data.filter((order) => {
         const term = searchTerm.toLowerCase();

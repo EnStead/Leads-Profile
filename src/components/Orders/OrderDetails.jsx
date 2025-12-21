@@ -26,7 +26,6 @@ const OrderDetails = () => {
     return res.data;
   };
 
-
   const {
     data: OrderDetailsData,
     isLoading: OrderDetailsLoading,
@@ -100,6 +99,24 @@ const OrderDetails = () => {
     }
   };
 
+  const getNextMonday = (fromDate = new Date()) => {
+    const date = new Date(fromDate);
+    const day = date.getDay(); // 0 = Sun, 1 = Mon, ... 6 = Sat
+
+    const daysUntilMonday = day === 1 ? 0 : (8 - day) % 7;
+    date.setDate(date.getDate() + daysUntilMonday);
+
+    return date;
+  };
+
+  const formatFullDate = (date) =>
+    date.toLocaleDateString("en-US", {
+      weekday: "long",
+      month: "short",
+      day: "2-digit",
+      year: "numeric",
+  });
+
 
   const formatDate = (date) => {
     if (!date) return "-";
@@ -117,10 +134,23 @@ const OrderDetails = () => {
       .replace(/\b\w/g, (char) => char.toUpperCase());
   };
 
+  
+  
+  
   // --- Progress bar calculation ---
   const totalLeads = OrderDetailsData?.quantity;
   const filledLeads = OrderDetailsData?.filled;
   const progressPercent = totalLeads ? Math.round((filledLeads / totalLeads) * 100) : 0;
+  
+  const noLeads =
+  !OrderDetailsLoading &&
+  (filledLeads === 0 || OrderDetailsData?.data?.length === 0);
+
+  const nextMonday = getNextMonday();
+
+  const disableDownload =
+  downloadingDay === orderId || noLeads;
+
 
   if (OrderDetailsError) {
     return (
@@ -172,13 +202,19 @@ const OrderDetails = () => {
 
           <button 
             onClick={() => downloadCSV(orderId)}
-            disabled={downloadingDay === orderId}
-            className={`flex w-48 items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold ${
-              downloadingDay === orderId ? "bg-gray-400 cursor-not-allowed" : "bg-brand-black text-white"
-            }`}
+            disabled={disableDownload}
+            className={`flex w-48 items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold
+              ${
+                disableDownload
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-brand-black text-white"
+              }
+            `}
           >
-            <Download size={16} />  {downloadingDay === orderId ? "Downloading..." : "Download CSV"}
+            <Download size={16} />
+            {downloadingDay === orderId ? "Downloading..." : "Download CSV"}
           </button>
+
         </div>
       </div>
 
@@ -221,13 +257,16 @@ const OrderDetails = () => {
                   Loading leads…
                 </td>
               </tr>
-            ) : totalLeads === 0 ? (
+              ) : noLeads ? (
               <tr>
                 <td
                   colSpan={12}
-                  className="text-center py-10 font-medium text-brand-subtext text-sm"
+                  className="text-center py-12 font-medium text-brand-subtext text-sm"
                 >
-                  No leads found.
+                  Leads will start loading from{" "}
+                  <span className="font-semibold text-brand-primary">
+                    {formatFullDate(nextMonday)}
+                  </span>
                 </td>
               </tr>
             ) : (

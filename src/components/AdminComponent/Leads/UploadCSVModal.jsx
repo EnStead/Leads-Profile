@@ -113,50 +113,50 @@ const toNumber = () => {
 const REQUIRED_FIELDS = ["dateTime", "firstName", "lastName", "email"];
 
 const normalizeLead = (row, index) => {
-    const rowIdentifier = getValue(row, "email") || getValue(row, "subId") || `#${index + 1}`;
+  const rowIdentifier = getValue(row, "email") || getValue(row, "subId") || `#${index + 1}`;
   const birthdayValue = clean(getValue(row, "birthday"));
+  const rawMonthlyIncome = clean(getValue(row, "monthlyNetIncome"));
 
   const lead = {
-dateTime: parseDateString(
-  clean(getValue(row, "dateTime")),
-  index,
-  rowIdentifier
-),
-firstName: clean(getValue(row, "firstName")),
-lastName: clean(getValue(row, "lastName")),
-email: clean(getValue(row, "email")),
-phone: clean(getValue(row, "phone")),
-city: clean(getValue(row, "city")),
-state: clean(getValue(row, "state")),
-incomeSource: clean(getValue(row, "incomeSource")),
-bankName: clean(getValue(row, "bankName")),
-subId: clean(getValue(row, "subId")),
-subId2: clean(getValue(row, "subId2")),
-rentOrOwn: clean(getValue(row, "rentOrOwn")),
-zipCode: clean(getValue(row, "zipCode")),
-    monthlyNetIncome: clean(getValue(row, "monthlyNetIncome")) !== null
-  ? Number(clean(getValue(row, "monthlyNetIncome")))
-  : null,
-
-timeEmployed: clean(getValue(row, "timeEmployed")) !== null
-  ? Number(clean(getValue(row, "timeEmployed")))
-  : null,
-
-birthday: birthdayValue
-  ? parseDateString(birthdayValue, index, rowIdentifier)
-  : null,
+    dateTime: parseDateString(
+      clean(getValue(row, "dateTime")),
+      index,
+      rowIdentifier
+    ),
+    firstName: clean(getValue(row, "firstName")),
+    lastName: clean(getValue(row, "lastName")),
+    email: clean(getValue(row, "email")),
+    phone: clean(getValue(row, "phone")),
+    city: clean(getValue(row, "city")),
+    state: clean(getValue(row, "state")),
+    incomeSource: clean(getValue(row, "incomeSource")),
+    bankName: clean(getValue(row, "bankName")),
+    subId: clean(getValue(row, "subId")),
+    subId2: clean(getValue(row, "subId2")),
+    rentOrOwn: clean(getValue(row, "rentOrOwn")),
+    zipCode: clean(getValue(row, "zipCode")),
+    monthlyNetIncome:
+      rawMonthlyIncome === null || rawMonthlyIncome === undefined || rawMonthlyIncome === ""
+        ? 0
+        : Number(rawMonthlyIncome) || 0,
+    timeEmployed: clean(getValue(row, "timeEmployed")) !== null
+      ? Number(clean(getValue(row, "timeEmployed")))
+      : null,
+    birthday: birthdayValue
+      ? parseDateString(birthdayValue, index, rowIdentifier)
+    : null,
   };
 
   for (const field of REQUIRED_FIELDS) {
-if (
-  lead[field] === null ||
-  lead[field] === undefined ||
-  lead[field] === ""
-) {
-  throw new Error(
-    `Row ${index + 1} (${rowIdentifier}): Missing required field "${field}"`
-  );
-}
+    if (
+      lead[field] === null ||
+      lead[field] === undefined ||
+      lead[field] === ""
+    ) {
+      throw new Error(
+        `Row ${index + 1} (${rowIdentifier}): Missing required field "${field}"`
+      );
+    }
   }
 
   return lead;
