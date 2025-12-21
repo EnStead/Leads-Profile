@@ -36,7 +36,7 @@ const LeadsChart = () => {
             Top Lead Purchased
           </h3>
         </div>
-        <Link className="w-fit text-sm text-brand-royalblue font-medium flex items-center gap-3">
+        <Link to={`/transactions`} className="w-fit text-sm text-brand-royalblue font-medium flex items-center gap-3">
           View Leads <MoveRight />
         </Link>
       </div>
