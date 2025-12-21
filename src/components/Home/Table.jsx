@@ -100,7 +100,7 @@ return (
                             <td className="p-3 text-brand-muted font-light text-sm">{order.quantity.toLocaleString()}</td>
                             <td className="p-3 text-sm">
                                 <span
-                                    className={`flex items-center w-fit px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(
+                                    className={`flex capitalize items-center w-fit px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(
                                     order.status
                                 )}`}
                                 >

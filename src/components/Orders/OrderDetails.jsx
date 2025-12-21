@@ -134,6 +134,11 @@ const OrderDetails = () => {
       .replace(/\b\w/g, (char) => char.toUpperCase());
   };
 
+  const formatNumber = (value) => {
+  if (value === null || value === undefined) return "0"; // show zero if null
+  return Number(value).toLocaleString();
+};
+
   
   
   
@@ -300,7 +305,7 @@ const OrderDetails = () => {
                     {formatSource(lead.incomeSource)}
                   </td>
                   <td className="p-3 font-light text-brand-subtext text-sm">
-                    {formatDate(lead.monthlyNetIncome)}
+                    {formatNumber(lead.monthlyNetIncome)}
                   </td>
                   <td className="p-3 font-light text-brand-subtext text-sm">
                     {lead.rentOrOwn}

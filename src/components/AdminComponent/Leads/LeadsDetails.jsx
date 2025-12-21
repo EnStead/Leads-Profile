@@ -103,7 +103,7 @@ const LeadsDetails = () => {
 
 // 1. Number with commas (e.g. 1400000 → 1,400,000)
 const formatNumber = (value) => {
-  if (!value && value !== 0) return "-";
+  if (value === null || value === undefined) return "0"; // show zero if null
   return Number(value).toLocaleString();
 };
 
