@@ -114,7 +114,7 @@ const REQUIRED_FIELDS = ["dateTime", "firstName", "lastName", "email"];
 
 const normalizeLead = (row, index) => {
     const rowIdentifier = getValue(row, "email") || getValue(row, "subId") || `#${index + 1}`;
-const birthdayValue = clean(getValue(row, "birthday"));
+  const birthdayValue = clean(getValue(row, "birthday"));
 
   const lead = {
 dateTime: parseDateString(

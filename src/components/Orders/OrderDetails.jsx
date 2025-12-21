@@ -101,6 +101,22 @@ const OrderDetails = () => {
   };
 
 
+  const formatDate = (date) => {
+    if (!date) return "-";
+    return new Date(date).toLocaleDateString("en-US", {
+      month: "short",
+      day: "2-digit",
+      year: "numeric",
+    });
+  };
+
+  const formatSource = (value) => {
+    if (!value) return "-";
+    return value
+      .replace(/_/g, " ")
+      .replace(/\b\w/g, (char) => char.toUpperCase());
+  };
+
   // --- Progress bar calculation ---
   const totalLeads = OrderDetailsData?.quantity;
   const filledLeads = OrderDetailsData?.filled;
@@ -237,15 +253,15 @@ const OrderDetails = () => {
                   </td>
                   <td className="p-3 font-light text-brand-subtext text-sm">
                     {lead.zipCode}
-                  </td>
+                  </td> 
                   <td className="p-3 font-light text-brand-subtext text-sm">
                     {lead.bankName}
                   </td>
                   <td className="p-3 font-light text-brand-subtext text-sm">
-                    {lead.incomeSource}
+                    {formatSource(lead.incomeSource)}
                   </td>
                   <td className="p-3 font-light text-brand-subtext text-sm">
-                    {lead.monthlyNetIncome.toLocaleString()}
+                    {formatDate(lead.monthlyNetIncome)}
                   </td>
                   <td className="p-3 font-light text-brand-subtext text-sm">
                     {lead.rentOrOwn}
