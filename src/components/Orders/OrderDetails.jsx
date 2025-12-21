@@ -290,11 +290,11 @@ const OrderDetails = () => {
               </tr>
             ) : (
               OrderDetailsData.data.map((lead, i) => (
-                <tr key={i} className="border-b border-brand-stroke capitalize">
-                  <td className="p-3 font-light text-brand-subtext text-sm">
+                <tr key={i} className="border-b border-brand-stroke ">
+                  <td className="p-3 font-light text-brand-subtext capitalize text-sm">
                     {lead.firstName}
                   </td>
-                  <td className="p-3 font-light text-brand-subtext text-sm">
+                  <td className="p-3 font-light text-brand-subtext capitalize text-sm">
                     {lead.lastName}
                   </td>
                   <td className="p-3 font-light text-brand-subtext text-sm">
@@ -303,16 +303,16 @@ const OrderDetails = () => {
                   <td className="p-3 font-light text-brand-subtext text-sm">
                     {lead.phone}
                   </td>
-                  <td className="p-3 font-light text-brand-subtext text-sm">
+                  <td className="p-3 font-light text-brand-subtext capitalize text-sm">
                     {lead.city}
                   </td>
-                  <td className="p-3 font-light text-brand-subtext text-sm">
+                  <td className="p-3 font-light text-brand-subtext capitalize text-sm">
                     {lead.state}
                   </td>
                   <td className="p-3 font-light text-brand-subtext text-sm">
                     {lead.zipCode}
                   </td> 
-                  <td className="p-3 font-light text-brand-subtext text-sm">
+                  <td className="p-3 font-light text-brand-subtext capitalize text-sm">
                     {lead.bankName}
                   </td>
                   <td className="p-3 font-light text-brand-subtext text-sm">
@@ -321,7 +321,7 @@ const OrderDetails = () => {
                   <td className="p-3 font-light text-brand-subtext text-sm">
                     {formatNumber(lead.monthlyNetIncome)}
                   </td>
-                  <td className="p-3 font-light text-brand-subtext text-sm">
+                  <td className="p-3 font-light text-brand-subtext capitalize text-sm">
                     {lead.rentOrOwn}
                   </td>
                   <td className="p-3 font-light text-brand-subtext text-sm">

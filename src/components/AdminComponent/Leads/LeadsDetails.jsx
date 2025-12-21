@@ -246,18 +246,18 @@ const formatSource = (value) => {
                     </tr>
                     ) : (
                     leadsDetailsData.data.map((lead, i) => (
-                        <tr key={i} className="border-b border-brand-stroke capitalize">
-                            <td className="p-3 font-light text-brand-subtext text-sm">{lead.firstName}</td>
-                            <td className="p-3 font-light text-brand-subtext text-sm">{lead.lastName}</td>
+                        <tr key={i} className="border-b border-brand-stroke">
+                            <td className="p-3 font-light text-brand-subtext capitalize text-sm">{lead.firstName}</td>
+                            <td className="p-3 font-light text-brand-subtext capitalize text-sm">{lead.lastName}</td>
                             <td className="p-3 font-light text-brand-subtext text-sm">{lead.email}</td>
                             <td className="p-3 font-light text-brand-subtext text-sm">{lead.phone}</td>
-                            <td className="p-3 font-light text-brand-subtext text-sm">{lead.city}</td>
-                            <td className="p-3 font-light text-brand-subtext text-sm">{lead.state}</td>
+                            <td className="p-3 font-light text-brand-subtext capitalize text-sm">{lead.city}</td>
+                            <td className="p-3 font-light text-brand-subtext capitalize text-sm">{lead.state}</td>
                             <td className="p-3 font-light text-brand-subtext text-sm">{lead.zipCode}</td>
-                            <td className="p-3 font-light text-brand-subtext text-sm">{lead.bankName}</td>
+                            <td className="p-3 font-light text-brand-subtext capitalize text-sm">{lead.bankName}</td>
                             <td className="p-3 font-light text-brand-subtext text-sm">{formatSource(lead.incomeSource)}</td>
                             <td className="p-3 font-light text-brand-subtext text-sm">{formatNumber(lead.monthlyNetIncome)}</td>
-                            <td className="p-3 font-light text-brand-subtext text-sm">{lead.rentOrOwn}</td>
+                            <td className="p-3 font-light text-brand-subtext capitalize text-sm">{lead.rentOrOwn}</td>
                             <td className="p-3 font-light text-brand-subtext text-sm">{formatDate(lead.birthday)}</td>
                         </tr>
                     ))
