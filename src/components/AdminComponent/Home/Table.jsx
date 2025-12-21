@@ -62,6 +62,12 @@ const Table = ({openOrderDetails}) => {
     return <p className="text-brand-red">Failed to load recent orders</p>;
     }
 
+    const formatSource = (value) => {
+    if (!value) return "-";
+    return value
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (char) => char.toUpperCase());
+    };
 
   return (
     <section className='bg-brand-white border border-brand-offwhite rounded-2xl p-4 w-full h-full'>
@@ -98,13 +104,13 @@ const Table = ({openOrderDetails}) => {
                             
                         </tr>  
                     </tbody> : 
-                    
+                     
                     <tbody>
                         {recentOrders.slice(0, 5).map((order) => (
                             <tr key={order._id} className="border-b border-brand-stroke">
                                 <td className="p-3 font-medium text-brand-subtext text-sm">{order.customId}</td>
                                 <td className="p-3 text-brand-muted font-light capitalize text-sm">{order.client.name}</td>
-                                <td className="p-3 text-brand-muted font-light capitalize text-sm">{order.orderType}</td>
+                                <td className="p-3 text-brand-muted font-light capitalize text-sm">{formatSource(order.orderType)}</td>
                                 <td className="p-3 text-brand-muted font-light text-sm">{order.quantity.toLocaleString()}</td>
                                 <td className="p-3 text-sm">
                                     <span

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
+import ExpandableText from "../../../utility/ExpandableText";
 
 const OrderModal = ({ open, onOpenChange, order }) => {
 
@@ -20,6 +21,13 @@ const OrderModal = ({ open, onOpenChange, order }) => {
   const formatStatus = (status = "") => {
   return status.replace(/_/g, " ");
 };
+
+    const formatSource = (value) => {
+    if (!value) return "-";
+    return value
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (char) => char.toUpperCase());
+    };
 
 
 
@@ -97,11 +105,16 @@ const OrderModal = ({ open, onOpenChange, order }) => {
                     </tr>
                     <tr className="border-b border-brand-stroke">
                         <td className="p-3 text-brand-muted">Bank Category</td>
-                        <td className="p-3 text-brand-primary font-semibold text-right">{order.orderType}</td>
+                        <td className="p-3 text-brand-primary font-semibold text-right">{formatSource(order.orderType)}</td>
                     </tr>
                     <tr  className="border-b border-brand-stroke">
                         <td className="p-3 text-brand-muted">Bank Names</td>
-                        <td className="p-3 text-brand-primary font-semibold text-right">{order.banks}</td>
+                        <td className="p-3 text-brand-primary font-semibold text-right">
+                          <ExpandableText
+                            text={order.banks?.join(", ")}
+                            maxLength={25}
+                          />
+                        </td>
                     </tr>
                     <tr  className="border-b border-brand-stroke">
                         <td className="p-3 text-brand-muted">Order Created</td>

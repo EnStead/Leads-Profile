@@ -1,5 +1,6 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import Teams from '../../assets/Teams.svg'
+import ExpandableText from "../../utility/ExpandableText";
 
 const STATUS_STEPS = [
   { labelTop: "Order Created", labelBottom: "" },
@@ -25,6 +26,16 @@ const OrderDetailsModal = ({ open, onOpenChange, order,openViewLeads }) => {
       return new Date(dateString).toLocaleString(undefined, options);
   };
 
+      const formatStatus = (status = "") => {
+      return status.replace(/_/g, " ");
+    };
+
+    const formatSource = (value) => {
+    if (!value) return "-";
+    return value
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (char) => char.toUpperCase());
+    };
   const getButton = () => {
     switch (order.status) {
 
@@ -70,6 +81,7 @@ const OrderDetailsModal = ({ open, onOpenChange, order,openViewLeads }) => {
 
     const currentStep = getCurrentStep();
 
+    // console.log(order)
 
 
   return (
@@ -110,14 +122,14 @@ const OrderDetailsModal = ({ open, onOpenChange, order,openViewLeads }) => {
                     className={`text-sm font-medium ml-1 capitalize ${
                         order.status === "completed"
                         ? "text-brand-green"
-                        : order.status === "in progress"
+                        : order.status === "in_progress"
                         ? "text-brand-blue"
                         : order.status === "processing"
                         ? "text-brand-muted"
                         : "text-brand-muted"
                     }`}
                 >
-                {order.status}
+                {formatStatus(order.status)}
                 </span>
 
             </Dialog.Description>
@@ -137,11 +149,16 @@ const OrderDetailsModal = ({ open, onOpenChange, order,openViewLeads }) => {
                         </tr>
                         <tr className="border-b border-brand-stroke">
                             <td className="p-3 text-brand-muted">Bank Category</td>
-                            <td className="p-3 text-brand-primary font-semibold text-right">{order.orderType}</td>
+                            <td className="p-3 text-brand-primary font-semibold text-right">{formatSource(order.orderType)}</td>
                         </tr>
                         <tr className="border-b border-brand-stroke">
                             <td className="p-3 text-brand-muted">Bank Names</td>
-                            <td className="p-3 text-brand-primary font-semibold text-right">{order.bankNames}</td>
+                            <td className="p-3 text-brand-primary font-semibold text-right">
+                              <ExpandableText
+                                text={order.banks?.join(", ")}
+                                maxLength={25}
+                              />
+                            </td>
                         </tr>
                         <tr  className="border-b border-brand-stroke">
                             <td className="p-3 text-brand-muted">Order Created</td>

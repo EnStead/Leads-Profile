@@ -284,7 +284,7 @@ const OrderDetails = () => {
                 >
                   Leads will start loading from{" "}
                   <span className="font-semibold text-brand-primary">
-                    {formatFullDate(nextMonday)}
+                    {formatFullDate(nextMonday)} 09 AM EST.
                   </span>
                 </td>
               </tr>
