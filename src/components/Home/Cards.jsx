@@ -116,7 +116,7 @@ const Cards = () => {
               {activeOrders}
             </h2>
             <div className='flex w-full justify-between items-center gap-4 mt-4 text-sm' >
-              <p className='text-brand-brown font-light'>awaiting pricing</p>
+              {/* <p className='text-brand-brown font-light'>awaiting pricing</p> */}
               <Link to={'/orders'} className='text-brand-blue font-medium flex items-center gap-3'  >View Orders <MoveRight size={18}/></Link>
             </div>
           </div>
