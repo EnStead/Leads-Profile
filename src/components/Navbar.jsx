@@ -3,16 +3,13 @@ import Logout from '../assets/Logout.svg'
 import Profile from '../assets/Profile.svg'
 import Avater from '../assets/Avater.jpg'
 import { DropdownMenu } from 'radix-ui'
-import UpdateProfile from './Login/UpdateProfile'
 import { useAuth } from '../context/AuthContext'
 import { useEffect, useRef, useState } from 'react'
 import { Menu } from 'lucide-react'
 
 const Navbar = ({
   isScrolled,
-  openAddModal,
-  isModalOpen,
-  setIsModalOpen
+  openUpdateModal
 }) => {
   const { logout } = useAuth()
   const navigate = useNavigate()
@@ -106,7 +103,7 @@ const Navbar = ({
                 className="bg-white shadow-md rounded-lg p-1 z-50 text-left"
               >
                 <DropdownMenu.Item
-                  onClick={openAddModal}
+                  onClick={openUpdateModal}
                   className="px-3 py-2 text-sm flex text-brand-subtext font-medium items-center gap-2 hover:bg-brand-subtext/10 cursor-pointer"
                 >
                   <img src={Profile} alt="Image" className="w-5" />
@@ -171,7 +168,7 @@ const Navbar = ({
                 className="bg-white shadow-md rounded-lg p-1 z-50 text-left"
               >
                 <DropdownMenu.Item
-                  onClick={openAddModal}
+                  onClick={openUpdateModal}
                   className="px-3 py-2 text-sm flex text-brand-subtext font-medium items-center gap-2 hover:bg-brand-subtext/10 cursor-pointer"
                 >
                   <img src={Profile} alt="Image" className="w-5" />
@@ -191,7 +188,7 @@ const Navbar = ({
         )}
       </nav>
 
-      <UpdateProfile open={isModalOpen} onOpenChange={setIsModalOpen} />
+      
     </>
   )
 }

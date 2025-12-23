@@ -40,7 +40,7 @@ const ProtectedRoutes = () => {
             path="/home"
             element={
                 <UserRoute>
-                    <Layout>
+                    <Layout isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen}>
                         <Home                     
                             isModalOpen={isModalOpen} 
                             openAddModal={openAddModal} 

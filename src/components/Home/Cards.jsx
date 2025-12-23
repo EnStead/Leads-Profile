@@ -68,7 +68,7 @@ const Cards = () => {
             </div>
             <div className='flex items-center gap-3 mt-4'>
               <img src={Head} alt="Image" />
-              <span className='text-brand-green font-sm font-medium'>0% <span className='text-brand-muted font-light'>vs yesterday</span></span>
+              <span className='text-brand-green font-sm font-medium'>{dashboardData?.leadsDeliveredTodayChangePct}% <span className='text-brand-muted font-light'>vs yesterday</span></span>
             </div>
           </div>
 

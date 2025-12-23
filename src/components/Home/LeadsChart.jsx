@@ -4,7 +4,18 @@ import { Link } from "react-router";
 import { MoveRight } from "lucide-react";
 import { useDashboard } from "../../context/DashboardContext";
 
-const COLORS = ["#3b82f6", "#8b5cf6", "#6366f1", "#06b6d4", "#475569", "#f59e0b", "#10b981"]; // add more if needed
+const stringToColor = (str) => {
+  let hash = 0;
+
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+
+  const hue = Math.abs(hash) % 360;
+
+  return `hsl(${hue}, 70%, 55%)`;
+};
+
 
 const LeadsChart = () => {
   const { dashboardData, dashboardLoading } = useDashboard();
@@ -21,11 +32,13 @@ const LeadsChart = () => {
 
 
   const total = bankBreakdown.reduce((acc, item) => acc + item.count, 0);
+  
   const pieData = bankBreakdown.map((item, index) => ({
     name: item.bank,
     value: item.count,
-    color: COLORS[index % COLORS.length],
+    color: stringToColor(item.bank),
   }));
+
 
   return (
     <div className="bg-brand-lightblue rounded-2xl p-3 w-full h-50 border-brand-white border">
@@ -71,13 +84,14 @@ const LeadsChart = () => {
                 {pieData.map((item) => (
                   <div
                   key={item.name}
-                  className="flex items-center gap-2 text-sm bg-gray-100 px-3 py-2 rounded-lg w-30 text-[10px]"
+                  className="flex items-center gap-2 text-[8px] bg-gray-100 px-3 py-2 rounded-lg w-30 "
                   >
                     <span
                       className="w-2 h-2 rounded-full"
                       style={{ backgroundColor: item.color }}
                       ></span>
-                    {item.name}: {((item.value / total) * 100).toFixed(0)}%
+                      {item.name}:{" "}
+                      {total > 0 ? ((item.value / total) * 100).toFixed(0) : 0}%
                   </div>
                 ))}
               </div>

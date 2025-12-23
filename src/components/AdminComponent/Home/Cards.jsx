@@ -57,7 +57,7 @@ const Cards = () => {
                 {processingOrders}
               </h2>
             <div className='flex items-center justify-between mt-4 w-full '>
-              <span className='text-brand-muted text-xs font-light'>Amount: <span className='text-brand-muted font-light'> ~ $750</span></span>
+              {/* <span className='text-brand-muted text-xs font-light'>Amount: <span className='text-brand-muted font-light'> ~ $750</span></span> */}
               <Link to={'/admin/orders'} className='text-brand-blue font-medium flex items-center gap-3'  >View Orders <MoveRight size={18}/></Link>
             </div>
           </div>
@@ -82,7 +82,7 @@ const Cards = () => {
             </h2>
             <div className='flex items-center gap-3 mt-4'>
               <img src={Head} alt="Image" />
-              <span className='text-brand-green font-sm font-medium'>+30% <span className='text-brand-muted font-light'>vs yesterday</span></span>
+              <span className='text-brand-green font-sm font-medium'>{adminDashboardData?.completedTodayChangePct}% <span className='text-brand-muted font-light'>vs yesterday</span></span>
             </div>
           </div>
 
@@ -108,7 +108,7 @@ const Cards = () => {
             </h2>
             <div className='flex items-center gap-3 mt-4'>
               <img src={Head} alt="Image" />
-              <span className='text-brand-green font-sm font-medium'>+30% <span className='text-brand-muted font-light'>vs yesterday</span></span>
+              <span className='text-brand-green font-sm font-medium'>{adminDashboardData?.leadsDeliveredTodayChangePct}% <span className='text-brand-muted font-light'>vs yesterday</span></span>
             </div>
           </div>
 

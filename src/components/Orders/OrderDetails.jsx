@@ -1,7 +1,6 @@
 import { useNavigate, useParams } from "react-router";
 import { useEffect, useState } from "react";
 import { ArrowLeft, RotateCw, Download } from "lucide-react";
-import { useDashboard } from "../../context/DashboardContext";
 import api from "../../utility/axios";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../../context/AuthContext";
@@ -10,12 +9,11 @@ import { useQueryClient } from "@tanstack/react-query";
 
 const OrderDetails = () => {
   const navigate = useNavigate();
- const { id: orderId } = useParams();
- const { user } = useAuth();
- const [page, setPage] = useState(1);
+  const { id: orderId } = useParams();
+  const { user } = useAuth();
+  const [page, setPage] = useState(1);
 
- const queryClient = useQueryClient();
-
+  const queryClient = useQueryClient();
 
   const fetchOrderDetails = async ({ queryKey }) => {
     const [, orderId, page] = queryKey;
@@ -25,7 +23,7 @@ const OrderDetails = () => {
         Authorization: `Bearer ${user?.token}`,
       },
     });
-    // console.log(res.data) 
+    // console.log(res.data)
     return res.data;
   };
 
@@ -37,26 +35,24 @@ const OrderDetails = () => {
   } = useQuery({
     queryKey: ["orderDetails", orderId, page],
     queryFn: fetchOrderDetails,
-    enabled: !!orderId
+    enabled: !!orderId,
   });
-
 
   // --- Refresh button handler ---
-const refreshData = () => {
-  queryClient.invalidateQueries({
-    queryKey: ["orderDetails", orderId],
-  });
-  console.log("Fetching order details...");
-
-};
+  const refreshData = () => {
+    queryClient.invalidateQueries({
+      queryKey: ["orderDetails", orderId],
+    });
+    console.log("Fetching order details...");
+  };
 
   // --- Last updated time ---
   const lastUpdated = OrderDetailsData?.[0]?.updatedAt
     ? new Date(OrderDetailsData[0].updatedAt).toLocaleString()
-  : "N/A";
+    : "N/A";
 
-  const [downloadingDay, setDownloadingDay] = useState(null); // stores the dayKey being downloaded    
-    
+  const [downloadingDay, setDownloadingDay] = useState(null); // stores the dayKey being downloaded
+
   const downloadCSV = async (dayKey) => {
     try {
       setDownloadingDay(dayKey);
@@ -97,7 +93,6 @@ const refreshData = () => {
       link.download = `orders-${orderId}.csv`;
       link.click();
       URL.revokeObjectURL(url);
-
     } catch (err) {
       console.error("CSV download failed", err);
       alert("Failed to download CSV. Make sure you are logged in.");
@@ -122,8 +117,7 @@ const refreshData = () => {
       month: "short",
       day: "2-digit",
       year: "numeric",
-  });
-
+    });
 
   const formatDate = (date) => {
     if (!date) return "-";
@@ -142,11 +136,11 @@ const refreshData = () => {
   };
 
   const formatNumber = (value) => {
-  if (value === null || value === undefined) return "0"; // show zero if null
-  return Number(value).toLocaleString();
-};
+    if (value === null || value === undefined) return "0"; // show zero if null
+    return Number(value).toLocaleString();
+  };
 
-    const timeAgo = (dateString) => {
+  const timeAgo = (dateString) => {
     const now = new Date();
     const past = new Date(dateString);
     const diff = (now - past) / 1000; // seconds
@@ -161,22 +155,22 @@ const refreshData = () => {
     if (hours < 24) return `${hours}h ago`;
     if (days < 7) return `${days}d ago`;
     return `${weeks}w ago`;
-    };
-  
+  };
+
   // --- Progress bar calculation ---
   const totalLeads = OrderDetailsData?.quantity;
   const filledLeads = OrderDetailsData?.filled;
-  const progressPercent = totalLeads ? Math.round((filledLeads / totalLeads) * 100) : 0;
-  
+  const progressPercent = totalLeads
+    ? Math.round((filledLeads / totalLeads) * 100)
+    : 0;
+
   const noLeads =
-  !OrderDetailsLoading &&
-  (filledLeads === 0 || OrderDetailsData?.data?.length === 0);
+    !OrderDetailsLoading &&
+    (filledLeads === 0 || OrderDetailsData?.data?.length === 0);
 
   const nextMonday = getNextMonday();
 
-  const disableDownload =
-  downloadingDay === orderId || noLeads;
-
+  const disableDownload = downloadingDay === orderId || noLeads;
 
   if (OrderDetailsError) {
     return (
@@ -185,7 +179,7 @@ const refreshData = () => {
   }
 
   return (
-    <section >
+    <section>
       {/* BACK BUTTON */}
       <button
         onClick={() => navigate(-1)}
@@ -207,7 +201,7 @@ const refreshData = () => {
               onClick={refreshData}
               className="flex items-center font-park font-semibold gap-1 text-brand-blue hover:underline"
             >
-              <RotateCw size={14}/> Refresh Data
+              <RotateCw size={14} /> Refresh Data
             </button>
           </p>
         </div>
@@ -226,7 +220,7 @@ const refreshData = () => {
             </div>
           </div>
 
-          <button 
+          <button
             onClick={() => downloadCSV(orderId)}
             disabled={disableDownload}
             className={`flex w-48 items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold
@@ -240,7 +234,6 @@ const refreshData = () => {
             <Download size={16} />
             {downloadingDay === orderId ? "Downloading..." : "Download CSV"}
           </button>
-
         </div>
       </div>
 
@@ -283,7 +276,7 @@ const refreshData = () => {
                   Loading leads…
                 </td>
               </tr>
-              ) : noLeads ? (
+            ) : noLeads ? (
               <tr>
                 <td
                   colSpan={12}
@@ -318,7 +311,7 @@ const refreshData = () => {
                   </td>
                   <td className="p-3 font-light text-brand-subtext text-sm">
                     {lead.zipCode}
-                  </td> 
+                  </td>
                   <td className="p-3 font-light text-brand-subtext capitalize text-sm">
                     {lead.bankName}
                   </td>
@@ -346,8 +339,6 @@ const refreshData = () => {
         totalPages={OrderDetailsData?.pagination?.pages}
         onPageChange={setPage}
       />
-
-
     </section>
   );
 };

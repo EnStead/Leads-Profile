@@ -7,6 +7,7 @@ import CreateAccount from './components/Login/CreateAccount';
 import ForgotPassword from './components/Login/ForgotPassword';
 import { Toast } from 'radix-ui';
 import ProtectedRoutes from './container/ProtectedRoutes';
+import ChangePassword from './components/Login/ChangePassword';
 
 function App() {
 
@@ -44,6 +45,12 @@ function App() {
                 path="/forgot-password" 
                 element={
                   <ForgotPassword  />
+                }
+              />
+              <Route
+                path="/change-password" 
+                element={
+                  <ChangePassword  />
                 }
               />
               {/* Authenticated Routes */}
