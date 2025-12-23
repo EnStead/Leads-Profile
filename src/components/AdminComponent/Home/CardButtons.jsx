@@ -79,7 +79,7 @@ const CardButtons = ({onOpenChange, openAddCustomerModal}) => {
                         System Status
                     </h3>
                     <p className='text-brand-muted font-light text-[10px]'>
-                        Ping Tree: <span className='text-brand-green font-medium' >Online</span> || API Sync: <span className='text-brand-green font-medium' >Active</span>
+                        Ping Tree: <span className='text-brand-green font-medium' ></span> || API Sync: <span className='text-brand-green font-medium' ></span>
                     </p>
                 </div>
             </div>
