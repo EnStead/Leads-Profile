@@ -9,7 +9,7 @@ import { useAdminAuth } from "../../../context/AdminContext";
 import ToastPop from "../../../utility/ToastPop";
 
 const CreateOrder = ({ open, onOpenChange }) => {
-  const { usersData, usersLoading, usersError } = useDashboard();
+  const { usersData, usersLoading, usersError, refetchadminOrder, refetchAdminDashboard } = useDashboard();
   const { user } = useAdminAuth(); // Admin user
 
   const [toastMsg, setToastMsg] = useState("");
@@ -27,6 +27,7 @@ const CreateOrder = ({ open, onOpenChange }) => {
   const [banks, setBanks] = useState([]);
   const [banksLoading, setBanksLoading] = useState(false);
   const [bankSearch, setBankSearch] = useState("");
+  const searchInputRef = useRef(null);
 
   const dropdownRef = useRef(null);
 
@@ -46,6 +47,13 @@ const CreateOrder = ({ open, onOpenChange }) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isSelectOpen]);
+
+  useEffect(() => {
+  if (isSelectOpen && searchInputRef.current) {
+    searchInputRef.current.focus();
+  }
+}, [isSelectOpen]);
+
 
   useEffect(() => {
     const fetchBanks = async () => {
@@ -114,6 +122,8 @@ const CreateOrder = ({ open, onOpenChange }) => {
       setToastMsg("Order created successfully!");
 
       resetForm();
+      refetchadminOrder();
+      refetchAdminDashboard();
       onOpenChange(false);
     } catch (error) {
       setToastType("error");
@@ -165,7 +175,6 @@ const CreateOrder = ({ open, onOpenChange }) => {
               w-[420px] xsm:w-[520px]
               max-h-[90vh]
               overflow-y-auto 
-              hide-scrollbar
               -translate-x-1/2 -translate-y-1/2
               bg-white rounded-2xl p-4 sxm:p-8 shadow-xl  
             "
@@ -369,28 +378,43 @@ const CreateOrder = ({ open, onOpenChange }) => {
 
                   {/* Custom Multi-Select Dropdown */}
                   <div className="relative " ref={dropdownRef}>
-                    <button
-                      type="button"
-                      onClick={() => setIsSelectOpen(!isSelectOpen)}
-                      className="w-full flex items-center justify-between px-4 py-3 border border-b-brand-gray bg-brand-white border-t-0 border-x-0 rounded-xl text-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-brand-gray"
+                    <div
+                      onClick={() => !isSelectOpen && setIsSelectOpen(true)}
+                      className={`w-full flex items-center px-4 py-3 border border-b-brand-gray bg-brand-white border-t-0 border-x-0 rounded-xl text-sm cursor-text
+                        ${isSelectOpen ? "ring-2 ring-brand-gray" : ""}
+                      `}
                     >
-                      <span>Choose the bank you need for this order...</span>
-                      <ChevronDown className="w-4 h-4" />
-                    </button>
+                      {isSelectOpen ? (
+                        <input
+                          ref={searchInputRef}
+                          type="text"
+                          value={bankSearch}
+                          onChange={(e) => setBankSearch(e.target.value)}
+                          placeholder="Search banks..."
+                          className="flex-1 outline-none text-sm bg-transparent"
+                        />
+                      ) : (
+                        <span className="flex-1 text-gray-500 truncate cursor-pointer">
+                          {selectedBanks.length
+                            ? `${selectedBanks.length} bank(s) selected`
+                            : "Choose the bank you need for this order..."}
+                        </span>
+                      )}
+
+                      <ChevronDown
+                        className={`w-4 h-4 transition-transform ${
+                          isSelectOpen ? "rotate-180" : ""
+                        }`}
+                      />
+                    </div>
+
 
                     {/* Dropdown Menu */}
                     {isSelectOpen && (
-                      <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg max-h-66 overflow-y-auto">
+                      <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg max-h-64 overflow-y-auto z-50">
+
                         {/* SEARCH INPUT */}
-                        <div className="p-2 w-full relative border-b border-gray-100">
-                          <input
-                            type="text"
-                            placeholder="Search banks..."
-                            value={bankSearch}
-                            onChange={(e) => setBankSearch(e.target.value)}
-                            className="w-115 fixed px-3 py-2 text-sm border bg-brand-white rounded-lg focus:outline-none focus:ring-1 focus:ring-brand-blue"
-                          />
-                        </div>
+
 
                         {/* BANK LIST */}
                         {banksLoading ? (

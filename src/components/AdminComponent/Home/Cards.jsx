@@ -7,6 +7,8 @@ import { Dot,MoveRight,UserRound } from 'lucide-react';
 import { Link } from 'react-router';
 import { useDashboard } from '../../../context/DashboardContext'
 import CardSkeleton from '../../../utility/skeletons/CardSkeleton'
+import { TrendingUp, TrendingDown } from "lucide-react";
+
 
 
 const Cards = () => { 
@@ -34,6 +36,30 @@ const Cards = () => {
     const processingOrders = adminDashboardData?.processingOrders;
     const completedToday = adminDashboardData?.completedToday;
     const leadsDeliveredToday = adminDashboardData?.leadsDeliveredToday;
+
+    const renderChange = (value) => {
+  const isNegative = value < 0;
+  const absValue = Math.abs(value);
+
+  return (
+    <span
+      className={`flex items-center gap-1 text-sm font-medium ${
+        isNegative ? "text-brand-red" : "text-brand-green"
+      }`}
+    >
+      {isNegative ? (
+        <TrendingDown size={16} className="text-brand-red" />
+      ) : (
+        <TrendingUp size={16} className="text-brand-green" />
+      )}
+      {absValue}%
+      <span className="text-brand-muted font-light ml-1">
+        vs yesterday
+      </span>
+    </span>
+  );
+};
+
 
   return (
     <section>
@@ -80,10 +106,8 @@ const Cards = () => {
             <h2 className='text-brand-primary font-bold text-4xl font-park '>
               {completedToday}
             </h2>
-            <div className='flex items-center gap-3 mt-4'>
-              <img src={Head} alt="Image" />
-              <span className='text-brand-green font-sm font-medium'>{adminDashboardData?.completedTodayChangePct}% <span className='text-brand-muted font-light'>vs yesterday</span></span>
-            </div>
+            {renderChange(adminDashboardData?.completedTodayChangePct)}
+
           </div>
 
         </div>
@@ -106,10 +130,8 @@ const Cards = () => {
             <h2 className='text-brand-primary font-bold text-4xl font-park '>
               {leadsDeliveredToday}
             </h2>
-            <div className='flex items-center gap-3 mt-4'>
-              <img src={Head} alt="Image" />
-              <span className='text-brand-green font-sm font-medium'>{adminDashboardData?.leadsDeliveredTodayChangePct}% <span className='text-brand-muted font-light'>vs yesterday</span></span>
-            </div>
+            {renderChange(adminDashboardData?.leadsDeliveredTodayChangePct)}
+
           </div>
 
         </div>
