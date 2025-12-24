@@ -39,7 +39,7 @@ const HEADER_ALIASES = {
 
 const getValue = (row, field) => {
   if (row[field] !== undefined) return row[field];
-
+console.log(Object.keys(row[0]));
   const aliases = HEADER_ALIASES[field] || [];
 
   for (const key of Object.keys(row)) {
@@ -119,7 +119,6 @@ const normalizeLead = (row, index) => {
     getValue(row, "email") || getValue(row, "subId") || `#${index + 1}`;
   const birthdayValue = clean(getValue(row, "birthday"));
   const rawMonthlyIncome = clean(getValue(row, "monthlyNetIncome"));
-console.log(Object.keys(rows[0]));
 
   const lead = {
     dateTime: parseDateString(

@@ -10,6 +10,18 @@ export const DashboardProvider = ({ children, orderId }) => {
   const { user } = useAuth(); // Client user
   const { user: adminUser } = useAdminAuth(); // Admin user
   const [page, setPage] = useState(1);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // const [isLogged, setIsLogged] = useState(false);
+
+    // Check if user is logged in when component mounts
+    useEffect(() => {
+        const stored = localStorage.getItem("user");
+        if (stored) {
+            setIsLoggedIn(true);
+        }
+    }, []);
+
+    // Check if user is logged in when component mounts
 
   // -------------------------
   // CLIENT DASHBOARD API CALLS
@@ -49,7 +61,7 @@ export const DashboardProvider = ({ children, orderId }) => {
   } = useQuery({
     queryKey: ["dashboard"],
     queryFn: fetchDashboard,
-    enabled: !!user?.token,
+    enabled: isLoggedIn && !!user?.token,
     refetchOnWindowFocus: false,
   });
 
@@ -61,7 +73,7 @@ export const DashboardProvider = ({ children, orderId }) => {
   } = useQuery({
     queryKey: ["allOrders", page],
     queryFn: fetchAllOrders,
-    enabled: !!user?.token,
+    enabled: isLoggedIn && !!user?.token,
     refetchOnWindowFocus: false,
   });
 
@@ -146,7 +158,7 @@ export const DashboardProvider = ({ children, orderId }) => {
   } = useQuery({
     queryKey: ["adminDashboard"],
     queryFn: fetchAdminDashboard,
-    enabled: !!adminUser?.token,
+    enabled: isLoggedIn && !!adminUser?.token,
     refetchOnWindowFocus: false,
   });
 
@@ -158,7 +170,7 @@ export const DashboardProvider = ({ children, orderId }) => {
   } = useQuery({
     queryKey: ["allLeads", page],
     queryFn: fetchAllLeads,
-    enabled: !!adminUser?.token,
+    enabled: isLoggedIn && !!adminUser?.token,
     refetchOnWindowFocus: false,
   });
 
@@ -171,7 +183,7 @@ export const DashboardProvider = ({ children, orderId }) => {
   } = useQuery({
     queryKey: ["usersData"],
     queryFn: fetchUsers,
-    enabled: !!adminUser?.token,
+    enabled: isLoggedIn && !!adminUser?.token,
     refetchOnWindowFocus: false,
   });
 
@@ -183,7 +195,7 @@ export const DashboardProvider = ({ children, orderId }) => {
   } = useQuery({
     queryKey: ["adminOrder", page],
     queryFn: fetchAdminOrder,
-    enabled: !!adminUser?.token,
+    enabled: isLoggedIn && !!adminUser?.token,
     refetchOnWindowFocus: false,
   });
 
@@ -195,7 +207,7 @@ export const DashboardProvider = ({ children, orderId }) => {
   } = useQuery({
     queryKey: ["allCustomers", page],
     queryFn: fetchAllCustomers,
-    enabled: !!adminUser?.token,
+    enabled: isLoggedIn && !!adminUser?.token,
     refetchOnWindowFocus: false,
   });
 
