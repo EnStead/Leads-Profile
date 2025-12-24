@@ -39,7 +39,6 @@ const HEADER_ALIASES = {
 
 const getValue = (row, field) => {
   if (row[field] !== undefined) return row[field];
-console.log(Object.keys(row[0]));
   const aliases = HEADER_ALIASES[field] || [];
 
   for (const key of Object.keys(row)) {
