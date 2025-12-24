@@ -184,9 +184,17 @@ const UploadCSVModal = ({ open, onOpenChange }) => {
     setToastType(type);
   };
 
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
   const handleFile = async (file) => {
     if (!file) return;
 
+      // 🔴 FILE SIZE CHECK
+  if (file.size > MAX_FILE_SIZE) {
+    showToast("File size exceeds 5MB. Please upload a smaller file.", "error");
+    return;
+  }
+  
     setProcessing(true); // 🔑 START IMMEDIATELY
     setProgress(0);
     try {

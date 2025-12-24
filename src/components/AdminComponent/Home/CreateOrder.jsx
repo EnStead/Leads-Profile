@@ -8,6 +8,14 @@ import api from "../../../utility/axios";
 import { useAdminAuth } from "../../../context/AdminContext";
 import ToastPop from "../../../utility/ToastPop";
 
+const PREMIUM_BANKS = [
+  "JP Morgan Chase",
+  "USAA Federal Savings Bank",
+  "Truist Bank",
+  "TD Bank",
+];
+
+
 const CreateOrder = ({ open, onOpenChange }) => {
   const { usersData, usersLoading, usersError, refetchadminOrder, refetchAdminDashboard } = useDashboard();
   const { user } = useAdminAuth(); // Admin user
@@ -20,6 +28,8 @@ const CreateOrder = ({ open, onOpenChange }) => {
     leadQuantity: "",
     bankPreference: "mixed",
   });
+
+
 
   const [selectedBanks, setSelectedBanks] = useState([]);
   const [isSelectOpen, setIsSelectOpen] = useState(false);
@@ -55,27 +65,30 @@ const CreateOrder = ({ open, onOpenChange }) => {
 }, [isSelectOpen]);
 
 
-  useEffect(() => {
-    const fetchBanks = async () => {
-      try {
-        setBanksLoading(true);
+useEffect(() => {
+  if (form.bankPreference !== "filtered") return;
 
-        const res = await api.get("/leads/banks", {
-          headers: {
-            Authorization: `Bearer ${user?.token}`,
-          },
-        });
+  const fetchBanks = async () => {
+    try {
+      setBanksLoading(true);
 
-        setBanks(res.data.data || []);
-      } catch (err) {
-        console.error("Failed to fetch banks", err);
-      } finally {
-        setBanksLoading(false);
-      }
-    };
+      const res = await api.get("/leads/banks", {
+        headers: {
+          Authorization: `Bearer ${user?.token}`,
+        },
+      });
 
-    fetchBanks();
-  }, [user?.token]);
+      setBanks(res.data.data || []);
+    } catch (err) {
+      console.error("Failed to fetch banks", err);
+    } finally {
+      setBanksLoading(false);
+    }
+  };
+
+  fetchBanks();
+}, [form.bankPreference, user?.token]);
+
 
   const resetForm = () => {
     setForm({
@@ -89,10 +102,10 @@ const CreateOrder = ({ open, onOpenChange }) => {
 
   const handleSubmit = async () => {
     if (!form.customerName) {
-      setToastType("error");
-      setToastMsg("Please select a customer");
-      return;
-    }
+    setToastType("error");
+    setToastMsg("Please select a customer");
+    return;
+  }
 
     if (!form.leadQuantity) {
       setToastType("error");
@@ -150,13 +163,22 @@ const CreateOrder = ({ open, onOpenChange }) => {
     setSelectedBanks(selectedBanks.filter((b) => b !== bank));
   };
 
-  const getBanksList = () => {
-    if (!showBankSelector) return [];
-
+const getBanksList = () => {
+  if (form.bankPreference === "filtered") {
     return banks.filter((bank) =>
       bank.name.toLowerCase().includes(bankSearch.toLowerCase())
     );
-  };
+  }
+
+  if (form.bankPreference === "premium_bank") {
+    return PREMIUM_BANKS.filter((bank) =>
+      bank.toLowerCase().includes(bankSearch.toLowerCase())
+    ).map((name) => ({ name })); // normalize shape
+  }
+
+  return [];
+};
+
 
   const showBankSelector =
     form.bankPreference === "filtered" ||
