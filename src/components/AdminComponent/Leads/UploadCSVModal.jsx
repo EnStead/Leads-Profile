@@ -19,7 +19,7 @@ const normalizeHeader = (header = "") =>
     .replace(/^_|_$/g, "");
 
 const HEADER_ALIASES = {
-  dateTime: ["date_time", "datetime", "dateandtime", "date"],
+  dateTime: ["date_time", "datetime", "dateandtime", "date", "date_and_time"],
   firstName: ["first_name", "firstname"],
   lastName: ["last_name", "lastname"],
   zipCode: ["zip_code", "zipcode", "postal_code"],
@@ -38,10 +38,10 @@ const HEADER_ALIASES = {
 };
 
 const getValue = (row, field) => {
-  // direct match first
   if (row[field] !== undefined) return row[field];
 
-  const aliases = HEADER_ALIASES[field];
+  const aliases = HEADER_ALIASES[field] || [];
+
   for (const key of Object.keys(row)) {
     if (aliases.includes(normalizeHeader(key))) {
       return row[key];
@@ -65,7 +65,9 @@ const parseDateString = (value, rowIndex, rowIdentifier) => {
   if (typeof value === "number") {
     const parsed = XLSX.SSF.parse_date_code(value);
     if (!parsed) {
-      throw new Error(`Row ${rowIndex + 1} (${rowIdentifier}): Invalid Excel date`);
+      throw new Error(
+        `Row ${rowIndex + 1} (${rowIdentifier}): Invalid Excel date`
+      );
     }
 
     return new Date(
@@ -97,11 +99,12 @@ const parseDateString = (value, rowIndex, rowIdentifier) => {
     }
   }
 
-  throw new Error(`Row ${rowIndex + 1} (${rowIdentifier}): Invalid date "${value}"`);
+  throw new Error(
+    `Row ${rowIndex + 1} (${rowIdentifier}): Invalid date "${value}"`
+  );
 };
 
-const clean = (v) =>
-  v === "" || v === undefined ? null : v;
+const clean = (v) => (v === "" || v === undefined ? null : v);
 
 const toNumber = () => {
   if (clean) return null;
@@ -109,13 +112,14 @@ const toNumber = () => {
   return isNaN(n) ? null : n;
 };
 
-
 const REQUIRED_FIELDS = ["dateTime", "firstName", "lastName", "email"];
 
 const normalizeLead = (row, index) => {
-  const rowIdentifier = getValue(row, "email") || getValue(row, "subId") || `#${index + 1}`;
+  const rowIdentifier =
+    getValue(row, "email") || getValue(row, "subId") || `#${index + 1}`;
   const birthdayValue = clean(getValue(row, "birthday"));
   const rawMonthlyIncome = clean(getValue(row, "monthlyNetIncome"));
+console.log(Object.keys(rows[0]));
 
   const lead = {
     dateTime: parseDateString(
@@ -136,15 +140,18 @@ const normalizeLead = (row, index) => {
     rentOrOwn: clean(getValue(row, "rentOrOwn")),
     zipCode: clean(getValue(row, "zipCode")),
     monthlyNetIncome:
-      rawMonthlyIncome === null || rawMonthlyIncome === undefined || rawMonthlyIncome === ""
+      rawMonthlyIncome === null ||
+      rawMonthlyIncome === undefined ||
+      rawMonthlyIncome === ""
         ? 0
         : Number(rawMonthlyIncome) || 0,
-    timeEmployed: clean(getValue(row, "timeEmployed")) !== null
-      ? Number(clean(getValue(row, "timeEmployed")))
-      : null,
+    timeEmployed:
+      clean(getValue(row, "timeEmployed")) !== null
+        ? Number(clean(getValue(row, "timeEmployed")))
+        : null,
     birthday: birthdayValue
       ? parseDateString(birthdayValue, index, rowIdentifier)
-    : null,
+      : null,
   };
 
   for (const field of REQUIRED_FIELDS) {
@@ -162,7 +169,6 @@ const normalizeLead = (row, index) => {
   return lead;
 };
 
-
 /* -------------------- COMPONENT -------------------- */
 
 const UploadCSVModal = ({ open, onOpenChange }) => {
@@ -175,36 +181,35 @@ const UploadCSVModal = ({ open, onOpenChange }) => {
   const [toastType, setToastType] = useState("success");
   const [processing, setProcessing] = useState(false);
 
-
   const showToast = (msg, type = "success") => {
     setToastMsg(msg);
     setToastType(type);
   };
 
   const handleFile = async (file) => {
-      if (!file) return;
+    if (!file) return;
 
-  setProcessing(true);   // 🔑 START IMMEDIATELY
-  setProgress(0);
+    setProcessing(true); // 🔑 START IMMEDIATELY
+    setProgress(0);
     try {
       let rows = [];
 
-        if (file.name.endsWith(".csv")) {
+      if (file.name.endsWith(".csv")) {
         const text = await file.text();
         const parsed = Papa.parse(text, {
-            header: true,
-            skipEmptyLines: true,
+          header: true,
+          skipEmptyLines: true,
         });
 
         rows = parsed.data.map((row) =>
-            Object.fromEntries(
+          Object.fromEntries(
             Object.entries(row).map(([key, value]) => [
-                normalizeHeader(key),
-                value,
+              normalizeHeader(key),
+              value,
             ])
-            )
+          )
         );
-        } else {
+      } else {
         const buffer = await file.arrayBuffer();
         const workbook = XLSX.read(buffer, { type: "array" });
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -214,12 +219,12 @@ const UploadCSVModal = ({ open, onOpenChange }) => {
 
         // 2️⃣ 🔑 NORMALIZE HEADERS HERE (this is the fix)
         rows = rows.map((row) =>
-        Object.fromEntries(
+          Object.fromEntries(
             Object.entries(row).map(([key, value]) => [
-            normalizeHeader(key),
-            value,
+              normalizeHeader(key),
+              value,
             ])
-        )
+          )
         );
       }
 
@@ -228,8 +233,8 @@ const UploadCSVModal = ({ open, onOpenChange }) => {
     } catch (err) {
       showToast(err.message || "Invalid file structure", "error");
     } finally {
-    setProcessing(false); // 🔑 STOP when upload starts/ends
-  }
+      setProcessing(false); // 🔑 STOP when upload starts/ends
+    }
   };
 
   const uploadLeads = async (data) => {
@@ -237,32 +242,32 @@ const UploadCSVModal = ({ open, onOpenChange }) => {
     // setProgress(0);
 
     try {
-        await api.post(
+      await api.post(
         "/leads/raw-leads",
         { leads: data },
         {
-            headers: {
-                Authorization: `Bearer ${user?.token}`,
-                "Content-Type": "application/json",
-            },
-            onUploadProgress: (e) => {
+          headers: {
+            Authorization: `Bearer ${user?.token}`,
+            "Content-Type": "application/json",
+          },
+          onUploadProgress: (e) => {
             if (e.total) {
-                setProgress(Math.round((e.loaded * 100) / e.total));
+              setProgress(Math.round((e.loaded * 100) / e.total));
             }
-            },
+          },
         }
-        );
+      );
       showToast("Leads uploaded successfully");
       refetchAllLeads();
       onOpenChange(false);
     } catch (err) {
-    console.error("UPLOAD ERROR:", err.response?.data || err);
-    showToast(
+      console.error("UPLOAD ERROR:", err.response?.data || err);
+      showToast(
         err.response?.data?.message ||
-        err.response?.data?.error ||
-        "Upload failed",
+          err.response?.data?.error ||
+          "Upload failed",
         "error"
-    );
+      );
     } finally {
       setUploading(false);
     }
@@ -290,9 +295,12 @@ const UploadCSVModal = ({ open, onOpenChange }) => {
                 handleFile(e.dataTransfer.files[0]);
               }}
               className={`flex flex-col items-center justify-center border-2 border-dashed rounded-xl p-10 cursor-pointer
-                ${processing || uploading ? "opacity-50 pointer-events-none" : "hover:bg-gray-50"}
+                ${
+                  processing || uploading
+                    ? "opacity-50 pointer-events-none"
+                    : "hover:bg-gray-50"
+                }
               `}
-
             >
               <Upload className="mb-3 text-brand-muted" />
               <p className="text-sm">
@@ -312,27 +320,27 @@ const UploadCSVModal = ({ open, onOpenChange }) => {
             </label>
 
             {(processing || uploading) && (
-  <div className="mt-6">
-    {processing && (
-      <p className="text-sm text-center text-brand-muted mb-2">
-        Processing file… Please wait
-      </p>
-    )}
+              <div className="mt-6">
+                {processing && (
+                  <p className="text-sm text-center text-brand-muted mb-2">
+                    Processing file… Please wait
+                  </p>
+                )}
 
-    {uploading && (
-      <>
-        <div className="h-2 bg-gray-200 rounded-full">
-          <div
-            className="h-full bg-brand-blue transition-all"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-        <p className="text-xs text-center mt-2">
-          Uploading... {progress}%
-        </p>
-      </>
-    )}
-  </div>
+                {uploading && (
+                  <>
+                    <div className="h-2 bg-gray-200 rounded-full">
+                      <div
+                        className="h-full bg-brand-blue transition-all"
+                        style={{ width: `${progress}%` }}
+                      />
+                    </div>
+                    <p className="text-xs text-center mt-2">
+                      Uploading... {progress}%
+                    </p>
+                  </>
+                )}
+              </div>
             )}
 
             <Dialog.Close className="absolute top-4 right-5 text-xl">
