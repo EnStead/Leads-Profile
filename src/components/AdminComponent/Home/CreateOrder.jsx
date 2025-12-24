@@ -100,6 +100,19 @@ useEffect(() => {
     setIsSelectOpen(false);
   };
 
+  const addCustomBank = (name) => {
+  const trimmed = name.trim();
+
+  if (!trimmed) return;
+
+  // Prevent duplicates
+  if (selectedBanks.includes(trimmed)) return;
+
+  setSelectedBanks((prev) => [...prev, trimmed]);
+  setBankSearch("");
+};
+
+
   const handleSubmit = async () => {
     if (!form.customerName) {
     setToastType("error");
@@ -414,7 +427,20 @@ const getBanksList = () => {
                           onChange={(e) => setBankSearch(e.target.value)}
                           placeholder="Search banks..."
                           className="flex-1 outline-none text-sm bg-transparent"
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+
+                              const matches = getBanksList();
+
+                              // Only allow adding if nothing matches
+                              if (matches.length === 0) {
+                                addCustomBank(bankSearch);
+                              }
+                            }
+                          }}
                         />
+
                       ) : (
                         <span className="flex-1 text-gray-500 truncate cursor-pointer">
                           {selectedBanks.length
@@ -461,6 +487,9 @@ const getBanksList = () => {
                               <div>
                                 <p className="text-sm text-gray-700">
                                   {bank.name}
+                                </p>
+                                <p className="text-xs text-gray-400">
+                                  {bank.count} leads available
                                 </p>
                               </div>
 
