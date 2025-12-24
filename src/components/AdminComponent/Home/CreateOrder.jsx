@@ -473,35 +473,34 @@ const getBanksList = () => {
                           </p>
                         ) : getBanksList().length === 0 ? (
                           <p className="p-4 text-sm text-gray-500">
-                            No banks found
+                            Press “Enter” to add bank
                           </p>
                         ) : (
-                          getBanksList().map((bank) => (
-                            <div
-                              key={bank.name}
-                              onClick={() => toggleBank(bank.name)}
-                              className={`px-4 py-2.5 cursor-pointer hover:bg-gray-50 flex items-center justify-between ${
-                                selectedBanks.includes(bank.name)
-                                  ? "bg-blue-50"
-                                  : ""
-                              }`}
-                            >
-                              <div>
-                                <p className="text-sm text-gray-700">
-                                  {bank.name}
-                                </p>
-                                <p className="text-xs text-gray-400">
-                                  {bank.count} leads available
-                                </p>
-                              </div>
+<Select.Portal>
+  <Select.Content 
+    className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg max-h-64 overflow-y-auto z-50"
+  >
+    <Select.Viewport>
+      {getBanksList().map((bank) => (
+        <Select.Item
+          key={bank.name}
+          value={bank.name}
+          onSelect={() => toggleBank(bank.name)}
+          className="px-4 py-2.5 cursor-pointer hover:bg-gray-50 flex items-center justify-between"
+        >
+          <div>
+            <p className="text-sm text-gray-700">{bank.name}</p>
+            <p className="text-xs text-gray-400">{bank.count} leads available</p>
+          </div>
+          {selectedBanks.includes(bank.name) && (
+            <span className="text-brand-blue text-sm">✓</span>
+          )}
+        </Select.Item>
+      ))}
+    </Select.Viewport>
+  </Select.Content>
+</Select.Portal>
 
-                              {selectedBanks.includes(bank.name) && (
-                                <span className="text-brand-blue text-sm">
-                                  ✓
-                                </span>
-                              )}
-                            </div>
-                          ))
                         )}
                       </div>
                     )}
