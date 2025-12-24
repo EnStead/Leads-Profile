@@ -412,64 +412,101 @@ const getBanksList = () => {
                   </label>
 
                   {/* Custom Multi-Select Dropdown */}
-{/* Wrapper with overflow-visible */}
-<div className="relative overflow-visible" ref={dropdownRef}>
-  {/* Trigger */}
-  <div
-    onClick={() => setIsSelectOpen(true)}
-    className={`w-full flex items-center px-4 py-3 border bg-white rounded-xl text-sm cursor-text
-      ${isSelectOpen ? "ring-2 ring-brand-gray" : ""}
-    `}
-  >
-    {isSelectOpen ? (
-      <input
-        ref={searchInputRef}
-        type="text"
-        value={bankSearch}
-        onChange={(e) => setBankSearch(e.target.value)}
-        placeholder="Search banks..."
-        className="flex-1 outline-none text-sm bg-transparent"
-      />
-    ) : (
-      <span className="flex-1 text-gray-500 truncate cursor-pointer">
-        {selectedBanks.length ? `${selectedBanks.length} bank(s) selected` : "Choose the bank you need..."}
-      </span>
-    )}
-  </div>
+                  <div className="relative " ref={dropdownRef}>
+                    <div
+                      onClick={() => !isSelectOpen && setIsSelectOpen(true)}
+                      className={`w-full flex items-center px-4 py-3 border border-b-brand-gray bg-brand-white border-t-0 border-x-0 rounded-xl text-sm cursor-text
+                        ${isSelectOpen ? "ring-2 ring-brand-gray" : ""}
+                      `}
+                    >
+                      {isSelectOpen ? (
+                        <input
+                          ref={searchInputRef}
+                          type="text"
+                          value={bankSearch}
+                          onChange={(e) => setBankSearch(e.target.value)}
+                          placeholder="Search banks..."
+                          className="flex-1 outline-none text-sm bg-transparent"
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
 
-  {/* Dropdown */}
-  {isSelectOpen && (
-    <div
-      className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg max-h-64 overflow-y-auto z-50"
-      style={{ maxHeight: "16rem" }}
-    >
-      {banksLoading ? (
-        <p className="p-4 text-sm text-gray-500">Loading banks...</p>
-      ) : getBanksList().length === 0 ? (
-        <p className="p-4 text-sm text-gray-500">Press “Enter” to add bank</p>
-      ) : (
-        getBanksList().map((bank) => (
-          <div
-            key={bank.name}
-            onClick={() => toggleBank(bank.name)}
-            className={`px-4 py-2.5 cursor-pointer hover:bg-gray-50 flex items-center justify-between ${
-              selectedBanks.includes(bank.name) ? "bg-blue-50" : ""
-            }`}
-          >
-            <div>
-              <p className="text-sm text-gray-700">{bank.name}</p>
-              <p className="text-xs text-gray-400">{bank.count} leads available</p>
-            </div>
-            {selectedBanks.includes(bank.name) && (
-              <span className="text-brand-blue text-sm">✓</span>
-            )}
-          </div>
-        ))
-      )}
-    </div>
-  )}
-</div>
+                              const matches = getBanksList();
 
+                              // Only allow adding if nothing matches
+                              if (matches.length === 0) {
+                                addCustomBank(bankSearch);
+                              }
+                            }
+                          }}
+                        />
+
+                      ) : (
+                        <span className="flex-1 text-gray-500 truncate cursor-pointer">
+                          {selectedBanks.length
+                            ? `${selectedBanks.length} bank(s) selected`
+                            : "Choose the bank you need for this order..."}
+                        </span>
+                      )}
+
+                      <ChevronDown
+                        className={`w-4 h-4 transition-transform ${
+                          isSelectOpen ? "rotate-180" : ""
+                        }`}
+                      />
+                    </div>
+
+
+                    {/* Dropdown Menu */}
+                    {isSelectOpen && (
+                      <div 
+                         className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg max-h-64 overflow-y-auto z-50"
+                        style={{ maxHeight: "16rem" }} // optional inline style
+                      
+                      >
+
+                       
+                        {/* BANK LIST */}
+                        {banksLoading ? (
+                          <p className="p-4 text-sm text-gray-500">
+                            Loading banks...
+                          </p>
+                        ) : getBanksList().length === 0 ? (
+                          <p className="p-4 text-sm text-gray-500">
+                            Press “Enter” to add bank
+                          </p>
+                        ) : (
+                          getBanksList().map((bank) => (
+                            <div
+                              key={bank.name}
+                              onClick={() => toggleBank(bank.name)}
+                              className={`px-4 py-2.5 cursor-pointer hover:bg-gray-50 flex items-center justify-between ${
+                                selectedBanks.includes(bank.name)
+                                  ? "bg-blue-50"
+                                  : ""
+                              }`}
+                            >
+                              <div>
+                                <p className="text-sm text-gray-700">
+                                  {bank.name}
+                                </p>
+                                <p className="text-xs text-gray-400">
+                                  {bank.count} leads available
+                                </p>
+                              </div>
+
+
+                              {selectedBanks.includes(bank.name) && (
+                                <span className="text-brand-blue text-sm">
+                                  ✓
+                                </span>
+                              )}
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    )}
+                  </div>
 
                   {/* Selected Banks Tags */}
                   {selectedBanks.length > 0 && (
