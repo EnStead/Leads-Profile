@@ -476,30 +476,35 @@ const getBanksList = () => {
                             Press “Enter” to add bank
                           </p>
                         ) : (
-<Select.Portal>
-  <Select.Content 
-    className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg max-h-64 overflow-y-auto z-50"
-  >
-    <Select.Viewport>
-      {getBanksList().map((bank) => (
-        <Select.Item
-          key={bank.name}
-          value={bank.name}
-          onSelect={() => toggleBank(bank.name)}
-          className="px-4 py-2.5 cursor-pointer hover:bg-gray-50 flex items-center justify-between"
-        >
-          <div>
-            <p className="text-sm text-gray-700">{bank.name}</p>
-            <p className="text-xs text-gray-400">{bank.count} leads available</p>
-          </div>
-          {selectedBanks.includes(bank.name) && (
-            <span className="text-brand-blue text-sm">✓</span>
-          )}
-        </Select.Item>
-      ))}
-    </Select.Viewport>
-  </Select.Content>
-</Select.Portal>
+<Select.Root
+  value={selectedBanks[0] || ""} // for single select, adapt for multi-select logic
+  onValueChange={(value) => toggleBank(value)}
+>
+  <Select.Trigger className="...">
+    <Select.Value placeholder="Choose a bank..." />
+    <Select.Icon>
+      <ChevronDown />
+    </Select.Icon>
+  </Select.Trigger>
+
+  <Select.Portal>
+    <Select.Content className="absolute top-full left-0 right-0 mt-2 max-h-64 overflow-y-auto z-50 bg-white border border-gray-200 rounded-xl shadow-lg">
+      <Select.Viewport>
+        {getBanksList().map((bank) => (
+          <Select.Item
+            key={bank.name}
+            value={bank.name}
+            className="px-4 py-2.5 cursor-pointer hover:bg-gray-50 flex items-center justify-between"
+          >
+            <Select.ItemText>{bank.name}</Select.ItemText>
+            {selectedBanks.includes(bank.name) && <span>✓</span>}
+          </Select.Item>
+        ))}
+      </Select.Viewport>
+    </Select.Content>
+  </Select.Portal>
+</Select.Root>
+
 
                         )}
                       </div>
