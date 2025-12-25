@@ -17,7 +17,24 @@ const LeadsOverview = ({searchTerm}) => {
     const { user } = useAdminAuth(); // Admin user
     const [downloadingDay, setDownloadingDay] = useState(null); // stores the dayKey being downloaded
 
-    
+      const CSV_FIELDS = [
+    { key: "dateTime", label: "Date & Time" },
+    { key: "firstName", label: "First Name" },
+    { key: "lastName", label: "Last Name" },
+    { key: "email", label: "Email" },
+    { key: "phone", label: "Phone" },
+    { key: "city", label: "City" },
+    { key: "state", label: "State" },
+    { key: "zipCode", label: "Zip" },
+    { key: "bankName", label: "Bank" },
+    { key: "incomeSource", label: "Source" },
+    { key: "monthlyNetIncome", label: "Monthly Income" },
+    { key: "subId", label: "SubId" },
+    { key: "subId2", label: "SubId2" },
+    { key: "birthday	", label: "Birthday	" },
+    { key: "timeEmployed", label: "Time Employed" },
+    { key: "rentOrOwn", label: "Rent Or Own" },
+    ];
     
     const downloadCSV = async (dayKey, totalLeads) => {
     try {
@@ -38,13 +55,15 @@ const LeadsOverview = ({searchTerm}) => {
         return;
         }
 
-        const headers = Object.keys(leads[0]);
+        const headers = CSV_FIELDS.map((f) => f.label);
+
         const csvRows = [
         headers.join(","),
         ...leads.map((lead) =>
-            headers.map((field) => `"${lead[field] ?? ""}"`).join(",")
+            CSV_FIELDS.map((f) => `"${lead[f.key] ?? ""}"`).join(",")
         ),
         ];
+
 
         const csvContent = csvRows.join("\n");
         const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });

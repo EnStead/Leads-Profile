@@ -4,6 +4,7 @@ import TableSkeleton from '../../utility/skeletons/TableSkeleton';
 import { useDashboard } from '../../context/DashboardContext';
 import Pagination from '../../utility/Pagination';
 import EmptyState from '../../utility/EmptyState';
+import { useSearchParams } from 'react-router';
 
 
 const getStatusColor = (status) => {
@@ -32,7 +33,15 @@ const formatStatus = (status = "") => {
 
 
 const Table = ({openAddModal,openOrderDetails,openViewLeads, searchTerm}) => {
-    const { allOrdersData, allOrdersLoading, allOrdersError,page,setPage } = useDashboard();
+    const { allOrdersData, allOrdersLoading, allOrdersError } = useDashboard();
+
+        const [searchParams, setSearchParams] = useSearchParams();
+        const page = Number(searchParams.get("p")) || 1;
+    
+        const handlePageChange = (newPage) => {
+      setSearchParams({ p: newPage });
+    };
+    
     
     const filteredOrders = allOrdersData?.data.filter((order) => {
         const term = searchTerm.toLowerCase();
@@ -147,8 +156,9 @@ const Table = ({openAddModal,openOrderDetails,openViewLeads, searchTerm}) => {
     <Pagination
         page={page}
         totalPages={allOrdersData?.pagination.pages}
-        onPageChange={setPage}
+  onPageChange={handlePageChange}
       />
+
 
 
     </section>

@@ -21,6 +21,8 @@ const LeadsChart = () => {
   const { dashboardData, dashboardLoading } = useDashboard();
   const bankBreakdown = dashboardData?.bankBreakdown;
 
+  // console.log(bankBreakdown)
+
   if (dashboardLoading) {
     return (
       <div className="w-full h-52 flex items-center justify-center text-gray-400">
@@ -31,13 +33,40 @@ const LeadsChart = () => {
 
 
 
-  const total = bankBreakdown.reduce((acc, item) => acc + item.count, 0);
-  
-  const pieData = bankBreakdown.map((item, index) => ({
+// 1. Sort banks by count (highest first)
+const sortedBanks = [...bankBreakdown].sort(
+  (a, b) => b.count - a.count
+);
+
+// 2. Take top 5
+const topBanks = sortedBanks.slice(0, 5);
+
+// 3. Group remaining as "Others"
+const othersCount = sortedBanks
+  .slice(5)
+  .reduce((acc, item) => acc + item.count, 0);
+
+// 4. Build final chart data
+const pieData = [
+  ...topBanks.map((item) => ({
     name: item.bank,
     value: item.count,
     color: stringToColor(item.bank),
-  }));
+  })),
+  ...(othersCount > 0
+    ? [
+        {
+          name: "Others",
+          value: othersCount,
+          color: "#94a3b8", // neutral gray for others
+        },
+      ]
+    : []),
+];
+
+// 5. Total (used for percentage)
+const total = pieData.reduce((acc, item) => acc + item.value, 0);
+
 
 
   return (

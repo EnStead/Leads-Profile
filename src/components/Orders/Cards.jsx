@@ -25,6 +25,28 @@ const Cards = ({searchTerm}) => {
     });
 
     const { user } = useAuth(); //user
+
+
+        const CSV_FIELDS = [
+  { key: "dateTime", label: "Date & Time" },
+  { key: "firstName", label: "First Name" },
+  { key: "lastName", label: "Last Name" },
+  { key: "email", label: "Email" },
+  { key: "phone", label: "Phone" },
+  { key: "city", label: "City" },
+  { key: "state", label: "State" },
+  { key: "zipCode", label: "Zip" },
+  { key: "bankName", label: "Bank" },
+  { key: "incomeSource", label: "Source" },
+  { key: "monthlyNetIncome", label: "Monthly Income" },
+  { key: "subId", label: "SubId" },
+  { key: "subId2", label: "SubId2" },
+  { key: "birthday	", label: "Birthday	" },
+  { key: "timeEmployed", label: "Time Employed" },
+  { key: "rentOrOwn", label: "Rent Or Own" },
+];
+
+
     const [downloadingDay, setDownloadingDay] = useState(null);
         
     const downloadCSV = async (orderId) => {
@@ -63,13 +85,14 @@ const Cards = ({searchTerm}) => {
         return;
         }
 
-        const headers = Object.keys(allLeads[0]);
-        const csvRows = [
-        headers.join(","),
-        ...allLeads.map((lead) =>
-            headers.map((field) => `"${lead[field] ?? ""}"`).join(",")
-        ),
-        ];
+const headers = CSV_FIELDS.map((f) => f.label);
+
+const csvRows = [
+  headers.join(","),
+  ...leads.map((lead) =>
+    CSV_FIELDS.map((f) => `"${lead[f.key] ?? ""}"`).join(",")
+  ),
+];
 
         const csvContent = csvRows.join("\n");
         const blob = new Blob([csvContent], {

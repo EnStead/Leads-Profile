@@ -37,6 +37,7 @@ const CreateOrder = ({ open, onOpenChange }) => {
   const [banks, setBanks] = useState([]);
   const [banksLoading, setBanksLoading] = useState(false);
   const [bankSearch, setBankSearch] = useState("");
+  const [dropdownAbove, setDropdownAbove] = useState(false);
   const searchInputRef = useRef(null);
 
   const dropdownRef = useRef(null);
@@ -64,6 +65,21 @@ const CreateOrder = ({ open, onOpenChange }) => {
   }
 }, [isSelectOpen]);
 
+// Update this useEffect to check space on open
+useEffect(() => {
+  if (!isSelectOpen || !dropdownRef.current) return;
+
+  const rect = dropdownRef.current.getBoundingClientRect();
+  const spaceBelow = window.innerHeight - rect.bottom;
+  const dropdownHeight = 256; // max height in px (same as max-h-64)
+
+  // Flip dropdown if not enough space below
+  if (spaceBelow < dropdownHeight) {
+    setDropdownAbove(true);
+  } else {
+    setDropdownAbove(false);
+  }
+}, [isSelectOpen]);
 
 useEffect(() => {
   if (form.bankPreference !== "filtered") return;
@@ -458,54 +474,42 @@ const getBanksList = () => {
 
 
                     {/* Dropdown Menu */}
-                    {isSelectOpen && (
-                      <div 
-                         className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg max-h-64 overflow-y-auto z-50"
-                        style={{ maxHeight: "16rem" }} // optional inline style
-                      
-                      >
 
-                       
-                        {/* BANK LIST */}
-                        {banksLoading ? (
-                          <p className="p-4 text-sm text-gray-500">
-                            Loading banks...
-                          </p>
-                        ) : getBanksList().length === 0 ? (
-                          <p className="p-4 text-sm text-gray-500">
-                            Press “Enter” to add bank
-                          </p>
-                        ) : (
-                          getBanksList().map((bank) => (
-                            <div
-                              key={bank.name}
-                              onClick={() => toggleBank(bank.name)}
-                              className={`px-4 py-2.5 cursor-pointer hover:bg-gray-50 flex items-center justify-between ${
-                                selectedBanks.includes(bank.name)
-                                  ? "bg-blue-50"
-                                  : ""
-                              }`}
-                            >
-                              <div>
-                                <p className="text-sm text-gray-700">
-                                  {bank.name}
-                                </p>
-                                <p className="text-xs text-gray-400">
-                                  {bank.count} leads available
-                                </p>
-                              </div>
-
-
-                              {selectedBanks.includes(bank.name) && (
-                                <span className="text-brand-blue text-sm">
-                                  ✓
-                                </span>
-                              )}
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    )}
+{isSelectOpen && (
+  <div
+    className="absolute left-0 right-0 bg-white border border-gray-200 rounded-xl shadow-lg max-h-64 overflow-y-auto z-50"
+    style={{
+      top: dropdownAbove ? "auto" : "100%",
+      bottom: dropdownAbove ? "100%" : "auto",
+      marginTop: dropdownAbove ? 0 : "0.5rem",  // mt-2
+      marginBottom: dropdownAbove ? "0.5rem" : 0,
+    }}
+  >
+    {banksLoading ? (
+      <p className="p-4 text-sm text-gray-500">Loading banks...</p>
+    ) : getBanksList().length === 0 ? (
+      <p className="p-4 text-sm text-gray-500">Press “Enter” to add bank</p>
+    ) : (
+      getBanksList().map((bank) => (
+        <div
+          key={bank.name}
+          onClick={() => toggleBank(bank.name)}
+          className={`px-4 py-2.5 cursor-pointer hover:bg-gray-50 flex items-center justify-between ${
+            selectedBanks.includes(bank.name) ? "bg-blue-50" : ""
+          }`}
+        >
+          <div>
+            <p className="text-sm text-gray-700">{bank.name}</p>
+            <p className="text-xs text-gray-400">{bank.count} leads available</p>
+          </div>
+          {selectedBanks.includes(bank.name) && (
+            <span className="text-brand-blue text-sm">✓</span>
+          )}
+        </div>
+      ))
+    )}
+  </div>
+)}
                   </div>
 
                   {/* Selected Banks Tags */}

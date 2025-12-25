@@ -1,5 +1,5 @@
 import { Ellipsis, Dot, } from 'lucide-react'
-import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
+import { useSearchParams } from "react-router";
 import { useDashboard } from '../../../context/DashboardContext';
 import TableSkeleton from '../../../utility/skeletons/TableSkeleton';
 import Pagination from '../../../utility/Pagination';
@@ -27,7 +27,15 @@ const formatStatus = (status = "") => {
 
 const Table = ({openOrderDetails,searchTerm}) => {
 
-    const {adminOrderData,adminOrderLoading,adminOrderError,page,setPage } = useDashboard();
+    const {adminOrderData,adminOrderLoading,adminOrderError,} = useDashboard();
+
+    const [searchParams, setSearchParams] = useSearchParams();
+    const page = Number(searchParams.get("p")) || 1;
+
+    const handlePageChange = (newPage) => {
+  setSearchParams({ p: newPage });
+};
+
 
     const filteredOrders = adminOrderData?.data.filter((order) => {
         const term = searchTerm.toLowerCase();
@@ -102,11 +110,12 @@ const Table = ({openOrderDetails,searchTerm}) => {
             </div>
         }
 
-      <Pagination
-        page={page}
-        totalPages={adminOrderData?.pagination.pages}
-        onPageChange={setPage}
-      />
+<Pagination
+  page={page}
+  totalPages={adminOrderData?.pagination.pages}
+  onPageChange={handlePageChange}
+/>
+
     </section>
   )
 }

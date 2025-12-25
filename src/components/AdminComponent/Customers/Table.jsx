@@ -1,4 +1,5 @@
 import { Ellipsis, Dot, } from 'lucide-react'
+import { useSearchParams } from "react-router";
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { useDashboard } from '../../../context/DashboardContext';
 import TableSkeleton from '../../../utility/skeletons/TableSkeleton';
@@ -10,7 +11,14 @@ import Pagination from '../../../utility/Pagination';
 
 const Table = ({openDetailsModal, onOpenChange, searchTerm }) => {
 
-  const {customersData,customersLoading,customersError,page,setPage } = useDashboard();
+  const {customersData,customersLoading,customersError} = useDashboard();
+
+      const [searchParams, setSearchParams] = useSearchParams();
+    const page = Number(searchParams.get("p")) || 1;
+
+    const handlePageChange = (newPage) => {
+  setSearchParams({ p: newPage });
+};
     
   const filteredCustomers = customersData?.data.filter((customer) => {
     const term = searchTerm.toLowerCase();
@@ -96,11 +104,11 @@ const Table = ({openDetailsModal, onOpenChange, searchTerm }) => {
 
         }
 
-      <Pagination
-        page={page}
-        totalPages={customersData?.pagination.pages}
-        onPageChange={setPage}
-      />
+<Pagination
+  page={page}
+  totalPages={customersData?.pagination.pages}
+  onPageChange={handlePageChange}
+/>
     </section>
   )
 }

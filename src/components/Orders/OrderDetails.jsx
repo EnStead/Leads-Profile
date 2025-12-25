@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router";
+import { useNavigate, useParams, useSearchParams } from "react-router";
 import { useEffect, useState } from "react";
 import { ArrowLeft, RotateCw, Download } from "lucide-react";
 import api from "../../utility/axios";
@@ -11,7 +11,15 @@ const OrderDetails = () => {
   const navigate = useNavigate();
   const { id: orderId } = useParams();
   const { user } = useAuth();
-  const [page, setPage] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const page = Number(searchParams.get("p")) || 1;
+
+  const [sort, setSort] = useState("newest"); // newest | oldest | az
+
+  const handlePageChange = (newPage) => {
+    setSearchParams({ p: newPage });
+  };
 
   const queryClient = useQueryClient();
 
@@ -46,6 +54,49 @@ const OrderDetails = () => {
     console.log("Fetching order details...");
   };
 
+    const sortedLeads = () => {
+  if (!OrderDetailsData?.data) return [];
+
+  const data = [...OrderDetailsData.data];
+
+  switch (sort) {
+    case "oldest":
+      return data.sort(
+        (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+      );
+
+    case "az":
+      return data.sort((a, b) =>
+        (a.firstName || "").localeCompare(b.firstName || "")
+      );
+
+    case "newest":
+    default:
+      return data.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+  }
+};
+
+    const CSV_FIELDS = [
+  { key: "dateTime", label: "Date & Time" },
+  { key: "firstName", label: "First Name" },
+  { key: "lastName", label: "Last Name" },
+  { key: "email", label: "Email" },
+  { key: "phone", label: "Phone" },
+  { key: "city", label: "City" },
+  { key: "state", label: "State" },
+  { key: "zipCode", label: "Zip" },
+  { key: "bankName", label: "Bank" },
+  { key: "incomeSource", label: "Source" },
+  { key: "monthlyNetIncome", label: "Monthly Income" },
+  { key: "subId", label: "SubId" },
+  { key: "subId2", label: "SubId2" },
+  { key: "birthday	", label: "Birthday	" },
+  { key: "timeEmployed", label: "Time Employed" },
+  { key: "rentOrOwn", label: "Rent Or Own" },
+];
+
   // --- Last updated time ---
   const lastUpdated = OrderDetailsData?.[0]?.updatedAt
     ? new Date(OrderDetailsData[0].updatedAt).toLocaleString()
@@ -77,13 +128,14 @@ const OrderDetails = () => {
         return;
       }
 
-      const headers = Object.keys(leads[0]);
-      const csvRows = [
-        headers.join(","),
-        ...leads.map((lead) =>
-          headers.map((field) => `"${lead[field] ?? ""}"`).join(",")
-        ),
-      ];
+const headers = CSV_FIELDS.map((f) => f.label);
+
+const csvRows = [
+  headers.join(","),
+  ...leads.map((lead) =>
+    CSV_FIELDS.map((f) => `"${lead[f.key] ?? ""}"`).join(",")
+  ),
+];
 
       const csvContent = csvRows.join("\n");
       const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
@@ -234,6 +286,18 @@ const OrderDetails = () => {
             <Download size={16} />
             {downloadingDay === orderId ? "Downloading..." : "Download CSV"}
           </button>
+
+                    <div className="flex items-center gap-2">
+            <select
+              value={sort}
+              onChange={(e) => setSort(e.target.value)}
+              className="border border-brand-stroke rounded-lg px-3 py-2 text-sm"
+            >
+              <option value="newest">New → Old</option>
+              <option value="oldest">Old → New</option>
+              <option value="az">A → Z</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -289,7 +353,7 @@ const OrderDetails = () => {
                 </td>
               </tr>
             ) : (
-              OrderDetailsData.data.map((lead, i) => (
+              sortedLeads().map((lead, i) => (
                 <tr key={i} className="border-b border-brand-stroke ">
                   <td className="p-3 font-light text-brand-subtext capitalize text-sm">
                     {lead.firstName}
@@ -337,7 +401,7 @@ const OrderDetails = () => {
       <Pagination
         page={page}
         totalPages={OrderDetailsData?.pagination?.pages}
-        onPageChange={setPage}
+        onPageChange={handlePageChange}
       />
     </section>
   );
