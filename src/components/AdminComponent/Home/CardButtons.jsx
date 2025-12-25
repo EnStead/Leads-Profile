@@ -1,8 +1,6 @@
 import CreateOrder from '../../../assets/CreateOrder.svg'
 import AddCustomer from '../../../assets/AddCustomer.svg'
-import Head from '../../../assets/Head.svg'
 import ViewOrder from '../../../assets/ViewOrder.svg'
-import Leads from '../../../assets/Leads.svg'
 import System from '../../../assets/System.svg'
 import { Link } from 'react-router'
 
@@ -48,7 +46,7 @@ const CardButtons = ({onOpenChange, openAddCustomerModal}) => {
         </div>
 
         {/* CARD 3 */}
-        <div className='bg-brand-white border border-brand-offwhite 
+        <Link to={'/admin/orders'} className='bg-brand-white border border-brand-offwhite 
           rounded-xl py-2 px-4 w-full h-fit flex flex-col justify-between items-start '
         >
             <div className='flex items-center justify-start gap-4'>
@@ -64,7 +62,7 @@ const CardButtons = ({onOpenChange, openAddCustomerModal}) => {
                     </p>
                 </div>
             </div>
-        </div>
+        </Link>
 
         {/* CARD 4 */}
         <div className='bg-brand-white border border-brand-offwhite 
