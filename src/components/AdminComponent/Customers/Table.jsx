@@ -7,7 +7,7 @@ import Pagination from "../../../utility/Pagination";
 import EmptyState from "../../../utility/EmptyState";
 
 
-const Table = ({ openDetailsModal, onOpenChange, searchTerm }) => {
+const Table = ({ openDetailsModal, onOpenChange }) => {
   const {
     customersData,
     customersLoading,
@@ -34,13 +34,6 @@ const Table = ({ openDetailsModal, onOpenChange, searchTerm }) => {
 
   const customers = customersData?.data ?? [];
 
-  const filteredCustomers = customers.filter((customer) => {
-    const term = searchTerm.toLowerCase();
-    return (
-      customer.name?.toLowerCase().includes(term) ||
-      customer.email?.toLowerCase().includes(term)
-    );
-  });
 
   const formatDate = (dateString) => {
     const options = {
@@ -88,7 +81,7 @@ const Table = ({ openDetailsModal, onOpenChange, searchTerm }) => {
           </thead>
 
           <tbody>
-            {filteredCustomers.length === 0 ? (
+            {customers.length === 0 ? (
               <tr>
                 <td
                   colSpan={5}
@@ -98,7 +91,7 @@ const Table = ({ openDetailsModal, onOpenChange, searchTerm }) => {
                 </td>
               </tr>
             ) : (
-              filteredCustomers?.map((order) => (
+              customers?.map((order) => (
                 <tr key={order._id} className="border-b border-brand-stroke">
                   <td className="p-3 font-medium text-brand-subtext text-sm">
                     {order.name}

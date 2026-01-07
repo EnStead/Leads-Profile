@@ -1,4 +1,4 @@
-import { createContext, useContext, } from "react";
+import { createContext, useContext, useEffect, useState, } from "react";
 import api from "../utility/axios";
 import { useAuth } from "./AuthContext";
 import { useAdminAuth } from "./AdminContext";
@@ -12,6 +12,12 @@ export const DashboardProvider = ({ children, orderId }) => {
   const { user: adminUser } = useAdminAuth(); // Admin user
 const [searchParams, setSearchParams] = useSearchParams();
 const page = Number(searchParams.get("p")) || 1;
+const [searchTerm, setSearchTerm] = useState(""); // can be dayKey or any search input
+const [dayKey, setDayKey] = useState("");
+const [customerSearch, setCustomerSearch] = useState("");
+const [orderSearch, setOrderSearch] = useState("");
+const [tranSearch, setTranSearch] = useState("");
+
 
 
 
@@ -28,13 +34,32 @@ const page = Number(searchParams.get("p")) || 1;
     return res.data.data;
   };
 
+  // const fetchAllOrders = async ({ queryKey }) => {
+  //   const [, page] = queryKey;
+  //   const res = await api.get(`/orders?page=${page}&limit=10`, {
+  //     headers: { Authorization: `Bearer ${user?.token}` },
+  //   });
+  //   return res.data;
+  // };
+
   const fetchAllOrders = async ({ queryKey }) => {
-    const [, page] = queryKey;
-    const res = await api.get(`/orders?page=${page}&limit=10`, {
-      headers: { Authorization: `Bearer ${user?.token}` },
-    });
-    return res.data;
-  };
+  const [, page, search] = queryKey;
+
+  let url = `/orders?page=${page}&limit=10`;
+
+  if (search) {
+    url += `&search=${search}`;
+  }
+
+  const res = await api.get(url, {
+    headers: {
+      Authorization: `Bearer ${user?.token}`,
+    },
+  });
+
+  return res.data;
+};
+
 
   const fetchOrderDetails = async () => {
     const res = await api.get(`/leads/order/${orderId}`, {
@@ -65,7 +90,7 @@ const page = Number(searchParams.get("p")) || 1;
     error: allOrdersError,
     refetch: refetchAllOrders,
   } = useQuery({
-    queryKey: ["allOrders", page],
+    queryKey: ["allOrders", page, searchTerm],
     queryFn: fetchAllOrders,
     enabled: !!user?.token,
     refetchOnWindowFocus: false,
@@ -101,23 +126,43 @@ const page = Number(searchParams.get("p")) || 1;
   };
 
   // --- ALL ORDER API CALL ---
-  const fetchAllLeads = async ({queryKey}) => {
-    const [, page] = queryKey;
-    const res = await api.get(`/leads/daily?page=${page}&limit=10`, {
-      headers: {
-        Authorization: `Bearer ${adminUser?.token}`, // use client token if needed
-      },
-    });
-    return res.data; // array of users
-  };
+const fetchAllLeads = async ({ queryKey }) => {
+  const [, page, dayKey] = queryKey;
+
+  let url = `/leads/daily?page=${page}&limit=10`;
+
+  if (dayKey) {
+    url += `&dayKey=${dayKey}`;
+  }
+
+  const res = await api.get(url, {
+    headers: {
+      Authorization: `Bearer ${adminUser?.token}`,
+    },
+  });
+
+  return res.data;
+};
+
+
 
   const fetchAdminOrder = async ({ queryKey }) => {
-    const [, page] = queryKey;
-    const res = await api.get(`/orders/admin/all?page=${page}&limit=10`, {
-      headers: { Authorization: `Bearer ${adminUser?.token}` },
-    });
-    return res.data;
-  };
+  const [, page, search] = queryKey;
+
+  let url = `/orders/admin/all?page=${page}&limit=10`;
+
+  if (search) {
+    url += `&search=${search}`;
+  }
+
+  const res = await api.get(url, {
+    headers: {
+      Authorization: `Bearer ${adminUser?.token}`,
+    },
+  });
+
+  return res.data;
+};
 
   // --- USERS API CALL FORM ---
   const fetchUsers = async () => {
@@ -130,17 +175,37 @@ const page = Number(searchParams.get("p")) || 1;
   };
 
     // --- ALL ORDER API CALL ---
-  const fetchAllCustomers = async ({queryKey}) => {
-    const [, page] = queryKey;
-    const res = await api.get(`/user/admin/customers?page=${page}&limit=10`, {
-      headers: {
-        Authorization: `Bearer ${adminUser?.token}`, // use client token if needed
-      },
-    });
+  // const fetchAllCustomers = async ({queryKey}) => {
+  //   const [, page] = queryKey;
+  //   const res = await api.get(`/user/admin/customers?page=${page}&limit=10`, {
+  //     headers: {
+  //       Authorization: `Bearer ${adminUser?.token}`, 
+  //     },
+  //   });
     
 
-    return res.data; // array of users
-  };
+  //   return res.data; 
+  // };
+
+const fetchAllCustomers = async ({ queryKey }) => {
+  const [, page, search] = queryKey;
+
+  let url = `/user/admin/customers?page=${page}&limit=10`;
+
+  if (search) {
+    url += `&search=${search}`;
+  }
+
+  const res = await api.get(url, {
+    headers: {
+      Authorization: `Bearer ${adminUser?.token}`,
+    },
+  });
+
+  return res.data;
+};
+
+
 
     // --- DEADLINE API CALL ---
     const fetchDeadline = async () => {
@@ -180,7 +245,7 @@ const page = Number(searchParams.get("p")) || 1;
     error: allLeadsError,
     refetch: refetchAllLeads,
   } = useQuery({
-    queryKey: ["allLeads", page],
+    queryKey: ["allLeads", page, dayKey],
     queryFn: fetchAllLeads,
     enabled: !!adminUser?.token,
     refetchOnWindowFocus: false,
@@ -205,7 +270,7 @@ const page = Number(searchParams.get("p")) || 1;
     error: adminOrderError,
     refetch: refetchadminOrder,
   } = useQuery({
-    queryKey: ["adminOrder", page],
+    queryKey: ["adminOrder", page, searchTerm],
     queryFn: fetchAdminOrder,
     enabled:!!adminUser?.token,
     refetchOnWindowFocus: false,
@@ -217,7 +282,7 @@ const page = Number(searchParams.get("p")) || 1;
     error: customersError,
     refetch: refetchCustomers,
   } = useQuery({
-    queryKey: ["allCustomers", page],
+    queryKey: ["allCustomers", page, searchTerm],
     queryFn: fetchAllCustomers,
     enabled:  !!adminUser?.token,
     refetchOnWindowFocus: false,
@@ -232,7 +297,7 @@ const page = Number(searchParams.get("p")) || 1;
   } = useQuery({
     queryKey: ["deadline"],
     queryFn: fetchDeadline,
-    enabled: !!adminUser?.token,
+    enabled: !!(adminUser?.token || user?.token),
     refetchOnWindowFocus: false,
   });
 
@@ -301,8 +366,17 @@ const page = Number(searchParams.get("p")) || 1;
         deadlineData,
         deadlineLoading,
         deadlineError,
-        refetchDeadline
-
+        refetchDeadline,
+        searchTerm,
+        setSearchTerm,
+        dayKey,
+        setDayKey,
+        customerSearch,
+        setCustomerSearch,
+        orderSearch,
+        setOrderSearch,
+        tranSearch, 
+        setTranSearch
       }}
     >
       {children}

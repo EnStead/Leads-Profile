@@ -141,11 +141,11 @@ const Cards = () => {
 
           </div>
 
-          <button onClick={openAddModal}
-            className="bg-brand-blue text-brand-white py-3 rounded-xl font-semibold mt-4 w-full font-park"
+          <a href="https://teams.microsoft.com/l/chat/0/0?users=info@enstead.co" target="_blank" rel="noopener noreferrer"
+            className="bg-brand-blue text-brand-white text-center py-3 rounded-xl font-semibold mt-4 w-full font-park"
           >
             Contact Support 
-          </button>
+          </a>
 
         </div>
       </div>

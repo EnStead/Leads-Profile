@@ -33,7 +33,7 @@ const Table = ({
   openAddModal,
   openOrderDetails,
   openViewLeads,
-  searchTerm,
+  
 }) => {
   const {
     allOrdersData,
@@ -59,11 +59,6 @@ const Table = ({
     }, 200); // 200ms delay
   };
 
-  const filteredOrders = allOrdersData?.data.filter((order) => {
-    const term = searchTerm.toLowerCase();
-
-    return order.customId?.toLowerCase().includes(term);
-  });
 
   const formatDate = (dateString) => {
     const options = {
@@ -84,7 +79,7 @@ const Table = ({
 
   return (
     <section className="w-full h-full">
-      {!filteredOrders.length ? (
+      {!allOrdersData?.data.length ? (
         <EmptyState />
       ) : (
         <div className="overflow-x-auto">
@@ -111,7 +106,7 @@ const Table = ({
             </thead>
 
             <tbody>
-              {filteredOrders.map((order) => (
+              {allOrdersData?.data.map((order) => (
                 <tr
                   key={order._id}
                   className="border-b border-brand-stroke capitalize"

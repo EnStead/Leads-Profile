@@ -2,12 +2,108 @@ import React, { useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 import ExpandableText from "../../../utility/ExpandableText";
+import api from "../../../utility/axios";
+import { useAdminAuth } from "../../../context/AdminContext";
 
 const OrderModal = ({ open, onOpenChange, order, onEdit }) => {
   if (!order) {
     return null; // ⬅ prevents ALL errors until order loads
   }
-// console.log(order)
+
+  const { user } = useAdminAuth();
+  // console.log(order);
+
+  const [downloading, setDownloading] = useState(false);
+
+  // Full date & time formatter (for dateTime)
+const formatDateTimeForCSV = (isoString) => {
+  if (!isoString) return "";
+  const options = {
+    year: "numeric",
+    month: "short",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  };
+  return new Date(isoString).toLocaleString("en-US", options);
+};
+
+// Birthday formatter (date only)
+const formatBirthdayForCSV = (isoString) => {
+  if (!isoString) return "";
+  const options = { year: "numeric", month: "short", day: "2-digit" };
+  return new Date(isoString).toLocaleDateString("en-US", options);
+};
+
+
+  const CSV_FIELDS = [
+    { key: "dateTime", label: "Date & Time" },
+    { key: "firstName", label: "First Name" },
+    { key: "lastName", label: "Last Name" },
+    { key: "email", label: "Email" },
+    { key: "phone", label: "Phone" },
+    { key: "city", label: "City" },
+    { key: "state", label: "State" },
+    { key: "zipCode", label: "Zip" },
+    { key: "bankName", label: "Bank" },
+    { key: "incomeSource", label: "Source" },
+    { key: "monthlyNetIncome", label: "Monthly Income" },
+    { key: "rentOrOwn", label: "Rent Or Own" },
+    { key: "birthday", label: "Birthday" },
+  ];
+
+const handleDownloadCSV = async () => {
+  if (!order?._id) return;
+
+  try {
+    setDownloading(true);
+
+    const res = await api.get(`/orders/admin/${order._id}/leads`, {
+      headers: {
+        Authorization: `Bearer ${user?.token}`,
+      },
+    });
+
+    const leads = res.data?.data?.leads || [];
+
+    if (!leads.length) {
+      alert("No leads available for this order");
+      return;
+    }
+
+    const headers = CSV_FIELDS.map((f) => f.label);
+
+    const rows = leads.map((lead) =>
+      CSV_FIELDS.map((f) => {
+        if (f.key === "dateTime") return `"${formatDateTimeForCSV(lead[f.key])}"`;
+        if (f.key === "birthday") return `"${formatBirthdayForCSV(lead[f.key])}"`;
+        return `"${lead[f.key] ?? ""}"`;
+      }).join(",")
+    );
+
+    const csvContent = [headers.join(","), ...rows].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `order-${order.customId || order._id}-leads.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+
+    setTimeout(() => {
+      onOpenChange(false);
+    }, 300);
+  } catch (err) {
+    console.error("CSV download failed:", err);
+    alert("Failed to download CSV.");
+  } finally {
+    setDownloading(false);
+  }
+};
+
+
   const formatDate = (dateString) => {
     const options = {
       year: "numeric",
@@ -35,13 +131,13 @@ const OrderModal = ({ open, onOpenChange, order, onEdit }) => {
 
         <Dialog.Content
           className="  fixed left-1/2 top-1/2 z-50
-              w-[420px] xsm:w-[520px]
-              max-h-[90vh]
-              overflow-y-auto 
-              hide-scrollbar
-              -translate-x-1/2 -translate-y-1/2
-              bg-white rounded-2xl p-8 shadow-xl  
-            "
+            w-[420px] xsm:w-[520px]
+            max-h-[90vh]
+            overflow-y-auto 
+            hide-scrollbar
+            -translate-x-1/2 -translate-y-1/2
+            bg-white rounded-2xl p-8 shadow-xl  
+          "
         >
           {/* Close Button */}
           <Dialog.Close className="absolute top-6 right-6 text-gray-400 hover:text-gray-600 cursor-pointer">
@@ -135,6 +231,24 @@ const OrderModal = ({ open, onOpenChange, order, onEdit }) => {
                   className="px-6 py-2 w-full rounded-lg bg-brand-blue text-white font-medium hover:opacity-90 transition"
                 >
                   Edit Order Info
+                </button>
+              </div>
+            )}
+            {/* CSV BUTTON */}
+            {["completed", "in_progress"].includes(order.status) && (
+              <div className="mt-4 flex w-full justify-center">
+                <button
+                  type="button"
+                  onClick={handleDownloadCSV}
+                  disabled={downloading}
+                  className={`px-6 py-2 w-full rounded-lg font-medium transition
+                    ${
+                      downloading
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "bg-brand-blue text-white hover:opacity-90"
+                    }`}
+                >
+                  {downloading ? "Downloading..." : "Download CSV"}
                 </button>
               </div>
             )}

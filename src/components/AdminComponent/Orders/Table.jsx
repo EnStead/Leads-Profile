@@ -22,7 +22,7 @@ const formatStatus = (status = "") => {
   return status.replace(/_/g, " ");
 };
 
-const Table = ({ openOrderDetails, searchTerm }) => {
+const Table = ({ openOrderDetails }) => {
   const {
     adminOrderData,
     adminOrderLoading,
@@ -30,8 +30,6 @@ const Table = ({ openOrderDetails, searchTerm }) => {
     page,
     setSearchParams,
   } = useDashboard();
-
- 
 
   let debounceTimer;
 
@@ -48,15 +46,6 @@ const Table = ({ openOrderDetails, searchTerm }) => {
       setSearchParams({ p: newPage });
     }, 200); // 200ms delay
   };
-
-  const filteredOrders = adminOrderData?.data.filter((order) => {
-    const term = searchTerm.toLowerCase();
-
-    return (
-      order.client?.name?.toLowerCase().includes(term) ||
-      order.customId?.toLowerCase().includes(term)
-    );
-  });
 
   const formatDate = (dateString) => {
     const options = {
@@ -76,7 +65,7 @@ const Table = ({ openOrderDetails, searchTerm }) => {
   }
   return (
     <section className="w-full h-full">
-      {!filteredOrders.length ? (
+      {!adminOrderData?.data.length ? (
         <EmptyState />
       ) : (
         <div className="overflow-x-auto">
@@ -106,7 +95,7 @@ const Table = ({ openOrderDetails, searchTerm }) => {
             </thead>
 
             <tbody>
-              {filteredOrders.map((order) => (
+              {adminOrderData?.data.map((order) => (
                 <tr
                   key={order._id}
                   className="border-b border-brand-stroke capitalize"

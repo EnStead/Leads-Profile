@@ -10,9 +10,8 @@ import { useAuth } from "../../context/AuthContext";
 import { useState } from "react";
 import api from "../../utility/axios";
 
-const Cards = ({ searchTerm }) => {
-  const { allOrdersData, allOrdersLoading, allOrdersError, page, setSearchParams, } =
-    useDashboard();
+const Cards = () => {
+  const { allOrdersData, allOrdersLoading, allOrdersError, page, setSearchParams, } = useDashboard();
 
       let debounceTimer;
 
@@ -30,11 +29,6 @@ const Cards = ({ searchTerm }) => {
     }, 200); // 200ms delay
   };
     
-  const filteredLeads = allOrdersData?.data.filter((order) => {
-    const term = searchTerm.toLowerCase();
-
-    return order.customId?.toLowerCase().includes(term);
-  });
 
   const { user } = useAuth(); //user
 
@@ -153,12 +147,12 @@ const Cards = ({ searchTerm }) => {
 
   return (
     <>
-      {!filteredLeads.length ? (
+      {!allOrdersData?.data.length ? (
         <EmptyState />
       ) : (
         <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {Array.isArray(filteredLeads) &&
-            filteredLeads.map((item) => (
+          {Array.isArray(allOrdersData?.data) &&
+            allOrdersData?.data.map((item) => (
               <div
                 key={item._id}
                 className="bg-transparent rounded-t-xl overflow-hidden relative"

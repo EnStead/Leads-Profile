@@ -8,7 +8,6 @@ import Pagination from "../../utility/Pagination";
 import { useQueryClient } from "@tanstack/react-query";
 import { useDashboard } from "../../context/DashboardContext";
 
-
 const WEEKDAY_MAP = {
   1: "Monday",
   2: "Tuesday",
@@ -39,13 +38,9 @@ const OrderDetails = () => {
     setSearchParams({ p: newPage });
   };
 
-  const {
-    deadlineData,
-    deadlineLoading,
-    deadlineError,
-  } = useDashboard();
+  const { deadlineData, deadlineLoading, deadlineError } = useDashboard();
 
-  const cutoff = deadlineData?.data;
+  const cutoff = deadlineData?.data ?? deadlineData;
 
   const cutoffText = (() => {
     if (deadlineLoading) return "Loading cut-off...";
@@ -56,7 +51,6 @@ const OrderDetails = () => {
       cutoff.minute
     )}`;
   })();
-    console.log(cutoffText)
 
   const queryClient = useQueryClient();
 
@@ -383,9 +377,8 @@ const OrderDetails = () => {
                   colSpan={12}
                   className="text-center py-12 font-medium text-brand-subtext text-sm"
                 >
-                 
                   <p className="text-[10px] text-brand-muted">
-                     Leads will start loading from{" "}
+                    Leads will start loading from{" "}
                     <span className="text-brand-royalblue font-medium">
                       {cutoffText}
                     </span>

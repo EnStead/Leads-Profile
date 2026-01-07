@@ -1,14 +1,42 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import LeadsOverview from "./LeadsOverview";
 import UploadCSVModal from "./UploadCSVModal";
+import { useDashboard } from "../../../context/DashboardContext";
+import { Search } from "lucide-react";
+import ToastPop from "../../../utility/ToastPop";
 
 const Leads = () => {
-  const [searchTerm, setSearchTerm] = useState("");
   const [openUpload, setOpenUpload] = useState(false);
 
-  const handleFileSelect = (file) => {
-    console.log("Selected file:", file);
-    // later → send to backend
+  const { searchTerm, setSearchTerm, setDayKey } = useDashboard();
+  const [toastMsg, setToastMsg] = useState("");
+  const [toastType, setToastType] = useState("error");
+
+    const showToast = (msg, type = "error") => {
+    setToastMsg(msg);
+    setToastType(type);
+  };
+
+  const isValidDayKey = (value) => /^\d{8}$/.test(value);
+
+  useEffect(() => {
+  if (searchTerm === "") {
+    setDayKey(""); // show all data automatically
+  }
+}, [searchTerm, setDayKey]);
+
+  const handleSearch = () => {
+    if (!searchTerm) {
+      setDayKey(""); // reset filter
+      return;
+    }
+
+    if (!isValidDayKey(searchTerm)) {
+      showToast('Please enter a valid date in 20260107 format', "error")
+      return;
+    }
+
+    setDayKey(searchTerm); // 🔥 this triggers refetch
   };
 
   return (
@@ -24,14 +52,21 @@ const Leads = () => {
         </div>
 
         <div className="mt-8 flex justify-between items-center gap-4">
-          <div className="relative w-full max-w-xs mt-4 xsm:mt-0">
+          <div className="relative w-full max-w-xs">
             <input
               type="text"
-              placeholder="Search by lead name or source"
+              placeholder="Search by date (20260107)"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full px-4 py-2 pr-12 border bg-brand-white border-t-0 border-x-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-gray"
             />
+
+            <button
+              onClick={handleSearch}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-brand-muted hover:text-brand-primary"
+            >
+              <Search/>
+            </button>
           </div>
 
           <button
@@ -43,12 +78,15 @@ const Leads = () => {
         </div>
       </div>
 
-      <LeadsOverview searchTerm={searchTerm} />
+      <LeadsOverview />
 
-      <UploadCSVModal
-        open={openUpload}
-        onOpenChange={setOpenUpload}
-        onFileSelect={handleFileSelect}
+      <UploadCSVModal open={openUpload} onOpenChange={setOpenUpload} />
+
+      
+      <ToastPop
+        message={toastMsg}
+        type={toastType}
+        onClose={() => setToastMsg("")}
       />
     </section>
   );
