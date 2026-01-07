@@ -34,6 +34,12 @@ const Orders = ({
     setSearchTerm(trimmed);
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
+
   return (
     <section className="bg-brand-sky min-h-[screen]">
       <div className="xsm:flex justify-between items-center">
@@ -53,6 +59,7 @@ const Orders = ({
               value={tranSearch}
               placeholder="Search by ID"
               onChange={(e) => setTranSearch(e.target.value)}
+              onKeyDown={handleKeyDown}
               className="w-full px-4 py-2 pr-12 border bg-brand-white border-t-0 border-x-0 rounded-xl  focus:outline-none focus:ring-2 focus:ring-brand-gray"
             />
 

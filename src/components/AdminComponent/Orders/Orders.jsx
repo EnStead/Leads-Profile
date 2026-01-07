@@ -42,6 +42,12 @@ const Orders = () => {
     setSearchTerm(trimmed);
   };
 
+        const handleKeyDown = (e) => {
+  if (e.key === "Enter") {
+    handleSearch();
+  }
+};
+
   return (
     <section>
       <div className="xsm:flex justify-between items-center">
@@ -62,6 +68,7 @@ const Orders = () => {
               placeholder="Search by name and ID..."
               value={orderSearch}
               onChange={(e) => setOrderSearch(e.target.value)}
+              onKeyDown={handleKeyDown}
               className="w-full px-4 py-2 pr-12 border bg-brand-white border-t-0 border-x-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-gray"
             />
             <button
