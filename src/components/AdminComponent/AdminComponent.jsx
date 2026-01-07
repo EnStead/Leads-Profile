@@ -7,7 +7,6 @@ import Leads from './Leads/Leads'
 import LeadsDetails from './Leads/LeadsDetails'
 import Orders from './Orders/Orders'
 import Customers from './Customers/Customers'
-import CreateOrder from './Home/CreateOrder'
 
 const AdminComponent = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);

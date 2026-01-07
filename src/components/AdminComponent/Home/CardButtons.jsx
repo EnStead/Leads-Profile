@@ -3,8 +3,44 @@ import AddCustomer from '../../../assets/AddCustomer.svg'
 import ViewOrder from '../../../assets/ViewOrder.svg'
 import System from '../../../assets/System.svg'
 import { Link } from 'react-router'
+import { useDashboard } from '../../../context/DashboardContext'
 
-const CardButtons = ({onOpenChange, openAddCustomerModal}) => {
+
+const WEEKDAY_MAP = {
+  1: "Monday",
+  2: "Tuesday",
+  3: "Wednesday",
+  4: "Thursday",
+  5: "Friday",
+  6: "Saturday",
+  7: "Sunday",
+};
+
+const formatTime = (hour, minute) => {
+  const period = hour >= 12 ? "PM" : "AM";
+  const formattedHour = hour % 12 || 12;
+  return `${formattedHour}:${String(minute).padStart(2, "0")} ${period}`;
+};
+
+const CardButtons = ({onOpenChange, openAddCustomerModal, openDeadlineModal}) => {
+  const {
+    deadlineData,
+    deadlineLoading,
+    deadlineError,
+  } = useDashboard();
+
+  const cutoff = deadlineData?.data;
+
+  const cutoffText = (() => {
+    if (deadlineLoading) return "Loading cut-off...";
+    if (deadlineError || !cutoff) return "Not set";
+
+    return `Every ${WEEKDAY_MAP[cutoff.weekday]}, ${formatTime(
+      cutoff.hour,
+      cutoff.minute
+    )}`;
+  })();
+
   return (
     <section className='grid my-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4' >
         {/* CARD 1 */}
@@ -65,23 +101,27 @@ const CardButtons = ({onOpenChange, openAddCustomerModal}) => {
         </Link>
 
         {/* CARD 4 */}
-        <div className='bg-brand-white border border-brand-offwhite 
-          rounded-xl py-2 px-4 w-full h-fit flex flex-col justify-between items-start '
-        >
-            <div className='flex items-center justify-start gap-4'>
-                <div className='p-1 bg-brand-offwhite rounded-lg' >
-                    <img src={System} alt="image" />
-                </div>
-                <div>
-                    <h3 className='text-brand-primary font-semibold font-park mb-2'>
-                        System Status
-                    </h3>
-                    <p className='text-brand-muted font-light text-[10px]'>
-                        Ping Tree: <span className='text-brand-green font-medium' ></span> || API Sync: <span className='text-brand-green font-medium' ></span>
-                    </p>
-                </div>
-            </div>
+      <div
+        onClick={openDeadlineModal}
+        className="bg-brand-white border border-brand-offwhite rounded-xl py-2 px-4 cursor-pointer"
+      >
+        <div className="flex gap-4">
+          <div className="p-1 bg-brand-offwhite rounded-lg">
+            <img src={System} alt="" />
+          </div>
+          <div>
+            <h3 className="font-semibold font-park">
+              Manage Order Deadline
+            </h3>
+            <p className="text-[10px] text-brand-muted">
+              Cut Off:{" "}
+              <span className="text-brand-royalblue font-medium">
+                {cutoffText}
+              </span>
+            </p>
+          </div>
         </div>
+      </div>
     </section>
   )
 }

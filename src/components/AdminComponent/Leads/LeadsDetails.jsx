@@ -363,6 +363,7 @@ const LeadsDetails = () => {
         page={page}
         totalPages={leadsDetailsData?.pagination?.pages}
         onPageChange={handlePageChange}
+        loading={leadsDetailsLoading}
       />
 
     </section>

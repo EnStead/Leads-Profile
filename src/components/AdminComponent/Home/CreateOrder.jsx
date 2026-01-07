@@ -15,9 +15,14 @@ const PREMIUM_BANKS = [
   "TD Bank",
 ];
 
-
-const CreateOrder = ({ open, onOpenChange }) => {
-  const { usersData, usersLoading, usersError, refetchadminOrder, refetchAdminDashboard } = useDashboard();
+const CreateOrder = ({ open, onOpenChange, mode = "create", orderToEdit }) => {
+  const {
+    usersData,
+    usersLoading,
+    usersError,
+    refetchadminOrder,
+    refetchAdminDashboard,
+  } = useDashboard();
   const { user } = useAdminAuth(); // Admin user
 
   const [toastMsg, setToastMsg] = useState("");
@@ -29,8 +34,6 @@ const CreateOrder = ({ open, onOpenChange }) => {
     bankPreference: "mixed",
   });
 
-
-
   const [selectedBanks, setSelectedBanks] = useState([]);
   const [isSelectOpen, setIsSelectOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -41,6 +44,18 @@ const CreateOrder = ({ open, onOpenChange }) => {
   const searchInputRef = useRef(null);
 
   const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    if (mode !== "edit" || !orderToEdit) return;
+
+    setForm({
+      customerName: orderToEdit.client?._id,
+      leadQuantity: orderToEdit.quantity.toString(),
+      bankPreference: orderToEdit.orderType,
+    });
+
+    setSelectedBanks(orderToEdit.banks || []);
+  }, [mode, orderToEdit]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -60,51 +75,50 @@ const CreateOrder = ({ open, onOpenChange }) => {
   }, [isSelectOpen]);
 
   useEffect(() => {
-  if (isSelectOpen && searchInputRef.current) {
-    searchInputRef.current.focus();
-  }
-}, [isSelectOpen]);
-
-// Update this useEffect to check space on open
-useEffect(() => {
-  if (!isSelectOpen || !dropdownRef.current) return;
-
-  const rect = dropdownRef.current.getBoundingClientRect();
-  const spaceBelow = window.innerHeight - rect.bottom;
-  const dropdownHeight = 256; // max height in px (same as max-h-64)
-
-  // Flip dropdown if not enough space below
-  if (spaceBelow < dropdownHeight) {
-    setDropdownAbove(true);
-  } else {
-    setDropdownAbove(false);
-  }
-}, [isSelectOpen]);
-
-useEffect(() => {
-  if (form.bankPreference !== "filtered") return;
-
-  const fetchBanks = async () => {
-    try {
-      setBanksLoading(true);
-
-      const res = await api.get("/leads/banks", {
-        headers: {
-          Authorization: `Bearer ${user?.token}`,
-        },
-      });
-
-      setBanks(res.data.data || []);
-    } catch (err) {
-      console.error("Failed to fetch banks", err);
-    } finally {
-      setBanksLoading(false);
+    if (isSelectOpen && searchInputRef.current) {
+      searchInputRef.current.focus();
     }
-  };
+  }, [isSelectOpen]);
 
-  fetchBanks();
-}, [form.bankPreference, user?.token]);
+  // Update this useEffect to check space on open
+  useEffect(() => {
+    if (!isSelectOpen || !dropdownRef.current) return;
 
+    const rect = dropdownRef.current.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const dropdownHeight = 256; // max height in px (same as max-h-64)
+
+    // Flip dropdown if not enough space below
+    if (spaceBelow < dropdownHeight) {
+      setDropdownAbove(true);
+    } else {
+      setDropdownAbove(false);
+    }
+  }, [isSelectOpen]);
+
+  useEffect(() => {
+    if (form.bankPreference !== "filtered") return;
+
+    const fetchBanks = async () => {
+      try {
+        setBanksLoading(true);
+
+        const res = await api.get("/leads/banks", {
+          headers: {
+            Authorization: `Bearer ${user?.token}`,
+          },
+        });
+
+        setBanks(res.data.data || []);
+      } catch (err) {
+        console.error("Failed to fetch banks", err);
+      } finally {
+        setBanksLoading(false);
+      }
+    };
+
+    fetchBanks();
+  }, [form.bankPreference, user?.token]);
 
   const resetForm = () => {
     setForm({
@@ -117,61 +131,56 @@ useEffect(() => {
   };
 
   const addCustomBank = (name) => {
-  const trimmed = name.trim();
+    const trimmed = name.trim();
 
-  if (!trimmed) return;
+    if (!trimmed) return;
 
-  // Prevent duplicates
-  if (selectedBanks.includes(trimmed)) return;
+    // Prevent duplicates
+    if (selectedBanks.includes(trimmed)) return;
 
-  setSelectedBanks((prev) => [...prev, trimmed]);
-  setBankSearch("");
-};
-
+    setSelectedBanks((prev) => [...prev, trimmed]);
+    setBankSearch("");
+  };
 
   const handleSubmit = async () => {
-    if (!form.customerName) {
-    setToastType("error");
-    setToastMsg("Please select a customer");
-    return;
-  }
-
-    if (!form.leadQuantity) {
+    if (!form.customerName || !form.leadQuantity) {
       setToastType("error");
-      setToastMsg("Please enter lead quantity");
+      setToastMsg("Please fill all required fields");
       return;
     }
 
     try {
-      setLoading(true); // ✅ start loading BEFORE request
+      setLoading(true);
 
-      const response = await api.post(
-        "/orders",
-        {
-          clientUserId: form.customerName,
-          quantity: Number(form.leadQuantity),
-          orderType: form.bankPreference,
-          banks: showBankSelector ? selectedBanks : [],
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${user?.token}`,
-          },
-        }
-      );
+      const payload = {
+        clientUserId: form.customerName,
+        quantity: Number(form.leadQuantity),
+        orderType: form.bankPreference,
+        banks: showBankSelector ? selectedBanks : [],
+      };
+
+      const url =
+        mode === "edit" ? `/orders/admin/${orderToEdit._id}` : "/orders";
+
+      const method = mode === "edit" ? api.put : api.post;
+
+      await method(url, payload, {
+        headers: { Authorization: `Bearer ${user?.token}` },
+      });
 
       setToastType("success");
-      setToastMsg("Order created successfully!");
+      setToastMsg(
+        mode === "edit" ? "Order updated successfully!" : "Order created!"
+      );
 
-      resetForm();
       refetchadminOrder();
       refetchAdminDashboard();
       onOpenChange(false);
     } catch (error) {
       setToastType("error");
-      setToastMsg(error.response?.data?.message || "Failed to create order");
+      setToastMsg(error.response?.data?.message || "Operation failed");
     } finally {
-      setLoading(false); // ✅ always stop loading
+      setLoading(false);
     }
   };
 
@@ -192,22 +201,21 @@ useEffect(() => {
     setSelectedBanks(selectedBanks.filter((b) => b !== bank));
   };
 
-const getBanksList = () => {
-  if (form.bankPreference === "filtered") {
-    return banks.filter((bank) =>
-      bank.name.toLowerCase().includes(bankSearch.toLowerCase())
-    );
-  }
+  const getBanksList = () => {
+    if (form.bankPreference === "filtered") {
+      return banks.filter((bank) =>
+        bank.name.toLowerCase().includes(bankSearch.toLowerCase())
+      );
+    }
 
-  if (form.bankPreference === "premium_bank") {
-    return PREMIUM_BANKS.filter((bank) =>
-      bank.toLowerCase().includes(bankSearch.toLowerCase())
-    ).map((name) => ({ name })); // normalize shape
-  }
+    if (form.bankPreference === "premium_bank") {
+      return PREMIUM_BANKS.filter((bank) =>
+        bank.toLowerCase().includes(bankSearch.toLowerCase())
+      ).map((name) => ({ name })); // normalize shape
+    }
 
-  return [];
-};
-
+    return [];
+  };
 
   const showBankSelector =
     form.bankPreference === "filtered" ||
@@ -236,8 +244,8 @@ const getBanksList = () => {
             </Dialog.Close>
 
             {/* HEADER */}
-            <Dialog.Title className="text-2xl font-bold mb-2 font-park text-center text-gray-900">
-              Create a New Order
+            <Dialog.Title className="text-2xl font-bold mb-2 font-park text-center text-brand-primary">
+              {mode === "edit" ? "Edit Order" : "Create a New Order"}
             </Dialog.Title>
             <Dialog.Description className="text-brand-subtext mb-6 text-center">
               Set up your customer order, criteria, and lead quantity.
@@ -346,7 +354,9 @@ const getBanksList = () => {
                         <RadioGroup.Indicator className="w-2.5 h-2.5 bg-brand-blue rounded-full" />
                       </div>
                       <div className="flex-1">
-                        <p className="font-semibold text-sm font-park">Mixed Banks</p>
+                        <p className="font-semibold text-sm font-park">
+                          Mixed Banks
+                        </p>
                         <p className="text-xs text-brand-muted">
                           Includes leads from all banks. No filtering applied.
                         </p>
@@ -367,9 +377,12 @@ const getBanksList = () => {
                         <RadioGroup.Indicator className="w-2.5 h-2.5 bg-brand-blue rounded-full" />
                       </div>
                       <div className="flex-1">
-                        <p className="font-semibold text-sm font-park">Filter Banks</p>
+                        <p className="font-semibold text-sm font-park">
+                          Filter Banks
+                        </p>
                         <p className="text-xs text-brand-muted">
-                          Only leads from the banks selected will be included in the order.
+                          Only leads from the banks selected will be included in
+                          the order.
                         </p>
                       </div>
                     </div>
@@ -388,14 +401,15 @@ const getBanksList = () => {
                         <RadioGroup.Indicator className="w-2.5 h-2.5 bg-brand-blue rounded-full" />
                       </div>
                       <div className="flex-1">
-                        <p className="font-semibold text-sm font-park">Premium Banks</p>
+                        <p className="font-semibold text-sm font-park">
+                          Premium Banks
+                        </p>
                         <p className="text-xs text-brand-muted">
                           Leads from premium banks are prioritized in the order.
                         </p>
                       </div>
                     </div>
                   </RadioGroup.Item>
-
 
                   {/* Credit Unions */}
                   <RadioGroup.Item value="credit_unions" asChild>
@@ -410,9 +424,12 @@ const getBanksList = () => {
                         <RadioGroup.Indicator className="w-2.5 h-2.5 bg-brand-blue rounded-full" />
                       </div>
                       <div className="flex-1">
-                        <p className="font-semibold text-sm font-park">Credit Unions</p>
+                        <p className="font-semibold text-sm font-park">
+                          Credit Unions
+                        </p>
                         <p className="text-xs text-brand-muted">
-                          The order will exclusively include leads from local credit unions.
+                          The order will exclusively include leads from local
+                          credit unions.
                         </p>
                       </div>
                     </div>
@@ -456,7 +473,6 @@ const getBanksList = () => {
                             }
                           }}
                         />
-
                       ) : (
                         <span className="flex-1 text-gray-500 truncate cursor-pointer">
                           {selectedBanks.length
@@ -472,44 +488,55 @@ const getBanksList = () => {
                       />
                     </div>
 
-
                     {/* Dropdown Menu */}
 
-{isSelectOpen && (
-  <div
-    className="absolute left-0 right-0 bg-white border border-gray-200 rounded-xl shadow-lg max-h-64 overflow-y-auto z-50"
-    style={{
-      top: dropdownAbove ? "auto" : "100%",
-      bottom: dropdownAbove ? "100%" : "auto",
-      marginTop: dropdownAbove ? 0 : "0.5rem",  // mt-2
-      marginBottom: dropdownAbove ? "0.5rem" : 0,
-    }}
-  >
-    {banksLoading ? (
-      <p className="p-4 text-sm text-gray-500">Loading banks...</p>
-    ) : getBanksList().length === 0 ? (
-      <p className="p-4 text-sm text-gray-500">Press “Enter” to add bank</p>
-    ) : (
-      getBanksList().map((bank) => (
-        <div
-          key={bank.name}
-          onClick={() => toggleBank(bank.name)}
-          className={`px-4 py-2.5 cursor-pointer hover:bg-gray-50 flex items-center justify-between ${
-            selectedBanks.includes(bank.name) ? "bg-blue-50" : ""
-          }`}
-        >
-          <div>
-            <p className="text-sm text-gray-700">{bank.name}</p>
-            <p className="text-xs text-gray-400">{bank.count} leads available</p>
-          </div>
-          {selectedBanks.includes(bank.name) && (
-            <span className="text-brand-blue text-sm">✓</span>
-          )}
-        </div>
-      ))
-    )}
-  </div>
-)}
+                    {isSelectOpen && (
+                      <div
+                        className="absolute left-0 right-0 bg-white border border-gray-200 rounded-xl shadow-lg max-h-64 overflow-y-auto z-50"
+                        style={{
+                          top: dropdownAbove ? "auto" : "100%",
+                          bottom: dropdownAbove ? "100%" : "auto",
+                          marginTop: dropdownAbove ? 0 : "0.5rem", // mt-2
+                          marginBottom: dropdownAbove ? "0.5rem" : 0,
+                        }}
+                      >
+                        {banksLoading ? (
+                          <p className="p-4 text-sm text-gray-500">
+                            Loading banks...
+                          </p>
+                        ) : getBanksList().length === 0 ? (
+                          <p className="p-4 text-sm text-gray-500">
+                            Press “Enter” to add bank
+                          </p>
+                        ) : (
+                          getBanksList().map((bank) => (
+                            <div
+                              key={bank.name}
+                              onClick={() => toggleBank(bank.name)}
+                              className={`px-4 py-2.5 cursor-pointer hover:bg-gray-50 flex items-center justify-between ${
+                                selectedBanks.includes(bank.name)
+                                  ? "bg-blue-50"
+                                  : ""
+                              }`}
+                            >
+                              <div>
+                                <p className="text-sm text-gray-700">
+                                  {bank.name}
+                                </p>
+                                <p className="text-xs text-gray-400">
+                                  {bank.count} leads available
+                                </p>
+                              </div>
+                              {selectedBanks.includes(bank.name) && (
+                                <span className="text-brand-blue text-sm">
+                                  ✓
+                                </span>
+                              )}
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   {/* Selected Banks Tags */}
@@ -548,7 +575,13 @@ const getBanksList = () => {
                   ${showBankSelector ? "" : "mt-12"}
                 `}
               >
-                {loading ? "Creating order..." : "Start Loading Leads"}
+                {loading
+                  ? mode === "edit"
+                    ? "Updating order..."
+                    : "Creating order..."
+                  : mode === "edit"
+                  ? "Update Order"
+                  : "Start Loading Leads"}
               </button>
             </div>
           </Dialog.Content>

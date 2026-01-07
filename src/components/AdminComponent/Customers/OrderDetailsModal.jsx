@@ -89,8 +89,8 @@ const OrderModal = ({ open, onOpenChange, order }) => {
                       <h4 className="font-medium text-brand-subtext text-sm">
                         Order {order._id}
                       </h4>
-                      <p className="text-xs text-brand-subtext mt-1">
-                        Category: {order.orderType} || Quantity: {order.quantity.toLocaleString()}
+                      <p className="text-xs text-brand-subtext mt-1 capitalize">
+                        Category: {formatStatus(order.orderType)} || Quantity: {order.quantity.toLocaleString()}
                       </p>
                     </div>
                     <div className="text-right">
@@ -98,7 +98,7 @@ const OrderModal = ({ open, onOpenChange, order }) => {
                         className={`text-sm font-medium ml-1 capitalize ${
                             order.status === "completed"
                             ? "text-brand-green"
-                            : order.status === "in progress" || "in_progress"
+                            : order.status === "in_progress"
                             ? "text-brand-blue"
                             : "text-brand-muted"
                         }`}

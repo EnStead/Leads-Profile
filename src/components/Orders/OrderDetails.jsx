@@ -6,6 +6,24 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../../context/AuthContext";
 import Pagination from "../../utility/Pagination";
 import { useQueryClient } from "@tanstack/react-query";
+import { useDashboard } from "../../context/DashboardContext";
+
+
+const WEEKDAY_MAP = {
+  1: "Monday",
+  2: "Tuesday",
+  3: "Wednesday",
+  4: "Thursday",
+  5: "Friday",
+  6: "Saturday",
+  7: "Sunday",
+};
+
+const formatTime = (hour, minute) => {
+  const period = hour >= 12 ? "PM" : "AM";
+  const formattedHour = hour % 12 || 12;
+  return `${formattedHour}:${String(minute).padStart(2, "0")} ${period}`;
+};
 
 const OrderDetails = () => {
   const navigate = useNavigate();
@@ -20,6 +38,25 @@ const OrderDetails = () => {
   const handlePageChange = (newPage) => {
     setSearchParams({ p: newPage });
   };
+
+  const {
+    deadlineData,
+    deadlineLoading,
+    deadlineError,
+  } = useDashboard();
+
+  const cutoff = deadlineData?.data;
+
+  const cutoffText = (() => {
+    if (deadlineLoading) return "Loading cut-off...";
+    if (deadlineError || !cutoff) return "Not set";
+
+    return `Every ${WEEKDAY_MAP[cutoff.weekday]}, ${formatTime(
+      cutoff.hour,
+      cutoff.minute
+    )}`;
+  })();
+    console.log(cutoffText)
 
   const queryClient = useQueryClient();
 
@@ -54,48 +91,48 @@ const OrderDetails = () => {
     console.log("Fetching order details...");
   };
 
-    const sortedLeads = () => {
-  if (!OrderDetailsData?.data) return [];
+  const sortedLeads = () => {
+    if (!OrderDetailsData?.data) return [];
 
-  const data = [...OrderDetailsData.data];
+    const data = [...OrderDetailsData.data];
 
-  switch (sort) {
-    case "oldest":
-      return data.sort(
-        (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
-      );
+    switch (sort) {
+      case "oldest":
+        return data.sort(
+          (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+        );
 
-    case "az":
-      return data.sort((a, b) =>
-        (a.firstName || "").localeCompare(b.firstName || "")
-      );
+      case "az":
+        return data.sort((a, b) =>
+          (a.firstName || "").localeCompare(b.firstName || "")
+        );
 
-    case "newest":
-    default:
-      return data.sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      );
-  }
-};
+      case "newest":
+      default:
+        return data.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+    }
+  };
 
-    const CSV_FIELDS = [
-  { key: "dateTime", label: "Date & Time" },
-  { key: "firstName", label: "First Name" },
-  { key: "lastName", label: "Last Name" },
-  { key: "email", label: "Email" },
-  { key: "phone", label: "Phone" },
-  { key: "city", label: "City" },
-  { key: "state", label: "State" },
-  { key: "zipCode", label: "Zip" },
-  { key: "bankName", label: "Bank" },
-  { key: "incomeSource", label: "Source" },
-  { key: "monthlyNetIncome", label: "Monthly Income" },
-  { key: "subId", label: "SubId" },
-  { key: "subId2", label: "SubId2" },
-  { key: "birthday	", label: "Birthday	" },
-  { key: "timeEmployed", label: "Time Employed" },
-  { key: "rentOrOwn", label: "Rent Or Own" },
-];
+  const CSV_FIELDS = [
+    { key: "dateTime", label: "Date & Time" },
+    { key: "firstName", label: "First Name" },
+    { key: "lastName", label: "Last Name" },
+    { key: "email", label: "Email" },
+    { key: "phone", label: "Phone" },
+    { key: "city", label: "City" },
+    { key: "state", label: "State" },
+    { key: "zipCode", label: "Zip" },
+    { key: "bankName", label: "Bank" },
+    { key: "incomeSource", label: "Source" },
+    { key: "monthlyNetIncome", label: "Monthly Income" },
+    { key: "subId", label: "SubId" },
+    { key: "subId2", label: "SubId2" },
+    { key: "birthday	", label: "Birthday	" },
+    { key: "timeEmployed", label: "Time Employed" },
+    { key: "rentOrOwn", label: "Rent Or Own" },
+  ];
 
   // --- Last updated time ---
   const lastUpdated = OrderDetailsData?.[0]?.updatedAt
@@ -128,14 +165,14 @@ const OrderDetails = () => {
         return;
       }
 
-const headers = CSV_FIELDS.map((f) => f.label);
+      const headers = CSV_FIELDS.map((f) => f.label);
 
-const csvRows = [
-  headers.join(","),
-  ...leads.map((lead) =>
-    CSV_FIELDS.map((f) => `"${lead[f.key] ?? ""}"`).join(",")
-  ),
-];
+      const csvRows = [
+        headers.join(","),
+        ...leads.map((lead) =>
+          CSV_FIELDS.map((f) => `"${lead[f.key] ?? ""}"`).join(",")
+        ),
+      ];
 
       const csvContent = csvRows.join("\n");
       const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
@@ -287,7 +324,7 @@ const csvRows = [
             {downloadingDay === orderId ? "Downloading..." : "Download CSV"}
           </button>
 
-                    <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2">
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value)}
@@ -346,10 +383,13 @@ const csvRows = [
                   colSpan={12}
                   className="text-center py-12 font-medium text-brand-subtext text-sm"
                 >
-                  Leads will start loading from{" "}
-                  <span className="font-semibold text-brand-primary">
-                    {formatFullDate(nextMonday)} at 09 AM EST.
-                  </span>
+                 
+                  <p className="text-[10px] text-brand-muted">
+                     Leads will start loading from{" "}
+                    <span className="text-brand-royalblue font-medium">
+                      {cutoffText}
+                    </span>
+                  </p>
                 </td>
               </tr>
             ) : (

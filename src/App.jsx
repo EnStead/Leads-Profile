@@ -28,7 +28,7 @@ function App() {
 
   return (
     <Toast.Provider swipeDirection="right">
-      <DashboardProvider>
+     
           <Router>
 
             <ScrollToTop /> 
@@ -65,7 +65,7 @@ function App() {
             </Routes>
 
           </Router>
-      </DashboardProvider>
+     
 
     </Toast.Provider>
   )

@@ -1,15 +1,17 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, } from "react";
 import api from "../utility/axios";
 import { useAuth } from "./AuthContext";
 import { useAdminAuth } from "./AdminContext";
 import { useQuery } from "@tanstack/react-query";
+import { useSearchParams } from "react-router";
 
 export const DashboardContext = createContext();
 
 export const DashboardProvider = ({ children, orderId }) => {
   const { user } = useAuth(); // Client user
   const { user: adminUser } = useAdminAuth(); // Admin user
-  const [page, setPage] = useState(1);
+const [searchParams, setSearchParams] = useSearchParams();
+const page = Number(searchParams.get("p")) || 1;
 
 
 
@@ -135,8 +137,26 @@ export const DashboardProvider = ({ children, orderId }) => {
         Authorization: `Bearer ${adminUser?.token}`, // use client token if needed
       },
     });
+    
+
     return res.data; // array of users
   };
+
+    // --- DEADLINE API CALL ---
+    const fetchDeadline = async () => {
+      const token = adminUser?.token || user?.token;
+
+      if (!token) throw new Error("No auth token");
+
+      const res = await api.get("/orders/admin/cutoff", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      return res.data;
+    };
+
 
   // -------------------------
   // ADMIN DASHBOARD REACT QUERY
@@ -201,6 +221,19 @@ export const DashboardProvider = ({ children, orderId }) => {
     queryFn: fetchAllCustomers,
     enabled:  !!adminUser?.token,
     refetchOnWindowFocus: false,
+    keepPreviousData: true,
+  });
+
+  const {
+    data: deadlineData,
+    isLoading: deadlineLoading,
+    error: deadlineError,
+    refetch: refetchDeadline,
+  } = useQuery({
+    queryKey: ["deadline"],
+    queryFn: fetchDeadline,
+    enabled: !!adminUser?.token,
+    refetchOnWindowFocus: false,
   });
 
   // -------------------------
@@ -227,8 +260,8 @@ export const DashboardProvider = ({ children, orderId }) => {
         OrderDetailsLoading,
         OrderDetailsError,
         refetchOrderDetails,
-        page,
-        setPage,
+
+        
 
         // Admin Dashboard
         adminDashboardData,
@@ -253,12 +286,23 @@ export const DashboardProvider = ({ children, orderId }) => {
         adminOrderLoading,
         adminOrderError,
         refetchadminOrder,
+        
 
         // Admin Order
         customersData,
         customersLoading,
         customersError,
-        refetchCustomers
+        refetchCustomers,
+        searchParams,
+        setSearchParams,
+        page,
+        
+        // Deadline
+        deadlineData,
+        deadlineLoading,
+        deadlineError,
+        refetchDeadline
+
       }}
     >
       {children}

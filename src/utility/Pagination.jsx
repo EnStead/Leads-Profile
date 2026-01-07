@@ -1,7 +1,6 @@
-// src/components/ui/Pagination.jsx
-import React from "react";
 
-const Pagination = ({ page, totalPages, onPageChange }) => {
+
+const Pagination = ({ page, totalPages, onPageChange, loading }) => {
   if (!totalPages || totalPages === 1) return null;
 
   const getPages = () => {
@@ -45,7 +44,7 @@ const Pagination = ({ page, totalPages, onPageChange }) => {
       <button
         className="px-3 py-2 border rounded-lg disabled:opacity-50"
         onClick={() => onPageChange(page - 1)}
-        disabled={page === 1}
+        disabled={page === 1 || loading}
       >
         Previous
       </button>
@@ -78,7 +77,7 @@ const Pagination = ({ page, totalPages, onPageChange }) => {
       <button
         className="px-3 py-2 border rounded-lg disabled:opacity-50"
         onClick={() => onPageChange(page + 1)}
-        disabled={page === totalPages}
+        disabled={page === totalPages || loading}
       >
         Next
       </button>
