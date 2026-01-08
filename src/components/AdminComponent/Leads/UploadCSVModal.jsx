@@ -28,7 +28,7 @@ const HEADER_ALIASES = {
   address: ["address"],
   phone: ["phone", "phone_number", "mobile"],
   bankName: ["bank_name", "bank", "bankname"],
-  loanAmount: ["loan_amount, loanamount, loan"],
+  loanAmount: ["loan_amount", "loanamount", "loan"],
   birthday: ["birthday", "dob", "date_of_birth"],
   email: ["email", "email_address"],
 };
@@ -235,7 +235,7 @@ const UploadCSVModal = ({ open, onOpenChange }) => {
   const uploadLeads = async (data) => {
     setUploading(true);
     // setProgress(0);
-
+    console.log(data)
     try {
       await api.post(
         "/leads/raw-leads",
