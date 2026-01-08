@@ -13,26 +13,41 @@ import { useDashboard } from "../../context/DashboardContext";
 const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 const OrdersChart = () => {
-  const [range, setRange] = useState("6M");
-  const ranges = ["7D", "3M", "6M", "1M", "1Y"];
-  const [hoverIndex, setHoverIndex] = useState(null);
+  const RANGE_TO_MONTHS = {
+  "7D": 1,   // approximate (show current month)
+  "1M": 1,
+  "3M": 3,
+  "6M": 6,
+  "1Y": 12,
+};
+
+const [range, setRange] = useState("7D");
+const ranges = ["7D", "1M", "3M", "6M", "1Y"];
+const [hoverIndex, setHoverIndex] = useState(null);
+
+const toDate = (year, month) => new Date(year, month - 1, 1);
 
   const { dashboardData, dashboardLoading,dashboardError } = useDashboard();
   const orderRate = dashboardData?.orderRate;
 
   // Transform API data for Recharts
-  const lineData = orderRate?.map(item => ({
-    name: MONTHS[item.month - 1], // Convert month number to short name
-    value: item.count,
-  }));
+const monthsToShow = RANGE_TO_MONTHS[range];
+const now = new Date();
 
-  if (dashboardLoading) {
-    return (
-      <div className="w-full h-52 flex items-center justify-center">
-        <p className="text-gray-400">Loading chart...</p>
-      </div>
-    );
-  }
+const filteredRate = orderRate?.filter(item => {
+  const itemDate = toDate(item.year, item.month);
+  const diffInMonths =
+    (now.getFullYear() - itemDate.getFullYear()) * 12 +
+    (now.getMonth() - itemDate.getMonth());
+
+  return diffInMonths < monthsToShow;
+}) || [];
+
+const lineData = filteredRate.map(item => ({
+  name: MONTHS[item.month - 1],
+  value: item.count,
+}));
+
 
 
   return (
@@ -62,7 +77,7 @@ const OrdersChart = () => {
       <div className="w-full h-32">
         {
           !lineData.length ?       <div className="w-full font-park flex items-center justify-center text-brand-gray font-semibold">
-            No Data yet!!
+           Not enough data for this range
           </div> : 
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart

@@ -169,7 +169,11 @@ const Table = ({
                         )}
 
                         <DropdownMenu.Item className="px-3 py-2 text-sm border-brand-white hover:bg-brand-sky cursor-pointer">
+                                      
+                        <a href="https://teams.microsoft.com/l/chat/0/0?users=info@enstead.co" target="_blank" rel="noopener noreferrer" className="flex gap-3 ">
                           Contact Support
+                        </a>
+                                        
                         </DropdownMenu.Item>
                       </DropdownMenu.Content>
                     </DropdownMenu.Root>

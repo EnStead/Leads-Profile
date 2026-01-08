@@ -175,7 +175,7 @@ const OrderDetailsModal = ({ open, onOpenChange, order,openViewLeads }) => {
             <div className="flex justify-between" >
               <h3 className="font-semibold mb-3">Status Timeline</h3>
               <div>
-                <a href="http://" target="_blank" rel="noopener noreferrer" className="flex gap-3 text-brand-blue font-semibold underline">
+                <a href="https://teams.microsoft.com/l/chat/0/0?users=info@enstead.co" target="_blank" rel="noopener noreferrer" className="flex gap-3 text-brand-blue font-semibold underline">
                   <img src={Teams} alt="Image" />  Chat With Support
                 </a>
               </div>
