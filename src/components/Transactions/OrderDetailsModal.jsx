@@ -69,9 +69,10 @@ const OrderDetailsModal = ({ open, onOpenChange, order,openViewLeads }) => {
     // Map order status to progress step (0–3)
     const getCurrentStep = () => {
     switch (order.status) {
-        case "processing":
-        case "in progress":
-        return 1; // Order Created → Processing
+        case "pending":
+          return 0; // Order Created → Processing
+        case "in_progress":
+          return 1
         case "completed":
         return 2; // Processing → Completed
         default:
@@ -110,9 +111,9 @@ const OrderDetailsModal = ({ open, onOpenChange, order,openViewLeads }) => {
                     {
                         order.status === "completed"
                         ? "Paid"
-                        : order.status === "in progress"
+                        : order.status === "in_progress"
                         ? "Paid"
-                        : order.status === "processing"
+                        : order.status === "pending"
                         ? "Paid"
                         : "Paid"
                     }
@@ -124,7 +125,7 @@ const OrderDetailsModal = ({ open, onOpenChange, order,openViewLeads }) => {
                         ? "text-brand-green"
                         : order.status === "in_progress"
                         ? "text-brand-blue"
-                        : order.status === "processing"
+                        : order.status === "pending"
                         ? "text-brand-muted"
                         : "text-brand-muted"
                     }`}
