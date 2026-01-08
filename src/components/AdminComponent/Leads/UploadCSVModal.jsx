@@ -25,15 +25,11 @@ const HEADER_ALIASES = {
   zipCode: ["zip_code", "zipcode", "postal_code", "zip"],
   city: ["city"],
   state: ["state"],
+  address: ["address"],
   phone: ["phone", "phone_number", "mobile"],
-  incomeSource: ["income_source", "source_of_income"],
   bankName: ["bank_name", "bank", "bankname"],
-  monthlyNetIncome: ["monthly_net_income", "monthly_income", "income", "loan_amount"],
-  subId: ["sub_id", "subid"],
-  subId2: ["subid2", "sub_id_2"],
-  rentOrOwn: ["rent_or_own", "housing_status"],
+  loanAmount: ["loan_amount, loanamount, loan"],
   birthday: ["birthday", "dob", "date_of_birth"],
-  timeEmployed: ["time_employed", "employment_duration"],
   email: ["email", "email_address"],
 };
 
@@ -115,9 +111,9 @@ const REQUIRED_FIELDS = ["dateTime", "firstName", "lastName", "email"];
 
 const normalizeLead = (row, index) => {
   const rowIdentifier =
-    getValue(row, "email") || getValue(row, "subId") || `#${index + 1}`;
+    getValue(row, "email") || getValue(row, "firstName") || `#${index + 1}`;
   const birthdayValue = clean(getValue(row, "birthday"));
-  const rawMonthlyIncome = clean(getValue(row, "monthlyNetIncome"));
+  const rawMonthlyIncome = clean(getValue(row, "loanAmount"));
 
   const lead = {
     dateTime: parseDateString(
@@ -131,22 +127,15 @@ const normalizeLead = (row, index) => {
     phone: clean(getValue(row, "phone")),
     city: clean(getValue(row, "city")),
     state: clean(getValue(row, "state")),
-    incomeSource: clean(getValue(row, "incomeSource")),
+    address: clean(getValue(row, "address")),
     bankName: clean(getValue(row, "bankName")),
-    subId: clean(getValue(row, "subId")),
-    subId2: clean(getValue(row, "subId2")),
-    rentOrOwn: clean(getValue(row, "rentOrOwn")),
     zipCode: clean(getValue(row, "zipCode")),
-    monthlyNetIncome:
+    loanAmount:
       rawMonthlyIncome === null ||
       rawMonthlyIncome === undefined ||
       rawMonthlyIncome === ""
         ? 0
         : Number(rawMonthlyIncome) || 0,
-    timeEmployed:
-      clean(getValue(row, "timeEmployed")) !== null
-        ? Number(clean(getValue(row, "timeEmployed")))
-        : null,
     birthday: birthdayValue
       ? parseDateString(birthdayValue, index, rowIdentifier)
       : null,
