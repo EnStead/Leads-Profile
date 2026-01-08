@@ -19,15 +19,11 @@ const LeadsOverview = () => {
     { key: "phone", label: "Phone" },
     { key: "city", label: "City" },
     { key: "state", label: "State" },
+    { key: "address", label: "Address" },
     { key: "zipCode", label: "Zip" },
     { key: "bankName", label: "Bank" },
-    { key: "incomeSource", label: "Source" },
-    { key: "monthlyNetIncome", label: "Monthly Income" },
-    { key: "subId", label: "SubId" },
-    { key: "subId2", label: "SubId2" },
+    { key: "loanAmount", label: "Loan Amount" },
     { key: "birthday	", label: "Birthday	" },
-    { key: "timeEmployed", label: "Time Employed" },
-    { key: "rentOrOwn", label: "Rent Or Own" },
   ];
 
   const downloadCSV = async (dayKey, totalLeads) => {

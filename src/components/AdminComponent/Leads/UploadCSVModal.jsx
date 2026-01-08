@@ -235,7 +235,7 @@ const UploadCSVModal = ({ open, onOpenChange }) => {
   const uploadLeads = async (data) => {
     setUploading(true);
     // setProgress(0);
-    console.log(data)
+    // console.log(data)
     try {
       await api.post(
         "/leads/raw-leads",

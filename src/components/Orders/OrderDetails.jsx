@@ -116,16 +116,12 @@ const OrderDetails = () => {
     { key: "email", label: "Email" },
     { key: "phone", label: "Phone" },
     { key: "city", label: "City" },
+    { key: "address", label: "Address" },
     { key: "state", label: "State" },
     { key: "zipCode", label: "Zip" },
     { key: "bankName", label: "Bank" },
-    { key: "incomeSource", label: "Source" },
-    { key: "monthlyNetIncome", label: "Monthly Income" },
-    { key: "subId", label: "SubId" },
-    { key: "subId2", label: "SubId2" },
+    { key: "loanAmount", label: "Loan Amount" },
     { key: "birthday	", label: "Birthday	" },
-    { key: "timeEmployed", label: "Time Employed" },
-    { key: "rentOrOwn", label: "Rent Or Own" },
   ];
 
   // --- Last updated time ---
@@ -344,11 +340,10 @@ const OrderDetails = () => {
                 "Phone",
                 "City",
                 "State",
+                "Address",
                 "Zip",
                 "Bank",
-                "Source",
-                "Monthly Income",
-                "Rent/Own",
+                "Loan Amount",
                 "Birthday",
               ].map((header) => (
                 <th
@@ -406,6 +401,9 @@ const OrderDetails = () => {
                   <td className="p-3 font-light text-brand-subtext capitalize text-sm">
                     {lead.state}
                   </td>
+                  <td className="p-3 font-light text-brand-subtext capitalize text-sm">
+                    {lead.address}
+                  </td>
                   <td className="p-3 font-light text-brand-subtext text-sm">
                     {lead.zipCode}
                   </td>
@@ -413,13 +411,7 @@ const OrderDetails = () => {
                     {lead.bankName}
                   </td>
                   <td className="p-3 font-light text-brand-subtext text-sm">
-                    {formatSource(lead.incomeSource)}
-                  </td>
-                  <td className="p-3 font-light text-brand-subtext text-sm">
-                    {formatNumber(lead.monthlyNetIncome)}
-                  </td>
-                  <td className="p-3 font-light text-brand-subtext capitalize text-sm">
-                    {lead.rentOrOwn}
+                    {formatNumber(lead.loanAmount)}
                   </td>
                   <td className="p-3 font-light text-brand-subtext text-sm">
                     {new Date(lead.birthday).toLocaleDateString()}
