@@ -19,16 +19,16 @@ const normalizeHeader = (header = "") =>
     .replace(/^_|_$/g, "");
 
 const HEADER_ALIASES = {
-  dateTime: ["date_time", "datetime", "dateandtime", "date", "date_and_time"],
-  firstName: ["first_name", "firstname"],
-  lastName: ["last_name", "lastname"],
-  zipCode: ["zip_code", "zipcode", "postal_code"],
+  dateTime: ["date_time", "datetime", "dateandtime", "date", "date_and_time", "lead_date"],
+  firstName: ["first_name", "firstname","fname"],
+  lastName: ["last_name", "lastname", "lname"],
+  zipCode: ["zip_code", "zipcode", "postal_code", "zip"],
   city: ["city"],
   state: ["state"],
   phone: ["phone", "phone_number", "mobile"],
   incomeSource: ["income_source", "source_of_income"],
-  bankName: ["bank_name", "bank"],
-  monthlyNetIncome: ["monthly_net_income", "monthly_income", "income"],
+  bankName: ["bank_name", "bank", "bankname"],
+  monthlyNetIncome: ["monthly_net_income", "monthly_income", "income", "loan_amount"],
   subId: ["sub_id", "subid"],
   subId2: ["subid2", "sub_id_2"],
   rentOrOwn: ["rent_or_own", "housing_status"],
