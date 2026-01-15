@@ -20,7 +20,6 @@ const LeadsDetails = () => {
     setSearchParams({ p: newPage });
   };
 
-
   const fetchLeadsDetails = async ({ queryKey }) => {
     const [, orderId, page] = queryKey;
 
@@ -50,130 +49,128 @@ const LeadsDetails = () => {
   };
 
   const sortedLeads = () => {
-  if (!leadsDetailsData?.data) return [];
+    if (!leadsDetailsData?.data) return [];
 
-  const data = [...leadsDetailsData.data];
+    const data = [...leadsDetailsData.data];
 
-  switch (sort) {
-    case "oldest":
-      return data.sort(
-        (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
-      );
+    switch (sort) {
+      case "oldest":
+        return data.sort(
+          (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+        );
 
-    case "az":
-      return data.sort((a, b) =>
-        (a.firstName || "").localeCompare(b.firstName || "")
-      );
+      case "az":
+        return data.sort((a, b) =>
+          (a.firstName || "").localeCompare(b.firstName || "")
+        );
 
-    case "newest":
-    default:
-      return data.sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      );
-  }
-};
+      case "newest":
+      default:
+        return data.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+    }
+  };
 
   // --- Last updated time ---
   const lastUpdated = leadsDetailsData?.[0]?.updatedAt
     ? new Date(leadsDetailsData[0].updatedAt).toLocaleString()
-  : "N/A";
+    : "N/A";
 
   const CSV_FIELDS = [
-  { key: "dateTime", label: "Date & Time" },
-  { key: "firstName", label: "First Name" },
-  { key: "lastName", label: "Last Name" },
-  { key: "email", label: "Email" },
-  { key: "phone", label: "Phone" },
-  { key: "city", label: "City" },
-  { key: "state", label: "State" },
-  { key: "zipCode", label: "Zip" },
-  { key: "bankName", label: "Bank" },
-  { key: "loanAmount", label: "Loan Amount" },
-  { key: "birthday	", label: "Birthday	" },
-  { key: "address	", label: "address	" },
-];
-
+    { key: "dateTime", label: "Date & Time" },
+    { key: "firstName", label: "First Name" },
+    { key: "lastName", label: "Last Name" },
+    { key: "email", label: "Email" },
+    { key: "phone", label: "Phone" },
+    { key: "city", label: "City" },
+    { key: "state", label: "State" },
+    { key: "zipCode", label: "Zip" },
+    { key: "bankName", label: "Bank" },
+    { key: "loanAmount", label: "Loan Amount" },
+    { key: "birthday	", label: "Birthday	" },
+    { key: "address	", label: "address	" },
+  ];
 
   const [downloadingDay, setDownloadingDay] = useState(null); // stores the dayKey being downloaded
 
   // --- FORMATTERS ---
 
-// 1. Date & Time formatter (for CSV)
-const formatDateTimeForCSV = (isoString) => {
-  if (!isoString) return "";
-  const options = {
-    year: "numeric",
-    month: "short",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
+  // 1. Date & Time formatter (for CSV)
+  const formatDateTimeForCSV = (isoString) => {
+    if (!isoString) return "";
+    const options = {
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    };
+    return new Date(isoString).toLocaleString("en-US", options);
   };
-  return new Date(isoString).toLocaleString("en-US", options);
-};
 
-// 2. Birthday formatter (date only)
-const formatBirthdayForCSV = (isoString) => {
-  if (!isoString) return "";
-  const options = { year: "numeric", month: "short", day: "2-digit" };
-  return new Date(isoString).toLocaleDateString("en-US", options);
-};
+  // 2. Birthday formatter (date only)
+  const formatBirthdayForCSV = (isoString) => {
+    if (!isoString) return "";
+    const options = { year: "numeric", month: "short", day: "2-digit" };
+    return new Date(isoString).toLocaleDateString("en-US", options);
+  };
 
+  const downloadCSV = async (dayKey) => {
+    try {
+      setDownloadingDay(dayKey);
 
+      const totalLeads = leadsDetailsData?.pagination?.total || 1000;
 
+      const res = await api.get(
+        `/leads/daily/${dayKey}?page=1&limit=${totalLeads}`,
+        {
+          headers: {
+            Authorization: `Bearer ${user?.token}`,
+          },
+        }
+      );
 
-const downloadCSV = async (dayKey) => {
-  try {
-    setDownloadingDay(dayKey);
+      const leads = res.data.data;
 
-    const totalLeads = leadsDetailsData?.pagination?.total || 1000;
-
-    const res = await api.get(
-      `/leads/daily/${dayKey}?page=1&limit=${totalLeads}`,
-      {
-        headers: {
-          Authorization: `Bearer ${user?.token}`,
-        },
+      if (!leads.length) {
+        alert("No leads available for this day");
+        setDownloadingDay(null);
+        return;
       }
-    );
 
-    const leads = res.data.data;
+      const headers = CSV_FIELDS.map((f) => f.label);
 
-    if (!leads.length) {
-      alert("No leads available for this day");
+      const csvRows = [
+        headers.join(","),
+        ...leads.map((lead) =>
+          CSV_FIELDS.map((f) => {
+            // Apply formatting
+            if (f.key === "dateTime")
+              return `"${formatDateTimeForCSV(lead[f.key])}"`;
+            if (f.key === "birthday" || f.key === "birthday\t")
+              return `"${formatBirthdayForCSV(lead[f.key])}"`;
+            return `"${lead[f.key] ?? ""}"`;
+          }).join(",")
+        ),
+      ];
+
+      const csvContent = csvRows.join("\n");
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `leads-${dayKey}.csv`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("CSV download failed", err);
+      alert("Failed to download CSV. Make sure you are logged in.");
+    } finally {
       setDownloadingDay(null);
-      return;
     }
-
-    const headers = CSV_FIELDS.map((f) => f.label);
-
-    const csvRows = [
-      headers.join(","),
-      ...leads.map((lead) =>
-        CSV_FIELDS.map((f) => {
-          // Apply formatting
-          if (f.key === "dateTime") return `"${formatDateTimeForCSV(lead[f.key])}"`;
-          if (f.key === "birthday" || f.key === "birthday\t") return `"${formatBirthdayForCSV(lead[f.key])}"`;
-          return `"${lead[f.key] ?? ""}"`;
-        }).join(",")
-      ),
-    ];
-
-    const csvContent = csvRows.join("\n");
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `leads-${dayKey}.csv`;
-    link.click();
-    URL.revokeObjectURL(url);
-  } catch (err) {
-    console.error("CSV download failed", err);
-    alert("Failed to download CSV. Make sure you are logged in.");
-  } finally {
-    setDownloadingDay(null);
-  }
-};
+  };
 
   // ---- FORMATTERS ----
 
@@ -286,7 +283,6 @@ const downloadCSV = async (dayKey) => {
               <option value="az">A → Z</option>
             </select>
           </div>
-
         </div>
       </div>
 
@@ -386,7 +382,6 @@ const downloadCSV = async (dayKey) => {
         onPageChange={handlePageChange}
         loading={leadsDetailsLoading}
       />
-
     </section>
   );
 };

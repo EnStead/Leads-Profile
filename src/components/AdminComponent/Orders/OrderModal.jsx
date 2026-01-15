@@ -16,26 +16,25 @@ const OrderModal = ({ open, onOpenChange, order, onEdit }) => {
   const [downloading, setDownloading] = useState(false);
 
   // Full date & time formatter (for dateTime)
-const formatDateTimeForCSV = (isoString) => {
-  if (!isoString) return "";
-  const options = {
-    year: "numeric",
-    month: "short",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
+  const formatDateTimeForCSV = (isoString) => {
+    if (!isoString) return "";
+    const options = {
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    };
+    return new Date(isoString).toLocaleString("en-US", options);
   };
-  return new Date(isoString).toLocaleString("en-US", options);
-};
 
-// Birthday formatter (date only)
-const formatBirthdayForCSV = (isoString) => {
-  if (!isoString) return "";
-  const options = { year: "numeric", month: "short", day: "2-digit" };
-  return new Date(isoString).toLocaleDateString("en-US", options);
-};
-
+  // Birthday formatter (date only)
+  const formatBirthdayForCSV = (isoString) => {
+    if (!isoString) return "";
+    const options = { year: "numeric", month: "short", day: "2-digit" };
+    return new Date(isoString).toLocaleDateString("en-US", options);
+  };
 
   const CSV_FIELDS = [
     { key: "dateTime", label: "Date & Time" },
@@ -47,62 +46,62 @@ const formatBirthdayForCSV = (isoString) => {
     { key: "state", label: "State" },
     { key: "zipCode", label: "Zip" },
     { key: "bankName", label: "Bank" },
-    { key: "incomeSource", label: "Source" },
-    { key: "monthlyNetIncome", label: "Monthly Income" },
-    { key: "rentOrOwn", label: "Rent Or Own" },
-    { key: "birthday", label: "Birthday" },
+    { key: "loanAmount", label: "Loan Amount" },
+    { key: "birthday	", label: "Birthday	" },
+    { key: "address	", label: "address	" },
   ];
 
-const handleDownloadCSV = async () => {
-  if (!order?._id) return;
+  const handleDownloadCSV = async () => {
+    if (!order?._id) return;
 
-  try {
-    setDownloading(true);
+    try {
+      setDownloading(true);
 
-    const res = await api.get(`/orders/admin/${order._id}/leads`, {
-      headers: {
-        Authorization: `Bearer ${user?.token}`,
-      },
-    });
+      const res = await api.get(`/orders/admin/${order._id}/leads`, {
+        headers: {
+          Authorization: `Bearer ${user?.token}`,
+        },
+      });
 
-    const leads = res.data?.data?.leads || [];
+      const leads = res.data?.data?.leads || [];
 
-    if (!leads.length) {
-      alert("No leads available for this order");
-      return;
+      if (!leads.length) {
+        alert("No leads available for this order");
+        return;
+      }
+
+      const headers = CSV_FIELDS.map((f) => f.label);
+
+      const rows = leads.map((lead) =>
+        CSV_FIELDS.map((f) => {
+          if (f.key === "dateTime")
+            return `"${formatDateTimeForCSV(lead[f.key])}"`;
+          if (f.key === "birthday")
+            return `"${formatBirthdayForCSV(lead[f.key])}"`;
+          return `"${lead[f.key] ?? ""}"`;
+        }).join(",")
+      );
+
+      const csvContent = [headers.join(","), ...rows].join("\n");
+
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `order-${order.customId || order._id}-leads.csv`;
+      link.click();
+      URL.revokeObjectURL(url);
+
+      setTimeout(() => {
+        onOpenChange(false);
+      }, 300);
+    } catch (err) {
+      console.error("CSV download failed:", err);
+      alert("Failed to download CSV.");
+    } finally {
+      setDownloading(false);
     }
-
-    const headers = CSV_FIELDS.map((f) => f.label);
-
-    const rows = leads.map((lead) =>
-      CSV_FIELDS.map((f) => {
-        if (f.key === "dateTime") return `"${formatDateTimeForCSV(lead[f.key])}"`;
-        if (f.key === "birthday") return `"${formatBirthdayForCSV(lead[f.key])}"`;
-        return `"${lead[f.key] ?? ""}"`;
-      }).join(",")
-    );
-
-    const csvContent = [headers.join(","), ...rows].join("\n");
-
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `order-${order.customId || order._id}-leads.csv`;
-    link.click();
-    URL.revokeObjectURL(url);
-
-    setTimeout(() => {
-      onOpenChange(false);
-    }, 300);
-  } catch (err) {
-    console.error("CSV download failed:", err);
-    alert("Failed to download CSV.");
-  } finally {
-    setDownloading(false);
-  }
-};
-
+  };
 
   const formatDate = (dateString) => {
     const options = {
