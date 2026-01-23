@@ -46,7 +46,7 @@ const Cards = () => {
     { key: "monthlyNetIncome", label: "Monthly Income" },
     { key: "subId", label: "SubId" },
     { key: "subId2", label: "SubId2" },
-    { key: "birthday	", label: "Birthday	" },
+    { key: "birthday", label: "Birthday" },
     { key: "timeEmployed", label: "Time Employed" },
     { key: "rentOrOwn", label: "Rent Or Own" },
   ];

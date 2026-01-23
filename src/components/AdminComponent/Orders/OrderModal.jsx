@@ -47,8 +47,8 @@ const OrderModal = ({ open, onOpenChange, order, onEdit }) => {
     { key: "zipCode", label: "Zip" },
     { key: "bankName", label: "Bank" },
     { key: "loanAmount", label: "Loan Amount" },
-    { key: "birthday	", label: "Birthday	" },
-    { key: "address	", label: "address	" },
+    { key: "birthday", label: "Birthday" },
+    { key: "address", label: "Address" },
   ];
 
   const handleDownloadCSV = async () => {

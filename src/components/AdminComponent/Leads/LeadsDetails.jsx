@@ -88,8 +88,8 @@ const LeadsDetails = () => {
     { key: "zipCode", label: "Zip" },
     { key: "bankName", label: "Bank" },
     { key: "loanAmount", label: "Loan Amount" },
-    { key: "birthday	", label: "Birthday	" },
-    { key: "address	", label: "address	" },
+    { key: "birthday", label: "Birthday" },
+    { key: "address", label: "Address" },
   ];
 
   const [downloadingDay, setDownloadingDay] = useState(null); // stores the dayKey being downloaded
@@ -149,7 +149,7 @@ const LeadsDetails = () => {
             // Apply formatting
             if (f.key === "dateTime")
               return `"${formatDateTimeForCSV(lead[f.key])}"`;
-            if (f.key === "birthday" || f.key === "birthday\t")
+            if (f.key === "birthday")
               return `"${formatBirthdayForCSV(lead[f.key])}"`;
             return `"${lead[f.key] ?? ""}"`;
           }).join(",")

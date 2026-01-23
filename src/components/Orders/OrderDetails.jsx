@@ -121,7 +121,7 @@ const OrderDetails = () => {
     { key: "zipCode", label: "Zip" },
     { key: "bankName", label: "Bank" },
     { key: "loanAmount", label: "Loan Amount" },
-    { key: "birthday	", label: "Birthday	" },
+    { key: "birthday", label: "Birthday" },
   ];
 
   // --- Last updated time ---
