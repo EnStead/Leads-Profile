@@ -65,14 +65,14 @@ const parseDateString = (value, rowIndex, rowIdentifier) => {
       );
     }
 
-    return new Date(
+    return new Date(Date.UTC(
       parsed.y,
       parsed.m - 1,
       parsed.d,
       parsed.H,
       parsed.M,
       parsed.S
-    ).toISOString();
+    )).toISOString();
   }
 
   // Otherwise treat as string
@@ -85,7 +85,7 @@ const parseDateString = (value, rowIndex, rowIdentifier) => {
 
     if (match) {
       const [, d, m, y, h, min, s] = match;
-      return new Date(y, m - 1, d, h, min, s || 0).toISOString();
+      return new Date(Date.UTC(y, m - 1, d, h, min, s || 0)).toISOString();
     }
 
     const parsed = new Date(value);
@@ -115,12 +115,20 @@ const normalizeLead = (row, index) => {
   const birthdayValue = clean(getValue(row, "birthday"));
   const rawMonthlyIncome = clean(getValue(row, "loanAmount"));
 
+  const dateTime = parseDateString(
+    clean(getValue(row, "dateTime")),
+    index,
+    rowIdentifier
+  );
+
+  if (new Date(dateTime) > new Date()) {
+    throw new Error(
+      `Row ${index + 1} (${rowIdentifier}): Date cannot be in the future`
+    );
+  }
+
   const lead = {
-    dateTime: parseDateString(
-      clean(getValue(row, "dateTime")),
-      index,
-      rowIdentifier
-    ),
+    dateTime,
     firstName: clean(getValue(row, "firstName")),
     lastName: clean(getValue(row, "lastName")),
     email: clean(getValue(row, "email")),
