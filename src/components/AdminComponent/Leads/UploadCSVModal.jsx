@@ -28,7 +28,7 @@ const HEADER_ALIASES = {
   address: ["address"],
   phone: ["phone", "phone_number", "mobile"],
   bankName: ["bank_name", "bank", "bankname"],
-  loanAmount: ["loan_amount", "loanamount", "loan"],
+  loanAmount: ["loan_amount", "loanamount", "loan", "amount_requested"],
   birthday: ["birthday", "dob", "date_of_birth"],
   email: ["email", "email_address"],
 };
