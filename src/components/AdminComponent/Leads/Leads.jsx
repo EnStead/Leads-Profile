@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import LeadsOverview from "./LeadsOverview";
 import UploadCSVModal from "./UploadCSVModal";
-import { useDashboard } from "../../../context/DashboardContext";
+import ManageHeadersModal from "./ManageHeadersModal";
+import { useAdminDashboard } from "../../../context/DashboardContext";
 import { Search } from "lucide-react";
 import ToastPop from "../../../utility/ToastPop";
 
 const Leads = () => {
   const [openUpload, setOpenUpload] = useState(false);
+  const [openManageHeaders, setOpenManageHeaders] = useState(false);
 
-  const { searchTerm, setSearchTerm, setDayKey } = useDashboard();
+  const { searchTerm, setSearchTerm, setDayKey } = useAdminDashboard();
   const [toastMsg, setToastMsg] = useState("");
   const [toastType, setToastType] = useState("error");
 
@@ -20,10 +22,13 @@ const Leads = () => {
   const isValidDayKey = (value) => /^\d{8}$/.test(value);
 
   useEffect(() => {
-  if (searchTerm === "") {
-    setDayKey(""); // show all data automatically
-  }
-}, [searchTerm, setDayKey]);
+    const trimmed = searchTerm.trim();
+    if (trimmed === "") {
+      setDayKey(""); // show all data automatically
+    } else if (isValidDayKey(trimmed)) {
+      setDayKey(trimmed); // automatically search when a valid 8-digit date is entered
+    }
+  }, [searchTerm, setDayKey]);
 
   const handleSearch = () => {
     if (!searchTerm) {
@@ -46,26 +51,26 @@ const Leads = () => {
 };
 
   return (
-    <section>
+    <section className="relative overflow-x-clip">
       <div className="xsm:flex justify-between items-center">
         <div>
-          <h2 className="text-brand-primary font-park font-bold text-xl mb-2">
+          <h2 className="text-brand-blackish font-park font-bold text-xl mb-2">
             Daily Leads Page
           </h2>
-          <p className="text-brand-subtext">
+          <p className="text-brand-body">
             Track and download leads generated each day.
           </p>
         </div>
 
         <div className="mt-8 flex justify-between items-center gap-4">
-          <div className="relative w-full max-w-xs">
+          <div className="relative w-full max-w-sm">
             <input
               type="text"
               placeholder="Search by date (20260107)"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="w-full px-4 py-2 pr-12 border bg-brand-white border-t-0 border-x-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-gray"
+              className="w-full px-4 py-2 pr-12 text-brand-body border bg-brand-white border-brand-placeholder rounded-xl focus:outline-none "
             />
 
             <button
@@ -75,19 +80,21 @@ const Leads = () => {
               <Search/>
             </button>
           </div>
-
-          <button
-            onClick={() => setOpenUpload(true)}
-            className="cursor-pointer w-67 bg-brand-blue text-brand-white font-park text-sm sm:text-base px-2 sm:px-10 py-2 rounded-xl font-medium hover:opacity-90 transition"
-          >
-            Upload LEADS
-          </button>
         </div>
       </div>
 
-      <LeadsOverview />
+      <div>
+        <LeadsOverview
+          onUploadOpen={() => setOpenUpload(true)}
+          onManageHeadersOpen={() => setOpenManageHeaders(true)}
+        />
+      </div>
 
       <UploadCSVModal open={openUpload} onOpenChange={setOpenUpload} />
+      <ManageHeadersModal
+        open={openManageHeaders}
+        onOpenChange={setOpenManageHeaders}
+      />
 
       
       <ToastPop

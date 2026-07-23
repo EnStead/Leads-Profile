@@ -1,42 +1,46 @@
-import { Toast } from 'radix-ui';
-import { useState, useEffect } from 'react';
+import { useEffect } from "react";
+import { useAppToast } from "./appToastContext";
 
-const ToastPop = ({ message, type = 'success', onClose }) => {
-  const [open, setOpen] = useState(false);
+const ToastPop = ({
+  message,
+  title,
+  subtitle,
+  type = "success",
+  onClose,
+  duration = 3000,
+  actionLabel,
+  onAction,
+}) => {
+  const { showToast, hideToast } = useAppToast() || {};
 
   useEffect(() => {
-    if (message) {
-      setOpen(true);
-    }
-  }, [message]);
+    if (!message || !showToast) return undefined;
 
-  const handleOpenChange = (isOpen) => {
-    setOpen(isOpen);
-    if (!isOpen && onClose) onClose();
-  };
+    showToast({
+      message,
+      title,
+      subtitle,
+      type,
+      duration,
+      actionLabel,
+      onAction,
+    });
 
-  const colors = {
-    success: 'text-brand-green border-brand-green',
-    error: 'text-brand-red border-brand-red',
-  };
+    const timer = setTimeout(() => {
+      if (onClose) onClose();
+    }, duration);
 
-  return (
-    <Toast.Provider>
-      <Toast.Root
-        open={open}
-        onOpenChange={handleOpenChange}
-        className={`bg-brand-white border px-4 py-3 rounded shadow w-fit max-w-xs ${colors[type]}`}
-      >
-        <Toast.Title className='font-park mb-2 font-medium'>
-          {type === 'success' ? 'Success' : 'Error'}
-        </Toast.Title>
+    return () => {
+      clearTimeout(timer);
+      if (onClose) onClose();
+    };
+  }, [actionLabel, duration, message, onAction, onClose, showToast, subtitle, title, type]);
 
-        <Toast.Description>{message}</Toast.Description>
-      </Toast.Root>
+  useEffect(() => {
+    if (!message) hideToast?.();
+  }, [hideToast, message]);
 
-      <Toast.Viewport className="fixed top-0 right-0 p-4 z-100" />
-    </Toast.Provider>
-  );
+  return null;
 };
 
 export default ToastPop;

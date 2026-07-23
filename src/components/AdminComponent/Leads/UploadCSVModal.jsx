@@ -1,358 +1,324 @@
 import * as Dialog from "@radix-ui/react-dialog";
-import { useState } from "react";
-import Papa from "papaparse";
-import * as XLSX from "xlsx";
-import { Upload } from "lucide-react";
+import { useEffect, useState } from "react"; 
+import { ArrowLeft, Check, FileText, Info, X } from "lucide-react";
 import api from "../../../utility/axios";
 import { useAdminAuth } from "../../../context/AdminContext";
-import { useDashboard } from "../../../context/DashboardContext";
-import ToastPop from "../../../utility/ToastPop";
+import { useAdminDashboard } from "../../../context/DashboardContext";
+import { useAppToast } from "../../../utility/appToastContext";
+import usaFlag from "../../../assets/usa.webp";
+import canadaFlag from "../../../assets/canada.png";
+import Excel from "../../../assets/Excel.svg";
+import UploadStatusPanel from "./components/UploadStatusPanel";
+import {
+  buildRawLeadsUploadPayload,
+  countDuplicateLeads,
+  formatFileSize,
+  parseLeadFile,
+} from "./uploadHelpers";
 
-/* -------------------- HELPERS -------------------- */
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
-const normalizeHeader = (header = "") =>
-  header
-    .toLowerCase()
-    .replace(/&/g, "and")
-    .replace(/[^a-z0-9]/g, "_")
-    .replace(/_+/g, "_")
-    .replace(/^_|_$/g, "");
-
-const HEADER_ALIASES = {
-  dateTime: ["date_time", "datetime", "dateandtime", "date", "date_and_time", "lead_date"],
-  firstName: ["first_name", "firstname","fname"],
-  lastName: ["last_name", "lastname", "lname"],
-  zipCode: ["zip_code", "zipcode", "postal_code", "zip"],
-  city: ["city"],
-  state: ["state"],
-  address: ["address"],
-  phone: ["phone", "phone_number", "mobile"],
-  bankName: ["bank_name", "bank", "bankname"],
-  loanAmount: ["loan_amount", "loanamount", "loan"],
-  birthday: ["birthday", "dob", "date_of_birth"],
-  email: ["email", "email_address"],
-};
-
-const getValue = (row, field) => {
-  if (row[field] !== undefined) return row[field];
-  const aliases = HEADER_ALIASES[field] || [];
-
-  for (const key of Object.keys(row)) {
-    if (aliases.includes(normalizeHeader(key))) {
-      return row[key];
-    }
-  }
-  return undefined;
-};
-
-
-const parseDateString = (value, rowIndex, rowIdentifier) => {
-  if (!value) {
-    throw new Error(`Row ${rowIndex + 1} (${rowIdentifier}): Missing date`);
-  }
-
-  // If it's already a Date (XLSX often does this)
-  if (value instanceof Date) {
-    return value.toISOString();
-  }
-
-  // If it's an Excel serial number
-  if (typeof value === "number") {
-    const parsed = XLSX.SSF.parse_date_code(value);
-    if (!parsed) {
-      throw new Error(
-        `Row ${rowIndex + 1} (${rowIdentifier}): Invalid Excel date`
-      );
-    }
-
-    return new Date(Date.UTC(
-      parsed.y,
-      parsed.m - 1,
-      parsed.d,
-      parsed.H,
-      parsed.M,
-      parsed.S
-    )).toISOString();
-  }
-
-  // Otherwise treat as string
-  if (typeof value === "string") {
-    value = value.trim().replace(/\s+/, " ");
-
-    const match = value.match(
-      /^(\d{1,2})\/(\d{1,2})\/(\d{4}) (\d{1,2}):(\d{2})(?::(\d{2}))?$/
-    );
-
-    if (match) {
-      const [, d, m, y, h, min, s] = match;
-      return new Date(Date.UTC(y, m - 1, d, h, min, s || 0)).toISOString();
-    }
-
-    const parsed = new Date(value);
-    if (!isNaN(parsed.getTime())) {
-      return parsed.toISOString();
-    }
-  }
-
-  throw new Error(
-    `Row ${rowIndex + 1} (${rowIdentifier}): Invalid date "${value}"`
-  );
-};
-
-const clean = (v) => (v === "" || v === undefined ? null : v);
-
-
-const REQUIRED_FIELDS = ["dateTime", "firstName", "lastName", "email"];
-
-const normalizeLead = (row, index) => {
-  const rowIdentifier =
-    getValue(row, "email") || getValue(row, "firstName") || `#${index + 1}`;
-  const birthdayValue = clean(getValue(row, "birthday"));
-  const rawMonthlyIncome = clean(getValue(row, "loanAmount"));
-
-  const dateTime = parseDateString(
-    clean(getValue(row, "dateTime")),
-    index,
-    rowIdentifier
-  );
-
-  if (new Date(dateTime) > new Date()) {
-    throw new Error(
-      `Row ${index + 1} (${rowIdentifier}): Date cannot be in the future`
-    );
-  }
-
-  const lead = {
-    dateTime,
-    firstName: clean(getValue(row, "firstName")),
-    lastName: clean(getValue(row, "lastName")),
-    email: clean(getValue(row, "email")),
-    phone: clean(getValue(row, "phone")),
-    city: clean(getValue(row, "city")),
-    state: clean(getValue(row, "state")),
-    address: clean(getValue(row, "address")),
-    bankName: clean(getValue(row, "bankName")),
-    zipCode: clean(getValue(row, "zipCode")),
-    loanAmount:
-      rawMonthlyIncome === null ||
-      rawMonthlyIncome === undefined ||
-      rawMonthlyIncome === ""
-        ? 0
-        : Number(rawMonthlyIncome) || 0,
-    birthday: birthdayValue
-      ? parseDateString(birthdayValue, index, rowIdentifier)
-      : null,
-  };
-
-  for (const field of REQUIRED_FIELDS) {
-    if (
-      lead[field] === null ||
-      lead[field] === undefined ||
-      lead[field] === ""
-    ) {
-      throw new Error(
-        `Row ${index + 1} (${rowIdentifier}): Missing required field "${field}"`
-      );
-    }
-  }
-
-  return lead;
-};
-
-/* -------------------- COMPONENT -------------------- */
+const COUNTRIES = [
+  { id: "us", label: "United States", flag: usaFlag },
+  { id: "ca", label: "Canada", flag: canadaFlag },
+];
 
 const UploadCSVModal = ({ open, onOpenChange }) => {
   const { user } = useAdminAuth();
-  const { refetchAllLeads } = useDashboard();
+  const { refetchAllLeads } = useAdminDashboard();
+  const { showToast } = useAppToast();
 
+  const [selectedCountry, setSelectedCountry] = useState("us");
+  const [selectedFile, setSelectedFile] = useState(null);
   const [uploading, setUploading] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [toastMsg, setToastMsg] = useState("");
-  const [toastType, setToastType] = useState("success");
   const [processing, setProcessing] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [duplicateCount, setDuplicateCount] = useState(0);
 
-  const showToast = (msg, type = "success") => {
-    setToastMsg(msg);
-    setToastType(type);
-  };
+  useEffect(() => {
+    if (open) return;
 
-  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-
-  const handleFile = async (file) => {
-    if (!file) return;
-
-      // 🔴 FILE SIZE CHECK
-  if (file.size > MAX_FILE_SIZE) {
-    showToast("File size exceeds 5MB. Please upload a smaller file.", "error");
-    return;
-  }
-  
-    setProcessing(true); // 🔑 START IMMEDIATELY
+    setSelectedCountry("us");
+    setSelectedFile(null);
+    setUploading(false);
+    setProcessing(false);
     setProgress(0);
-    try {
-      let rows = [];
+    setDuplicateCount(0);
+  }, [open]);
 
-      if (file.name.endsWith(".csv")) {
-        const text = await file.text();
-        const parsed = Papa.parse(text, {
-          header: true,
-          skipEmptyLines: true,
-        });
-
-        rows = parsed.data.map((row) =>
-          Object.fromEntries(
-            Object.entries(row).map(([key, value]) => [
-              normalizeHeader(key),
-              value,
-            ])
-          )
-        );
-      } else {
-        const buffer = await file.arrayBuffer();
-        const workbook = XLSX.read(buffer, { type: "array" });
-        const sheet = workbook.Sheets[workbook.SheetNames[0]];
-
-        // 1️⃣ Convert sheet → JSON
-        rows = XLSX.utils.sheet_to_json(sheet);
-
-        // 2️⃣ 🔑 NORMALIZE HEADERS HERE (this is the fix)
-        rows = rows.map((row) =>
-          Object.fromEntries(
-            Object.entries(row).map(([key, value]) => [
-              normalizeHeader(key),
-              value,
-            ])
-          )
-        );
-      }
-
-      const leads = rows.map((row, index) => normalizeLead(row, index));
-      await uploadLeads(leads);
-    } catch (err) {
-      showToast(err.message || "Invalid file structure", "error");
-    } finally {
-      setProcessing(false); // 🔑 STOP when upload starts/ends
-    }
+  const setStageProgress = (nextValue) => {
+    setProgress((currentValue) => Math.max(currentValue, nextValue));
   };
 
-  const uploadLeads = async (data) => {
+  const getUploadErrorMessage = (error, fallback = "Upload failed") =>
+    error?.response?.data?.message ||
+    error?.response?.data?.error ||
+    error?.message ||
+    fallback;
+
+  const uploadLeads = async (leads) => {
     setUploading(true);
-    // setProgress(0);
-    // console.log(data)
+    setStageProgress(85);
+
     try {
-      await api.post(
-        "/leads/raw-leads",
-        { leads: data },
+      const payload = buildRawLeadsUploadPayload(leads);
+
+      const response = await api.post(
+        "/api/v2/admin/uploads/raw-leads",
+        payload,
         {
           headers: {
             Authorization: `Bearer ${user?.token}`,
             "Content-Type": "application/json",
           },
-          onUploadProgress: (e) => {
-            if (e.total) {
-              setProgress(Math.round((e.loaded * 100) / e.total));
-            }
+          onUploadProgress: (event) => {
+            if (!event.total) return;
+
+            const ratio = event.loaded / event.total;
+            const nextProgress = 85 + Math.round(ratio * 15);
+            setStageProgress(nextProgress);
           },
-        }
+        },
       );
-      showToast("Leads uploaded successfully");
+
+      setStageProgress(100);
+      const uploadedCount = response?.data?.data?.count;
+      const skippedDuplicates = response?.data?.data?.skippedDuplicates;
+
+      showToast({
+        message:
+          uploadedCount != null
+            ? `Uploaded ${uploadedCount} leads${skippedDuplicates != null ? `, skipped ${skippedDuplicates} duplicates` : ""}`
+            : "Leads uploaded successfully",
+        type: "success",
+        title: "Leads Added",
+        subtitle: "Leads have been successfully added to the inventory.",
+        actionLabel: "View Leads",
+        duration: 0,
+      });
+
       refetchAllLeads();
-      onOpenChange(false);
-    } catch (err) {
-      console.error("UPLOAD ERROR:", err.response?.data || err);
-      showToast(
-        err.response?.data?.message ||
-          err.response?.data?.error ||
-          "Upload failed",
-        "error"
+      setTimeout(() => onOpenChange(false), 350);
+    } catch (error) {
+      console.error("UPLOAD ERROR:", error.response?.data || error);
+      const errorMessage = getUploadErrorMessage(
+        error,
+        "We couldn’t process this file. Please check the format and try again.",
       );
+
+      showToast({
+        message: errorMessage,
+        type: "error",
+        title: "Import failed",
+        subtitle: errorMessage,
+        actionLabel: "Retry Upload",
+        duration: 0,
+      });
     } finally {
       setUploading(false);
     }
   };
 
+  const handleFile = async (file) => {
+    if (!file) return;
+
+    if (file.size > MAX_FILE_SIZE) {
+      const errorMessage = "File size exceeds 10MB. Please upload a smaller file.";
+      showToast({
+        message: errorMessage,
+        type: "error",
+        title: "Import failed",
+        subtitle: errorMessage,
+        actionLabel: "Retry Upload",
+        duration: 0,
+      });
+      return;
+    }
+
+    setSelectedFile(file);
+    setDuplicateCount(0);
+    setProcessing(true);
+    setProgress(4);
+
+    try {
+      setStageProgress(12);
+      const leads = await parseLeadFile(file);
+
+      setStageProgress(58);
+      const duplicates = countDuplicateLeads(leads);
+      setDuplicateCount(duplicates);
+      setStageProgress(78);
+
+      await uploadLeads(leads);
+    } catch (error) {
+      const errorMessage = error.message || "Invalid file structure";
+      showToast({
+        message: errorMessage,
+        type: "error",
+        title: "Import failed",
+        subtitle: errorMessage,
+        actionLabel: "Retry Upload",
+        duration: 0,
+      });
+      setProgress(0);
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const activeCountry = COUNTRIES.find((country) => country.id === selectedCountry);
+  const isBusy = uploading || processing;
+
   return (
     <>
       <Dialog.Root open={open} onOpenChange={onOpenChange}>
         <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 bg-black/40 z-50" />
+          <Dialog.Overlay className="fixed inset-0 z-50 bg-black/35 backdrop-blur-[3px]" />
 
-          <Dialog.Content className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl w-[480px] p-8 shadow-xl z-50">
-            <Dialog.Title className="text-xl font-bold text-center mb-2 font-park">
-              Upload Leads
-            </Dialog.Title>
-
-            <Dialog.Description className="text-center text-sm text-brand-subtext mb-6">
-              Upload Excel files
+          <Dialog.Content className="fixed left-1/2 top-1/2 z-50 h-[90vh] w-[min(1100px,94vw)] -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-brand-sky p-3 focus:outline-none">
+            <Dialog.Title className="sr-only">Upload Leads</Dialog.Title>
+            <Dialog.Description className="sr-only">
+              Upload leads by country pool and monitor upload progress.
             </Dialog.Description>
 
-            <label
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={(e) => {
-                e.preventDefault();
-                handleFile(e.dataTransfer.files[0]);
-              }}
-              className={`flex flex-col items-center justify-center border-2 border-dashed rounded-xl p-10 cursor-pointer
-                ${
-                  processing || uploading
-                    ? "opacity-50 pointer-events-none"
-                    : "hover:bg-gray-50"
-                }
-              `}
-            >
-              <Upload className="mb-3 text-brand-muted" />
-              <p className="text-sm">
-                <span className="font-semibold">Click to upload</span> or drag &
-                drop
-              </p>
-              <p className="text-xs text-brand-muted mt-1 font-bold">
-                XLSX files ONLY
-              </p>
-
-              <input
-                type="file"
-                accept=".csv,.xlsx"
-                className="hidden"
-                onChange={(e) => handleFile(e.target.files[0])}
-              />
-            </label>
-
-            {(processing || uploading) && (
-              <div className="mt-6">
-                {processing && (
-                  <p className="text-sm text-center text-brand-muted mb-2">
-                    Processing file… Please wait
-                  </p>
-                )}
-
-                {uploading && (
-                  <>
-                    <div className="h-2 bg-gray-200 rounded-full">
-                      <div
-                        className="h-full bg-brand-blue transition-all"
-                        style={{ width: `${progress}%` }}
-                      />
-                    </div>
-                    <p className="text-xs text-center mt-2">
-                      Uploading... {progress}%
-                    </p>
-                  </>
-                )}
-              </div>
-            )}
-
-            <Dialog.Close className="absolute top-4 right-5 text-xl">
-              ×
+            <Dialog.Close className="absolute right-8 top-8 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full bg-brand-white text-brand-blackish">
+              <X size={18} />
             </Dialog.Close>
+
+            <div className="grid h-full gap-4 lg:grid-cols-[1fr_1.04fr]">
+              <section className="bg-brand-sky px-6 py-6 lg:px-7">
+                <button
+                  type="button"
+                  onClick={() => onOpenChange(false)}
+                  className="inline-flex items-center gap-2 text-sm font-medium text-brand-blackish"
+                >
+                  <ArrowLeft size={15} />
+                  Back
+                </button>
+
+                <div className="mt-4">
+                  <h2 className="text-lg font-bold text-brand-blackish">
+                    Upload Leads
+                  </h2>
+                  <p className="mt-2 text-sm font-light text-brand-body">
+                    Choose your Country Pool & Upload your file.
+                  </p>
+                </div>
+
+                <div className="mt-8">
+                  <p className="font-semibold text-brand-blackish">
+                    Select Country Pool
+                  </p>
+
+                  <div className="mt-4 flex flex-wrap gap-3">
+                    {COUNTRIES.map((country) => {
+                      const isSelected = selectedCountry === country.id;
+
+                      return (
+                        <button
+                          key={country.id}
+                          type="button"
+                          onClick={() => setSelectedCountry(country.id)}
+                          className={`inline-flex min-w-[170px] items-center justify-between rounded-xl border px-4 py-3 text-sm font-medium transition ${
+                            isSelected
+                              ? "border-brand-blue bg-brand-lightblue text-brand-blackish"
+                              : "border-brand-stroke bg-brand-white text-brand-blackish"
+                          }`}
+                        >
+                          <span className="inline-flex items-center gap-2">
+                            <img
+                              src={country.flag}
+                              alt={country.label}
+                              className="h-5 w-5 rounded-full object-cover"
+                            />
+                            {country.label}
+                          </span>
+
+                          {isSelected ? (
+                            <span className="ml-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#5d85ff] text-white">
+                              <Check size={12} />
+                            </span>
+                          ) : null}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="mt-8">
+                  <p className="text-sm font-semibold text-brand-blackish">
+                    Upload File
+                  </p>
+
+                  {selectedFile ? (
+                    <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-xl border border-brand-lightblue bg-brand-white px-4 py-4 transition hover:opacity-95">
+                      <span className="inline-flex h-11 w-11 items-center justify-center">
+                        <img src={Excel} alt="" />
+                      </span>
+
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-sm font-medium text-brand-blackish">
+                          {selectedFile.name}
+                        </span>
+                        <span className="mt-1 block text-xs text-brand-label">
+                          {formatFileSize(selectedFile.size)} • {duplicateCount.toLocaleString()} duplicates found
+                        </span>
+                      </span>
+
+                      <input
+                        type="file"
+                        accept=".csv,.xlsx"
+                        className="hidden"
+                        disabled={isBusy}
+                        onChange={(event) => handleFile(event.target.files?.[0])}
+                      />
+                    </label>
+                  ) : (
+                    <label
+                      onDragOver={(event) => event.preventDefault()}
+                      onDrop={(event) => {
+                        event.preventDefault();
+                        handleFile(event.dataTransfer.files?.[0]);
+                      }}
+                      className={`mt-4 flex min-h-[280px] cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-brand-lightblue bg-brand-white px-6 text-center transition ${
+                        isBusy ? "pointer-events-none opacity-60" : "hover:bg-brand-lightblue"
+                      }`}
+                    >
+                      <span className="inline-flex h-14 w-14 items-center justify-center text-brand-label">
+                        <FileText size={34} />
+                      </span>
+                      <p className="mt-5 text-sm font-light text-brand-body">
+                        <span className="font-medium text-brand-blue">Click to upload</span> or drag your file here
+                      </p>
+                      <div className="mt-13 flex items-center justify-center gap-1.5 text-xs text-brand-label">
+                        <Info size={14} className="flex-shrink-0" />
+                        <span>
+                          Accepts `.csv` and `.xlsx` files. Max size <b>10MB</b>
+                        </span>
+                      </div>
+
+                      <input
+                        type="file"
+                        accept=".csv,.xlsx"
+                        className="hidden"
+                        disabled={isBusy}
+                        onChange={(event) => handleFile(event.target.files?.[0])}
+                      />
+                    </label>
+                  )}
+                </div>
+              </section>
+
+              <UploadStatusPanel
+                progress={progress}
+                hasFile={Boolean(selectedFile)}
+                duplicateCount={duplicateCount}
+                countryLabel={activeCountry?.label || ""}
+              />
+            </div>
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
-
-      <ToastPop
-        message={toastMsg}
-        type={toastType}
-        onClose={() => setToastMsg("")}
-      />
     </>
   );
 };

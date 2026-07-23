@@ -1,53 +1,170 @@
 @import url('https://fonts.googleapis.com/css2?family=Parkinsans:wght@300..800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Borel&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&display=swap');
 @import "tailwindcss";
 
 
+@layer base {
+  :root {
+    /* --- Default (Day) Theme Variables --- */
+    --brand-lightblue: #D5E1FF;
+    --brand-skyblue: #6D97FF;
+    --brand-blue: #2F6BFF;
+    --brand-royalblue: #1C4099;
+    --brand-darkblue: #040A19;
+    --brand-accent: #2FD3FF;
+    --brand-purple: #5B2FFF;
+    --brand-sky: #F3F8FF;
+
+    --brand-blackish: #0A1020;
+    --brand-white: #FFFFFF;
+
+    --brand-body: #334155;
+    --brand-label: #64748B;
+    --brand-placeholder: #717180;
+    --brand-stroke: #E2E8F0;
+    --brand-offwhite: #F9F9F9;
+
+    --brand-success: #1A801D;
+    --brand-error: #AA2523;
+    --brand-info: #8A521A;
+    --brand-inprogress: #0082EC;
+    --brand-red: #F04D3E;
+
+    --brand-them: #F3F8FF;
+    --brand-let: #2A2F3D;
+    --brand-rou: #0A1020;
+
+  }
+
+  /* --- Theme Overrides --- */
+  
+  [data-theme="dawn"] {
+    --brand-lightblue: #D5E1FF;
+    --brand-skyblue: #6D97FF;
+    --brand-blue: #2F6BFF;
+    --brand-royalblue: #1C4099;
+    --brand-darkblue: #040A19;
+    --brand-accent: #2FD3FF;
+    --brand-purple: #5B2FFF;
+    --brand-sky: #FCF8F5;
+
+    --brand-blackish: #2A2F3D;
+    --brand-white: #FFFFFF;
+
+    --brand-body: #5A6475;
+    --brand-label: #7A8294;
+    --brand-placeholder: #9A9EAB;
+    --brand-stroke: #E8E4E1;
+    --brand-offwhite: #FDFBF9;
+
+    --brand-success: #1A801D;
+    --brand-error: #AA2523;
+    --brand-info: #8A521A;
+    --brand-inprogress: #0082EC;
+    --brand-red: #F04D3E;
+
+    --brand-them: #FCF8F5;
+    --brand-let: #2A2F3D;
+    --brand-rou: #2A2F3D;
+    --brand-tile: #F8FAFC;
+  }
+
+  [data-theme="evening"] {
+    /* Insert Evening Hex Codes Here */
+    --brand-lightblue: #162854;
+    --brand-skyblue: #1C4099;
+    --brand-blue: #2F6BFF;
+    --brand-royalblue: #6D97FF;
+    --brand-darkblue: #D5E1FF;
+    --brand-accent: #2FD3FF;
+    --brand-purple: #AA93FF;
+    --brand-sky: #131B2F;
+
+    --brand-blackish: #F8FAFC;
+    --brand-white: #1E293B;
+
+    --brand-body: #94A3B8;
+    --brand-label: #64748B;
+    --brand-placeholder: #475569;
+    --brand-stroke: #334155;
+    --brand-offwhite: #27364B;
+
+    --brand-success: #34C759;
+    --brand-error: #FF453A;
+    --brand-info: #FF9F0A;
+    --brand-inprogress: #33A1FF;
+    --brand-red: #F04D3E;
+
+    --brand-them: #131B2F;
+    --brand-let: #F8FAFC;
+    --brand-rou: #F8FAFC; 
+    --brand-tile: #F8FAFC;
+  }
+
+  [data-theme="midnight"] {
+    /* Insert Midnight Hex Codes Here */
+    --brand-lightblue: #0D204D;
+    --brand-skyblue: #1C4099;
+    --brand-blue: #2F6BFF;
+    --brand-royalblue: #6D97FF;
+    --brand-darkblue: #D5E1FF;
+    --brand-accent: #2FD3FF;
+    --brand-purple: #AA93FF;
+    --brand-sky: #040A19;
+
+    --brand-blackish: #F3F8FF;
+    --brand-white: #0C111C;
+
+    --brand-body: #CBD5E1;
+    --brand-label: #94A3B8;
+    --brand-placeholder: #475569;
+    --brand-stroke: #1E293B;
+    --brand-offwhite: #16223B;
+
+    --brand-success: #34C759;
+    --brand-error: #FF453A;
+    --brand-info: #FF9F0A;
+    --brand-inprogress: #33A1FF;
+    --brand-red: #F04D3E;
+
+    --brand-them: #F3F8FF;
+    --brand-let: #2A2F3D;
+    --brand-rou: #0A1020;
+    
+  }
+}
+
 @theme {
-  --color-brand-primary: #151515;
-  --color-brand-subtext: #333333;
-  --color-brand-white: #FFFFFF;
-  --color-brand-black: #000000;
-  --color-brand-darkblue: #040A19;
-  --color-brand-blue: #2F6BFF;
-  --color-brand-purple: #5B2FFF;
-  --color-brand-stroke: #EDEDED;
-  --color-brand-sky: #F3F8FF;
-  --color-brand-offwhite: #F9F9F9;
-  --color-brand-green: #23AA25;
-  --color-brand-brown: #AA6923;
-  --color-brand-lightblue: #D5E1FF;
-  --color-brand-royalblue: #1C4099;
-  --color-brand-muted: #797979;
-  --color-brand-gray: #B2B2B2;
 
+  --color-brand-lightblue: var(--brand-lightblue);
+  --color-brand-skyblue: var(--brand-skyblue);
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-royalblue: var(--brand-royalblue);
+  --color-brand-darkblue: var(--brand-darkblue);
+  --color-brand-accent: var(--brand-accent);
+  --color-brand-purple: var(--brand-purple);
+  --color-brand-sky: var(--brand-sky);
 
+  --color-brand-blackish: var(--brand-blackish);
+  --color-brand-white: var(--brand-white);
 
-  --color-brand-accent: #F7EAD7;
-  --color-brand-background1: #FAF8FE;
-  --color-brand-head: #151515;
-  --color-brand-planoff: #EAEAEA;
-  --color-brand-midtext: #F9A720;
-  --color-brand-planmid: #B2B2B2;
-  --color-brand-planbut: #C2ABF9;
-  --color-brand-plan2: #D5C4FB;
-  --color-brand-plan3: #76B1FF;
-  --color-brand-plan4: #74C460;
-  --color-brand-footnoti: #101828;
-  --color-brand-footnoti1: #667085;
-  --color-brand-orange: #EE542B;
-  --color-brand-darkpurple: #3F3062;
-  --color-brand-placeholder: #B2B2B2;
-  --color-brand-offpurple: #1F1731;
-  --color-brand-charcoal: #222222;
-  --color-brand-purp: #E7DEFC;
-  --color-brand-purpbg: #B091F7;
-  --color-brand-red: #F04D3E;
-  --color-brand-step: #7E60C4;
-  --color-brand-cloud: #53389E;
-  --color-brand-purUp: #6941C6;
+  --color-brand-body: var(--brand-body);
+  --color-brand-label: var(--brand-label);
+  --color-brand-placeholder: var(--brand-placeholder);
+  --color-brand-stroke: var(--brand-stroke);
+  --color-brand-offwhite: var(--brand-offwhite);
 
+  --color-brand-success: var(--brand-success);
+  --color-brand-error: var(--brand-error);
+  --color-brand-info: var(--brand-info);
+  --color-brand-inprogress: var(--brand-inprogress);
+  --color-brand-red: var(--brand-red);
+
+  --color-brand-them: var(--brand-them);
+  --color-brand-let: var(--brand-let);
+  --color-brand-rou: var(--brand-rou);
 
 
   
@@ -55,6 +172,7 @@
   --font-sans: "Inter", sans-serif;
   --font-park: "Parkinsans", serif;
   --font-logo: "Borel", serif;
+  --font-num: "Caveat", cursive;
 
   --radius-xl: 1rem;
   --radius-2xl: 1.5rem;
@@ -83,11 +201,264 @@
     @apply font-sans;
     @apply bg-brand-sky
   }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-park;
+  }
   button {
     @apply cursor-pointer;
     @apply font-park;
   }
+
+  /* View Transition for Theme Change */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
+
+  ::view-transition-new(root) {
+    animation: theme-reveal 1s ease-in-out;
+    z-index: 9999;
+  }
 }
+
+/* Theme dropdown glassmorphism */
+/* ── Pill container ── */
+.theme-pill {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 12px;
+  border-radius: 999px;
+
+  /* glass variables — adapt to your brand tokens */
+  --c-light: #fff;
+  --c-dark:  #000;
+  --c-glass: #bbbbbc;
+  --c-action: var(--brand-blue);
+  --glass-reflex-light: 1;
+  --glass-reflex-dark:  1;
+
+  background-color: color-mix(in srgb, var(--c-glass) 12%, transparent);
+  backdrop-filter: blur(8px) saturate(150%);
+  -webkit-backdrop-filter: blur(8px) saturate(150%);
+
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 10%), transparent),
+    inset 1.8px 3px 0px -2px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 90%), transparent),
+    inset -2px -2px 0px -2px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 80%), transparent),
+    inset -3px -8px 1px -6px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 60%), transparent),
+    inset -0.3px -1px 4px 0px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 12%), transparent),
+    inset -1.5px 2.5px 0px -2px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 20%), transparent),
+    inset 0px 3px 4px -2px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 20%), transparent),
+    inset 2px -6.5px 1px -4px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 10%), transparent),
+    0px 1px 5px 0px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 10%), transparent),
+    0px 6px 16px 0px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 8%), transparent);
+
+  transition:
+    background-color 400ms cubic-bezier(1, 0, 0.4, 1),
+    box-shadow       400ms cubic-bezier(1, 0, 0.4, 1);
+}
+
+/* ── Navbar Glass ── */
+.nav-glass {
+  --c-light: #fff;
+  --c-dark:  #000;
+  --c-glass: #bbbbbc;
+  --glass-reflex-light: 1;
+  --glass-reflex-dark:  1;
+
+  background-color: color-mix(in srgb, var(--c-glass) 12%, transparent);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 10%), transparent),
+    inset 0px -2px 0px -1px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 80%), transparent),
+    0px 1px 5px 0px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 10%), transparent),
+    0px 6px 16px 0px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 8%), transparent);
+}
+
+/* dark/evening overrides */
+[data-theme="evening"] .theme-pill,
+[data-theme="midnight"] .theme-pill,
+[data-theme="evening"] .nav-glass,
+[data-theme="midnight"] .nav-glass {
+  --glass-reflex-dark:  2;
+  --glass-reflex-light: 0.3;
+}
+
+/* ── Glass indicator ── */
+.theme-indicator {
+  position: absolute;
+  left: 0px;
+  top: 6px;
+  width: 58px;
+  height: calc(100% - 12px);
+  border-radius: 20px;
+  z-index: 0;
+  pointer-events: none;
+
+  background:
+    linear-gradient(
+      138deg,
+      color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 55%), transparent) 0%,
+      color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 6%), transparent) 38%,
+      transparent 55%
+    ),
+    linear-gradient(
+      to top,
+      color-mix(in srgb, var(--c-action) calc(var(--glass-reflex-light) * 14%), transparent) 0%,
+      transparent 55%
+    ),
+    color-mix(in srgb, var(--c-glass) 22%, transparent);
+
+  box-shadow:
+    inset 2px 1px 0px -1px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 90%), transparent),
+    inset 0 0 0 1px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 14%), transparent),
+    inset -1.5px -1px 0px -1px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 80%), transparent),
+    inset -2px -6px 1px -5px color-mix(in srgb, var(--c-light) calc(var(--glass-reflex-light) * 60%), transparent),
+    inset -1px 2px 3px -1px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 20%), transparent),
+    inset 0px -4px 1px -2px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 10%), transparent),
+    0px 3px 6px 0px color-mix(in srgb, var(--c-dark) calc(var(--glass-reflex-dark) * 8%), transparent);
+
+  /* position driven by data-active */
+  translate: calc(var(--_x, 0) * 1px) 0;
+  transition:
+    translate    480ms cubic-bezier(1, 0, 0.4, 1),
+    background   480ms cubic-bezier(1, 0, 0.4, 1),
+    box-shadow   480ms cubic-bezier(1, 0, 0.4, 1);
+}
+
+/* Step = 52px (40px button + 12px gap) */
+/* Start = 3px (12px padding - 9px overhang) */
+.theme-pill[data-active="0"] { --_x: 3;   }
+.theme-pill[data-active="1"] { --_x: 55;  }
+.theme-pill[data-active="2"] { --_x: 107; }
+.theme-pill[data-active="3"] { --_x: 159; }
+
+/* ── Viscous stretch direction ── */
+/* We use Even/Odd keyframes to ensure the animation-name changes 
+   on every step, forcing the browser to replay the animation. */
+
+@keyframes stretchRightOdd {
+  0%,100% { scale: 1 1; }
+  50%     { scale: 1.3 1; }
+}
+@keyframes stretchRightEven {
+  0%,100% { scale: 1 1; }
+  50%     { scale: 1.3 1; }
+}
+@keyframes stretchLeftOdd {
+  0%,100% { scale: 1 1; }
+  50%     { scale: 1.3 1; }
+}
+@keyframes stretchLeftEven {
+  0%,100% { scale: 1 1; }
+  50%     { scale: 1.3 1; }
+}
+
+/* Moving Right -> Target is Odd (1, 3) */
+.theme-pill[data-prev="0"][data-active="1"] .theme-indicator,
+.theme-pill[data-prev="0"][data-active="3"] .theme-indicator,
+.theme-pill[data-prev="1"][data-active="3"] .theme-indicator,
+.theme-pill[data-prev="2"][data-active="3"] .theme-indicator {
+  transform-origin: left center;
+  animation: stretchRightOdd 440ms ease;
+}
+
+/* Moving Right -> Target is Even (2) */
+.theme-pill[data-prev="0"][data-active="2"] .theme-indicator,
+.theme-pill[data-prev="1"][data-active="2"] .theme-indicator {
+  transform-origin: left center;
+  animation: stretchRightEven 440ms ease;
+}
+
+/* Moving Left -> Target is Odd (1) */
+.theme-pill[data-prev="2"][data-active="1"] .theme-indicator,
+.theme-pill[data-prev="3"][data-active="1"] .theme-indicator {
+  transform-origin: right center;
+  animation: stretchLeftOdd 440ms ease;
+}
+
+/* Moving Left -> Target is Even (0, 2) */
+.theme-pill[data-prev="1"][data-active="0"] .theme-indicator,
+.theme-pill[data-prev="2"][data-active="0"] .theme-indicator,
+.theme-pill[data-prev="3"][data-active="0"] .theme-indicator,
+.theme-pill[data-prev="3"][data-active="2"] .theme-indicator {
+  transform-origin: right center;
+  animation: stretchLeftEven 440ms ease;
+}
+
+/* ── Buttons ── */
+.theme-pill-item {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: none;
+  border: none;
+  opacity: 0.6;
+  transition: transform 200ms ease, opacity 200ms ease;
+}
+.theme-pill-item:hover {
+  transform: scale(1.1);
+  opacity: 1;
+}
+.theme-pill-active {
+  opacity: 1;
+}
+.theme-pill-icon {
+  width: 20px;
+  height: 20px;
+}
+.theme-pill-sm {
+  transform: scale(0.9);
+}
+
+
+/* Theme label morph */
+.theme-label {
+  display: inline-block;
+  animation: themeLabelMorph 400ms ease-out;
+}
+
+/* Theme label morph */
+.icon-label {
+
+  animation: iconLabelMorph 400ms ease-out;
+}
+
+@keyframes themeLabelMorph {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+@keyframes iconLabelMorph {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
 
 
 /* Hide scrollbar but keep scroll functionality */
@@ -100,6 +471,57 @@
 }
 
 
+/* Overlay fade */
+.modal-overlay[data-state="open"] {
+  animation: overlayShow 0.35s ease forwards;
+}
+.modal-overlay[data-state="closed"] {
+  animation: overlayHide 0.25s ease forwards;
+}
+
+@keyframes overlayShow {
+  from { opacity: 0; backdrop-filter: blur(0px); }
+  to   { opacity: 1; backdrop-filter: blur(4px); }
+}
+@keyframes overlayHide {
+  from { opacity: 1; backdrop-filter: blur(4px); }
+  to   { opacity: 0; backdrop-filter: blur(0px); }
+}
+
+/* Modal origin-scale */
+.modal-content[data-state="open"] {
+  animation: modalExpand 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.modal-content[data-state="closed"] {
+  animation: modalShrink 0.25s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+@keyframes modalExpand {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.04);
+    transform-origin: var(--modal-origin-x, 50%) var(--modal-origin-y, 50%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    transform-origin: var(--modal-origin-x, 50%) var(--modal-origin-y, 50%);
+  }
+}
+
+@keyframes modalShrink {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+    transform-origin: var(--modal-origin-x, 50%) var(--modal-origin-y, 50%);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.04);
+    transform-origin: var(--modal-origin-x, 50%) var(--modal-origin-y, 50%);
+  }
+}
+
 @media (min-width:1920px) {
   .cnt{
     max-width: 1440px !important;
@@ -109,4 +531,51 @@
     max-width: 1370px !important;
     margin: auto !important;
   }
+}
+
+/* View Transition theme reveal from top-right */
+@supports (view-transition-name: root) {
+  :root {
+    view-transition-name: root;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
+
+  ::view-transition-new(root) {
+    animation: themeReveal 1700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    transform-origin: 100% 0%;
+  }
+
+  ::view-transition-old(root) {
+    animation: themeFadeOut 1400ms ease-out both;
+  }
+
+  @keyframes themeReveal {
+    from {
+      clip-path: circle(0% at 100% 0%);
+      filter: brightness(0.9) saturate(0.8);
+    }
+    to {
+      clip-path: circle(180% at 100% 0%);
+      filter: brightness(1) saturate(1);
+    }
+  }
+
+  @keyframes themeFadeOut {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+}
+
+@keyframes theme-reveal {
+  from { clip-path: circle(0% at 100% 0%); }
+  to { clip-path: circle(150% at 100% 0%); }
 }

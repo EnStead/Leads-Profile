@@ -1,59 +1,121 @@
-import { Link } from "react-router";
-import { useDashboard } from "../../../context/DashboardContext";
-import Pagination from "../../../utility/Pagination";
-import CardSkeleton from "../../../utility/skeletons/CardSkeleton";
-import api from "../../../utility/axios";
-import { useAdminAuth } from "../../../context/AdminContext";
 import { useState } from "react";
+import api from "../../../utility/axios";
 import EmptyState from "../../../utility/EmptyState";
+import { useAdminDashboard } from "../../../context/DashboardContext";
+import { useAdminAuth } from "../../../context/AdminContext";
+import LeadDayCard from "./components/LeadDayCard";
+import LeadsOverviewSidebar from "./components/LeadsOverviewSidebar";
 
-const LeadsOverview = () => {
-  const { user } = useAdminAuth(); // Admin user
-  const [downloadingDay, setDownloadingDay] = useState(null); // stores the dayKey being downloaded
+const toNumber = (...values) => {
+  for (const value of values) {
+    const numericValue = Number(value);
+    if (Number.isFinite(numericValue)) return numericValue;
+  }
 
-  const CSV_FIELDS = [
-    { key: "dateTime", label: "Date & Time" },
-    { key: "firstName", label: "First Name" },
-    { key: "lastName", label: "Last Name" },
-    { key: "email", label: "Email" },
-    { key: "phone", label: "Phone" },
-    { key: "city", label: "City" },
-    { key: "state", label: "State" },
-    { key: "address", label: "Address" },
-    { key: "zipCode", label: "Zip" },
-    { key: "bankName", label: "Bank" },
-    { key: "loanAmount", label: "Loan Amount" },
-    { key: "birthday", label: "Birthday" },
-  ];
+  return 0;
+};
 
+const getLeadMetrics = (lead) => ({
+  used: toNumber(
+    lead?.fulfillment?.used,
+    lead?.used,
+    lead?.fulfilled,
+    lead?.filled,
+    lead?.assigned,
+    lead?.givenOut,
+    lead?.distributed,
+    0,
+  ),
+  total: toNumber(
+    lead?.fulfillment?.total,
+    lead?.total,
+    lead?.target,
+    lead?.uploaded,
+    lead?.uploadedCount,
+    lead?.totalUploaded,
+  ),
+  progressPct: toNumber(
+    lead?.fulfillment?.progressPct,
+    lead?.progressPct,
+    lead?.percentage,
+    lead?.pct,
+  ),
+  uploaded: toNumber(
+    lead?.fulfillment?.total,
+    lead?.total,
+    lead?.uploaded,
+    lead?.uploadedCount,
+    lead?.totalUploaded,
+  ),
+  fulfilled: toNumber(
+    lead?.fulfillment?.used,
+    lead?.used,
+    lead?.fulfilled,
+    lead?.filled,
+    lead?.assigned,
+    lead?.givenOut,
+    lead?.distributed,
+    0,
+  ),
+  duplicates: toNumber(
+    lead?.duplicates?.displayCount,
+    lead?.duplicates?.totalDuplicateRows,
+    lead?.duplicates?.rolling24hCount,
+    lead?.duplicates?.historicalCount,
+    lead?.duplicates?.duplicateRate,
+    lead?.duplicates,
+    lead?.duplicateCount,
+    lead?.totalDuplicates,
+    lead?.duplicateLeads,
+  ),
+});
+
+const CSV_FIELDS = [
+  { key: "dateTime", label: "Date & Time" },
+  { key: "firstName", label: "First Name" },
+  { key: "lastName", label: "Last Name" },
+  { key: "email", label: "Email" },
+  { key: "phone", label: "Phone" },
+  { key: "city", label: "City" },
+  { key: "state", label: "State" },
+  { key: "address", label: "Address" },
+  { key: "zipCode", label: "Zip" },
+  { key: "bankName", label: "Bank" },
+  { key: "loanAmount", label: "Loan Amount" },
+  { key: "birthday", label: "Birthday" },
+];
+
+const LeadsOverview = ({ onUploadOpen, onManageHeadersOpen }) => {
+  const { user } = useAdminAuth();
+  const [downloadingDay, setDownloadingDay] = useState(null);
+  const {
+    allLeadsData,
+    allLeadsLoading,
+    allLeadsError,
+    adminImportBatchesOverviewData,
+  } = useAdminDashboard();
+  
   const downloadCSV = async (dayKey, totalLeads) => {
     try {
-      setDownloadingDay(dayKey); // start downloading
+      setDownloadingDay(dayKey);
 
-      // Use totalLeads from the overview data
-      const res = await api.get(
-        `/leads/daily/${dayKey}?page=1&limit=${totalLeads}`,
-        {
-          headers: {
-            Authorization: `Bearer ${user?.token}`,
-          },
-        }
-      );
+      const res = await api.get(`/api/v1/leads/daily/${dayKey}?page=1&limit=${totalLeads}`, {
+        headers: {
+          Authorization: `Bearer ${user?.token}`,
+        },
+      });
 
-      const leads = res.data.data;
-
+      const leads = res.data?.data || [];
       if (!leads.length) {
         alert("No leads available for this day");
-        setDownloadingDay(null);
         return;
       }
 
-      const headers = CSV_FIELDS.map((f) => f.label);
-
+      const headers = CSV_FIELDS.map((field) => field.label);
       const csvRows = [
         headers.join(","),
         ...leads.map((lead) =>
-          CSV_FIELDS.map((f) => `"${lead[f.key] ?? ""}"`).join(",")
+          CSV_FIELDS.map((field) => `"${lead[field.key] ?? ""}"`).join(","),
         ),
       ];
 
@@ -65,202 +127,55 @@ const LeadsOverview = () => {
       link.download = `leads-${dayKey}.csv`;
       link.click();
       URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error("CSV download failed", err);
+    } catch (error) {
+      console.error("CSV download failed", error);
       alert("Failed to download CSV. Make sure you are logged in.");
     } finally {
-      setDownloadingDay(null); // finished downloading
+      setDownloadingDay(null);
     }
   };
-
-  const {
-    allLeadsData,
-    allLeadsLoading,
-    allLeadsError,
-    page,
-    setPage,
-  } = useDashboard();
-
-
-  const formatDate = (dateString) => {
-    const options = {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true, // AM / PM
-    };
-
-    return new Date(dateString).toLocaleString(undefined, options);
-  };
-
-  if (allLeadsLoading) {
-    return (
-      <section>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <CardSkeleton />
-          <CardSkeleton />
-          <CardSkeleton />
-          <CardSkeleton />
-        </div>
-      </section>
-    );
-  }
 
   if (allLeadsError) {
     return <p className="text-brand-red">Failed to load dashboard data.</p>;
   }
 
   return (
-    <div className="min-h-screen pt-8">
-      <div className=" grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column - Leads List */}
-        <div className="lg:col-span-2 space-y-4">
-          {!allLeadsData.data.length ? (
-            <EmptyState />
-          ) : (
-            Array.isArray(allLeadsData?.data) &&
-            allLeadsData?.data.map((lead) => (
+    <div className="pt-8">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.6fr_0.92fr]">
+        <div className="grid gap-5 md:grid-cols-2">
+          {allLeadsLoading ? (
+            Array.from({ length: 6 }).map((_, index) => (
               <div
-                key={lead.dayKey}
-                className="bg-brand-white rounded-xl px-6 py-3 border border-brand-stroke"
-              >
-                <div className=" xsm:flex items-center justify-between">
-                  <div>
-                    <h3 className="text-lg font-semibold font-park text-brand-primary">
-                      Leads - {lead.dayKey}
-                    </h3>
-                    <p className="text-sm font-light text-brand-muted mt-1">
-                      Total: {lead.total.toLocaleString()} || Last updated{" "}
-                      {formatDate(lead.lastUpdated)}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-4 mt-4 xsm:mt-0">
-                    <Link
-                      to={`/admin/leads/${lead.dayKey}`}
-                      className="text-brand-darkblue font-sans cursor-pointer hover:text-gray-900 font-medium"
-                    >
-                      View
-                    </Link>
-                    <button
-                      disabled={!lead.total || downloadingDay === lead.dayKey}
-                      onClick={() => downloadCSV(lead.dayKey, lead.total)}
-                      className={`font-medium ${
-                        lead.total
-                          ? "text-brand-blue hover:text-blue-700"
-                          : "text-gray-400 cursor-not-allowed"
-                      }`}
-                    >
-                      {downloadingDay === lead.dayKey
-                        ? "Downloading..."
-                        : "Download CSV"}
-                    </button>
-                  </div>
-                </div>
-              </div>
+                key={index}
+                className="h-[258px] animate-pulse rounded-[1.75rem] border border-[#d8e2f0] bg-white"
+              />
             ))
+          ) : !allLeadsData?.data?.length ? (
+            <div className="md:col-span-2">
+              <EmptyState />
+            </div>
+          ) : (
+            allLeadsData.data.map((lead) => {
+              const metrics = getLeadMetrics(lead);
+              return (
+                <LeadDayCard
+                  key={lead.dayKey}
+                  lead={lead}
+                  metrics={metrics}
+                  isDownloading={downloadingDay === lead.dayKey}
+                  onDownload={downloadCSV}
+                />
+              );
+            })
           )}
         </div>
 
-        {/* Right Column - Leads Overview */}
-        <div className="lg:col-span-1">
-          <div className="bg-brand-white rounded-xl p-6 border border-brand-offwhite sticky top-8">
-            <h2 className="font-bold font-park text-brand-primary mb-6">
-              Leads Overview
-            </h2>
-
-            {/* Stats Grid */}
-            <div className="space-y-6">
-              {/* Row 1 */}
-              <div className="grid grid-cols-2 gap-6">
-                <div className="bg-brand-offwhite  rounded-lg p-2">
-                  <p className="text-xs text-brand-muted mb-1">
-                    Days Since Setup
-                  </p>
-                  <p className="font-bold font-park text-brand-primary">
-                    {allLeadsData.overview.daysSinceSetup} Days
-                  </p>
-                </div>
-                <div className="bg-brand-offwhite  rounded-lg p-2">
-                  <p className="text-xs text-brand-muted mb-1">
-                    Total Leads Generated
-                  </p>
-                  <p className="font-bold font-park text-brand-primary">
-                    {allLeadsData.overview.totalLeadsGenerated.toLocaleString()}
-                  </p>
-                </div>
-              </div>
-
-              {/* Row 2 */}
-              <div className="grid grid-cols-2 gap-6">
-                <div className="bg-brand-offwhite rounded-lg p-2">
-                  <p className="text-xs text-brand-muted mb-1">Today's Leads</p>
-                  <p className="font-bold font-park text-brand-primary">
-                    {allLeadsData.overview.todaysLeads.toLocaleString()}
-                  </p>
-                </div>
-                <div className="bg-brand-offwhite  rounded-lg p-2">
-                  <p className="text-xs text-brand-muted mb-1">
-                    Average Daily Leads
-                  </p>
-                  <p className="font-bold font-park text-brand-primary">
-                    {allLeadsData.overview.averageDailyLeads.toLocaleString()}
-                  </p>
-                </div>
-              </div>
-
-              {/* Row 3 */}
-              <div className="grid grid-cols-2 gap-6">
-                {/* <div className="bg-brand-offwhite rounded-lg p-2">
-                            <p className="text-xs text-brand-muted mb-1">Lead Conversion Rate (%)</p>
-                            <p className="font-bold font-park text-brand-primary">
-                                {overviewStats.leadConversionRate}
-                            </p>
-                            </div> */}
-                <div className="bg-brand-offwhite rounded-lg">
-                  <p className="text-xs text-brand-muted mb-1">
-                    Total Customer
-                  </p>
-                  <p className="font-bold font-park text-brand-primary">
-                    {allLeadsData.overview.totalClients.toLocaleString()}
-                  </p>
-                </div>
-              </div>
-
-              {/* System Status */}
-              <div className="bg-brand-offwhite rounded-lg p-2 text-brand-muted">
-                <p className="text-xs text-brand-muted mb-3">System Status</p>
-                <div className="flex gap-3">
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm font-light text-brand-muted">
-                      Ping Tree:
-                    </span>
-                    <span className="text-sm font-medium text-brand-green">
-                      {/* {overviewStats.pingTree}  */}
-                    </span>
-                  </div>
-                  ||
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm  font-light text-brand-muted">
-                      API Sync:
-                    </span>
-                    <span className="text-sm font-medium text-brand-green">
-                      {/* {overviewStats.apiSync} */}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <LeadsOverviewSidebar
+          overview={adminImportBatchesOverviewData}
+          onUpload={onUploadOpen}
+          onManageHeaders={onManageHeadersOpen}
+        />
       </div>
-
-      <Pagination
-        page={page}
-        totalPages={allLeadsData?.pagination.pages}
-        onPageChange={setPage}
-      />
     </div>
   );
 };

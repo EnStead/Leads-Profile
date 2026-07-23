@@ -1,25 +1,46 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import api from "../utility/axios";
+import {
+  AUTH_SESSION_EVENT,
+  clearStoredAuth,
+  getStoredAuthForRole,
+  persistStoredValue,
+} from "../utility/authSession";
+import { preloadProfilePresets } from "../utility/profilePresets";
 
 const AdminContext = createContext();
 
 export const AdminProvider = ({ children }) => {
-  const [user, setUser] = useState(null); 
+  const [user, setUser] = useState(() => getStoredAuthForRole("admin")); 
   const [authReady, setAuthReady] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   // Load admin user
   useEffect(() => {
-    const saved = localStorage.getItem("admin");
-    if (saved) setUser(JSON.parse(saved));
+    preloadProfilePresets();
+    setUser(getStoredAuthForRole("admin"));
     setAuthReady(true);
+
+    const syncSession = (event) => {
+      if (event?.detail?.role && event.detail.role !== "admin") return;
+      setUser(getStoredAuthForRole("admin"));
+    };
+
+    window.addEventListener(AUTH_SESSION_EVENT, syncSession);
+
+    return () => {
+      window.removeEventListener(AUTH_SESSION_EVENT, syncSession);
+    };
   }, []);
+
+  const updateUserSession = (nextUser) => {
+    setUser(nextUser);
+  };
 
   // Save admin user to localStorage
   useEffect(() => {
-    if (user) localStorage.setItem("admin", JSON.stringify(user));
-    else localStorage.removeItem("admin");
+    persistStoredValue("admin", user);
   }, [user]);
 
   // LOGIN FUNCTION
@@ -28,7 +49,7 @@ export const AdminProvider = ({ children }) => {
       setLoading(true);
       setError(null);
 
-      const response = await api.post("/auth/sign-in", loginData);
+      const response = await api.post("/api/v1/auth/sign-in", loginData);
 
       //     // Role validation
       // if (response.data.data.role !== "admin") {
@@ -38,6 +59,12 @@ export const AdminProvider = ({ children }) => {
       const extractedUser = {
         user: response.data.data.user,
         token: response.data.data.token,
+        refreshToken:
+          response.data.data.refreshToken ?? response.data.refreshToken ?? null,
+        refreshTokenExpiresAt:
+          response.data.data.refreshTokenExpiresAt ??
+          response.data.refreshTokenExpiresAt ??
+          null,
         adminData: response.data, // return here to match your Login.jsx
       };
 
@@ -52,11 +79,21 @@ export const AdminProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem("admin");
-    localStorage.removeItem("admin_token");
-    localStorage.removeItem("admin_user");
+  const logout = async () => {
+    const refreshToken = user?.refreshToken ?? null;
+
+    try {
+      if (refreshToken) {
+        await api.post("/api/v1/auth/sign-out", { refreshToken }, {});
+      }
+    } catch {
+      // Ignore sign-out failures and clear local session below.
+    } finally {
+      clearStoredAuth("admin");
+      setUser(null);
+      localStorage.removeItem("admin_token");
+      localStorage.removeItem("admin_user");
+    }
   };
 
   return (
@@ -65,6 +102,7 @@ export const AdminProvider = ({ children }) => {
         user,
         login,
         logout,
+        updateUserSession,
         loading,
         error,
         authReady,

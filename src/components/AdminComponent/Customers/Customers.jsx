@@ -2,22 +2,35 @@ import { useEffect, useState } from "react";
 import Table from "./Table";
 import DeleteModal from "./DeleteModal";
 import OrderDetailsModal from "./OrderDetailsModal";
-import { useDashboard } from "../../../context/DashboardContext";
+import CreateOrder from "../Home/CreateOrder";
+import { useAdminDashboard } from "../../../context/DashboardContext";
 import { Search } from "lucide-react";
 
 const Customers = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const { customerSearch, setCustomerSearch, setSearchTerm } = useDashboard();
+  const [isCreateOrderOpen, setIsCreateOrderOpen] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const {
+    customerSearch,
+    setCustomerSearch,
+    setSearchTerm,
+    setSelectedCustomerHistoryId,
+  } = useAdminDashboard();
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedCustomerId, setSelectedCustomerId] = useState(null);
   const openDetailsModal = (order) => {
+    setSelectedCustomerHistoryId(order._id);
     setIsModalOpen(true);
     setSelectedOrder(order);
   };
   const openDeleteModal = (customerId) => {
     setSelectedCustomerId(customerId);
     setIsDeleteOpen(true);
+  };
+  const openCreateOrderModal = (customer) => {
+    setSelectedCustomer(customer);
+    setIsCreateOrderOpen(true);
   };
 
   useEffect(() => {
@@ -49,11 +62,11 @@ const Customers = () => {
     <section>
       <div className="xsm:flex justify-between items-center">
         <div>
-          <h2 className="text-brand-primary font-park font-bold text-xl mb-2">
-            Customers Details
+          <h2 className="text-brand-blackish  font-bold text-xl mb-2">
+            My Customers
           </h2>
-          <p className="text-brand-subtext">
-            Manage all customers and their order activity.
+          <p className="text-brand-body">
+            Manage customer activity, orders, and lead usage.
           </p>
         </div>
         <div className="mt-8 flex justify-between items-center gap-4">
@@ -65,7 +78,7 @@ const Customers = () => {
               value={customerSearch}
               onChange={(e) => setCustomerSearch(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="w-full px-4 py-2 pr-12 border bg-brand-white border-t-0 border-x-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-gray"
+              className="w-full px-4 py-2 pr-12 text-brand-body border bg-brand-white border-brand-placeholder rounded-xl focus:outline-none "
             />
 
             <button
@@ -89,6 +102,15 @@ const Customers = () => {
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
         order={selectedOrder}
+        onCreateOrder={openCreateOrderModal}
+        onDeleteCustomer={(customer) => openDeleteModal(customer._id)}
+      />
+
+      <CreateOrder
+        open={isCreateOrderOpen}
+        onOpenChange={setIsCreateOrderOpen}
+        initialCustomer={selectedCustomer}
+        startAtStep={2}
       />
 
       <DeleteModal
@@ -101,3 +123,4 @@ const Customers = () => {
 };
 
 export default Customers;
+

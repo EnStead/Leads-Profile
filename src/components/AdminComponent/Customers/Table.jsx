@@ -1,22 +1,20 @@
-import { Ellipsis, Dot } from "lucide-react";
-import { useSearchParams } from "react-router";
-import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import { useDashboard } from "../../../context/DashboardContext";
+import { useAdminDashboard } from "../../../context/DashboardContext";
 import TableSkeleton from "../../../utility/skeletons/TableSkeleton";
 import Pagination from "../../../utility/Pagination";
 import EmptyState from "../../../utility/EmptyState";
+import {
+  getProfileImageSrc,
+  PROFILE_BG_TONES,
+} from "../../../utility/profilePresets";
 
-
-const Table = ({ openDetailsModal, onOpenChange }) => {
+const Table = ({ openDetailsModal }) => {
   const {
     customersData,
     customersLoading,
     customersError,
     page,
     setSearchParams,
-  } = useDashboard();
-
-  let debounceTimer;
+  } = useAdminDashboard();
 
   const handlePageChange = (newPage) => {
     if (
@@ -26,14 +24,10 @@ const Table = ({ openDetailsModal, onOpenChange }) => {
     )
       return;
 
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => {
-      setSearchParams({ p: newPage });
-    }, 200); // 200ms delay
+    setSearchParams({ p: newPage });
   };
 
   const customers = customersData?.data ?? [];
-
 
   const formatDate = (dateString) => {
     const options = {
@@ -44,100 +38,132 @@ const Table = ({ openDetailsModal, onOpenChange }) => {
     return new Date(dateString).toLocaleString(undefined, options);
   };
 
-  if (customersLoading) {
-    return <TableSkeleton rows={5} columns={7} />;
-  }
+  const getAvatarBgTone = (customer) => {
+    const seed = String(
+      customer?.imagePreset || customer?._id || customer?.email || customer?.name || "",
+    );
+
+    const total = [...seed].reduce((sum, char) => sum + char.charCodeAt(0), 0);
+    return PROFILE_BG_TONES[total % PROFILE_BG_TONES.length];
+  };
+
+  const getCustomerAvatarSrc = (customer) => {
+    const presetId = String(customer?.imagePreset || "").trim();
+    return presetId ? getProfileImageSrc(presetId) : getProfileImageSrc();
+  };
 
   if (customersError) {
     return <p className="text-brand-red">Failed to load customers</p>;
   }
 
-  if (!customers.length) {
-    return <EmptyState />;
-  }
-
   return (
     <section className="w-full h-full">
+      <style>{`
+        @keyframes rowFadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .row-animate {
+          animation: rowFadeInUp 300ms ease-out both;
+        }
+      `}</style>
       <div className="overflow-x-auto">
+        {customersLoading ? (
+          <TableSkeleton rows={5} columns={7} />
+        ) : !customers.length ? (
+          <EmptyState />
+        ) : (
         <table className="w-full border-collapse text-left">
-          <thead className="bg-brand-white rounded-2xl">
+          <thead className="capitalize">
             <tr>
-              <th className="p-3 font-medium text-sm text-brand-muted rounded-l-lg">
-                Full/Business Name
+              <th className="p-3 font-medium text-sm text-brand-placeholder ">
+               Customer Id
               </th>
-              <th className="p-3 font-medium text-sm text-brand-muted rounded-l-lg">
+              <th className="p-3 font-medium text-sm text-brand-placeholder ">
+                Customer Name
+              </th>
+              <th className="p-3 font-medium text-sm text-brand-placeholder ">
                 Email Address
               </th>
-              <th className="p-3 font-medium text-sm text-brand-muted">
+              <th className="p-3 font-medium text-sm text-brand-placeholder">
                 Total Orders
               </th>
-              <th className="p-3 font-medium text-sm text-brand-muted">
+              <th className="p-3 font-medium text-sm text-brand-placeholder">
+                Active Orders
+              </th>
+              <th className="p-3 font-medium text-sm text-brand-placeholder">
+                Leads Recieved
+              </th>
+              <th className="p-3 font-medium text-sm text-brand-placeholder">
                 Last Order Date
               </th>
-              <th className="p-3 font-medium text-sm text-brand-muted text-right rounded-r-lg">
+              <th className="p-3 font-medium text-sm text-brand-placeholder text-right">
                 Action
               </th>
             </tr>
           </thead>
-
+ 
           <tbody>
-            {customers.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={5}
-                  className="text-center py-10 text-brand-subtext text-sm"
+            {customers?.map((customer, index) => (
+                <tr
+                  key={customer._id}
+                  className="border-b border-brand-stroke hover:bg-brand-white transition-colors duration-200 row-animate"
+                  style={{ animationDelay: `${index * 50}ms` }}
                 >
-                  No customers match your search.
-                </td>
-              </tr>
-            ) : (
-              customers?.map((order) => (
-                <tr key={order._id} className="border-b border-brand-stroke">
-                  <td className="p-3 font-medium text-brand-subtext text-sm">
-                    {order.name}
+                  <td className="p-3 font-light text-brand-body text-sm">
+                    {customer.customId || customer._id}
                   </td>
-                  <td className="p-3 text-brand-muted font-light text-sm">
-                    {order.email}
+                  <td className="p-3 font-light text-brand-body text-sm">
+                    <div className="flex items-center gap-3">
+                      <span
+                        className={`inline-flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-brand-stroke ${getAvatarBgTone(customer)}`}
+                      >
+                        <img
+                          src={getCustomerAvatarSrc(customer)}
+                          alt={customer.name}
+                          className="h-full w-full object-cover"
+                        />
+                      </span>
+                      <span>{customer.name}</span>
+                    </div>
                   </td>
-                  <td className="p-3 text-brand-muted font-light text-sm">
-                    {order.totalOrders}
+                  <td className="p-3 text-brand-body font-light text-sm">
+                    <a href={`mailto:${customer.email}`} className="hover:text-brand-blue hover:underline transition-colors">
+                      {customer.email}
+                    </a>
                   </td>
-                  <td className="p-3 text-brand-muted font-light text-sm">
-                    {formatDate(order.updatedAt)}
+                  <td className="p-3 text-brand-body font-light text-sm">
+                    {Number(customer.totalOrders ?? 0).toLocaleString()}
+                  </td>
+                  <td className="p-3 text-brand-body font-light text-sm">
+                    {Number(customer.activeOrders ?? 0).toLocaleString()}
+                  </td>
+                  <td className="p-3 text-brand-body font-light text-sm">
+                    {Number(customer.totalLeadsDelivered ?? 0).toLocaleString()}
+                  </td>
+                  <td className="p-3 text-brand-body font-light text-sm">
+                    {formatDate(customer.lastOrderDate)}
                   </td>
                   <td className="p-3 text-right relative">
-                    <DropdownMenu.Root
-                      className={"border-none shadow-md text-left"}
+                    <button
+                      onClick={() => openDetailsModal(customer)}
+                      className="inline-flex items-center gap-1 text-brand-blue text-sm font-semibold transition-all duration-200 hover:underline hover:underline-offset-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue/40 focus-visible:ring-offset-2 focus-visible:ring-offset-brand-white rounded-sm"
                     >
-                      <DropdownMenu.Trigger className="p-2 rounded-full hover:bg-brand-white">
-                        <Ellipsis size={18} />
-                      </DropdownMenu.Trigger>
-
-                      <DropdownMenu.Content
-                        sideOffset={5}
-                        className="bg-white shadow-md rounded-lg p-1 z-50 text-left"
-                      >
-                        <DropdownMenu.Item
-                          onClick={() => openDetailsModal(order)}
-                          className="px-3 py-2 text-sm text-brand-primary hover:bg-brand-primary/10 cursor-pointer"
-                        >
-                          View Details
-                        </DropdownMenu.Item>
-
-                        <DropdownMenu.Item
-                          onClick={() => onOpenChange(order._id)}
-                          className="px-3 py-2 text-sm text-brand-red hover:bg-brand-red/10 cursor-pointer"
-                        >
-                          Delete Customer
-                        </DropdownMenu.Item>
-                      </DropdownMenu.Content>
-                    </DropdownMenu.Root>
+                      View details
+                    </button>
                   </td>
                 </tr>
               ))
-            )}
+            }
           </tbody>
         </table>
+        )}
       </div>
 
       <Pagination
@@ -151,3 +177,4 @@ const Table = ({ openDetailsModal, onOpenChange }) => {
 };
 
 export default Table;
+

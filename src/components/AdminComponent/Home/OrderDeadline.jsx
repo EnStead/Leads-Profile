@@ -5,8 +5,8 @@ import * as Select from "@radix-ui/react-select";
 import Picker from "react-mobile-picker";
 import { ChevronDown } from "lucide-react";
 import api from "../../../utility/axios";
-import ToastPop from "../../../utility/ToastPop";
-import { useDashboard } from "../../../context/DashboardContext";
+import { useAdminDashboard } from "../../../context/DashboardContext";
+import { useAppToast } from "../../../utility/appToastContext";
 
 /* ================= CONSTANTS ================= */
 
@@ -28,23 +28,22 @@ const MINUTES = Array.from({ length: 60 }, (_, i) => i);
 const OrderDeadline = ({ open, onOpenChange }) => {
   const { user } = useAdminAuth();
   const { deadlineData, deadlineLoading, deadlineError, refetchDeadline } =
-    useDashboard();
+    useAdminDashboard();
 
   const [weekday, setWeekday] = useState(null);
   const [time, setTime] = useState({ hour: 0, minute: 0 });
   const [loading, setLoading] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
 
-  const [toastMsg, setToastMsg] = useState("");
-  const [toastType, setToastType] = useState("");
-
-  const showToast = (msg, type = "success") => {
-    setToastMsg(msg);
-    setToastType(type);
-  };
+  const { showToast } = useAppToast();
 
   useEffect(() => {
-    if (!open || !deadlineData?.data) return;
+    if (!open) {
+      setShowTimePicker(false);
+      return;
+    }
+
+    if (!deadlineData?.data) return;
 
     const { weekday, hour, minute } = deadlineData.data;
 
@@ -65,7 +64,7 @@ const OrderDeadline = ({ open, onOpenChange }) => {
 
     try {
       setLoading(true);
-      const res = await api.put("/orders/admin/cutoff", payload, {
+      const res = await api.put("/api/v1/orders/admin/cutoff", payload, {
         headers: {
           Authorization: `Bearer ${user?.token}`,
         },
@@ -73,15 +72,20 @@ const OrderDeadline = ({ open, onOpenChange }) => {
 
       // console.log("Customer created:", res.data);
 
-      showToast(res.data.message || "Deadline Created", "success");
+      showToast({
+        type: "success",
+        title: "Deadline Updated",
+        subtitle: res.data.message || "Changes saved successfully",
+      });
       refetchDeadline();
       onOpenChange(false);
     } catch (err) {
       // console.log(err)
-      showToast(
-        err?.response?.data?.message || "Failed to create deadline",
-        "error"
-      );
+      showToast({
+        type: "error",
+        title: "Update Failed",
+        subtitle: err?.response?.data?.message || "Failed to update deadline",
+      });
     } finally {
       setLoading(false);
     }
@@ -93,9 +97,16 @@ const OrderDeadline = ({ open, onOpenChange }) => {
     <>
       <Dialog.Root open={open} onOpenChange={onOpenChange}>
         <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0 bg-black/30 z-50 backdrop-blur-[2px]" />
+          <Dialog.Overlay className="modal-overlay fixed inset-0 bg-black/30 z-50 backdrop-blur-[2px] " />
 
-          <Dialog.Content className="fixed left-1/2 top-1/2 z-50 w-[520px] -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl p-8 shadow-xl focus:outline-none">
+          <Dialog.Content
+            onAnimationEnd={(e) => {
+              if (e.animationName === "modalShrink") {
+                // optional: any cleanup
+              }
+            }}
+            className="modal-content fixed left-1/2 top-1/2 z-50 w-[90vw] max-w-[520px] bg-white rounded-2xl p-8 shadow-xl focus:outline-none "
+          >
             <Dialog.Close className="absolute top-4 right-6 text-2xl cursor-pointer">
               ×
             </Dialog.Close>
@@ -136,7 +147,7 @@ const OrderDeadline = ({ open, onOpenChange }) => {
                       <Select.Content
                         position="popper"
                         sideOffset={6}
-                        className="z-[9999] bg-white w-100 shadow-lg rounded-xl border"
+                        className="z-[9999] bg-white shadow-lg rounded-xl border select-content-animate"
                       >
                         <Select.Viewport className="p-1">
                           {WEEKDAYS.map((d) => (
@@ -167,7 +178,7 @@ const OrderDeadline = ({ open, onOpenChange }) => {
                     value={
                       time
                         ? `${String(time.hour).padStart(2, "0")}:${String(
-                            time.minute
+                            time.minute,
                           ).padStart(2, "0")}`
                         : ""
                     }
@@ -191,11 +202,7 @@ const OrderDeadline = ({ open, onOpenChange }) => {
                             className="cursor-pointer w-20 "
                           >
                             {HOURS.map((h) => (
-                              <Picker.Item
-                                key={h}
-                                value={h}
-                                className="border-y border-brand-muted"
-                              >
+                              <Picker.Item key={h} value={h} className="">
                                 {String(h).padStart(2, "0")}
                               </Picker.Item>
                             ))}
@@ -206,11 +213,7 @@ const OrderDeadline = ({ open, onOpenChange }) => {
                             className="cursor-pointer w-20"
                           >
                             {MINUTES.map((m) => (
-                              <Picker.Item
-                                key={m}
-                                value={m}
-                                className="border-y border-brand-muted"
-                              >
+                              <Picker.Item key={m} value={m} className="">
                                 {String(m).padStart(2, "0")}
                               </Picker.Item>
                             ))}
@@ -244,7 +247,7 @@ const OrderDeadline = ({ open, onOpenChange }) => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="bg-brand-blue text-white py-3 rounded-xl font-semibold"
+                  className="bg-brand-blue text-white py-3 rounded-xl font-semibold transition-colors duration-200 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
                   {loading ? "Updating..." : "Update Deadline"}
                 </button>
@@ -254,11 +257,6 @@ const OrderDeadline = ({ open, onOpenChange }) => {
         </Dialog.Portal>
       </Dialog.Root>
 
-      <ToastPop
-        message={toastMsg}
-        type={toastType}
-        onClose={() => setToastMsg("")}
-      />
     </>
   );
 };

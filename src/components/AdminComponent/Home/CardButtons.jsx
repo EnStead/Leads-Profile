@@ -1,129 +1,57 @@
-import CreateOrder from '../../../assets/CreateOrder.svg'
-import AddCustomer from '../../../assets/AddCustomer.svg'
-import ViewOrder from '../../../assets/ViewOrder.svg'
-import System from '../../../assets/System.svg'
-import { Link } from 'react-router'
-import { useDashboard } from '../../../context/DashboardContext'
+import { ExternalLink, Plus } from "lucide-react";
 
-
-const WEEKDAY_MAP = {
-  1: "Monday",
-  2: "Tuesday",
-  3: "Wednesday",
-  4: "Thursday",
-  5: "Friday",
-  6: "Saturday",
-  7: "Sunday",
-};
-
-const formatTime = (hour, minute) => {
-  const period = hour >= 12 ? "PM" : "AM";
-  const formattedHour = hour % 12 || 12;
-  return `${formattedHour}:${String(minute).padStart(2, "0")} ${period}`;
-};
-
-const CardButtons = ({onOpenChange, openAddCustomerModal, openDeadlineModal}) => {
-  const {
-    deadlineData,
-    deadlineLoading,
-    deadlineError,
-  } = useDashboard();
-
-  const cutoff = deadlineData?.data;
-
-  const cutoffText = (() => {
-    if (deadlineLoading) return "Loading cut-off...";
-    if (deadlineError || !cutoff) return "Not set";
-
-    return `Every ${WEEKDAY_MAP[cutoff.weekday]}, ${formatTime(
-      cutoff.hour,
-      cutoff.minute
-    )}`;
-  })();
-
+const CardButtons = ({ openAddCustomerModal, openDeadlineModal }) => {
   return (
-    <section className='grid my-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4' >
-        {/* CARD 1 */}
-        <div onClick={onOpenChange} className='bg-brand-white border border-brand-offwhite 
-          rounded-xl py-2 px-4 w-full h-fit flex flex-col justify-between items-start cursor-pointer  '
-        >
-            <div className='flex items-center justify-start gap-4'>
-                <div className='p-1 bg-brand-blue rounded-lg' >
-                    <img src={CreateOrder} alt="image" />
-                </div>
-                <div>
-                    <h3 className='text-brand-primary font-semibold font-park mb-2'>
-                        Create Order
-                    </h3>
-                    <p className='text-brand-muted font-light text-[10px]'>
-                        Start and attach an order to customer
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        {/* CARD 2 */}
-        <div onClick={openAddCustomerModal} className='bg-brand-white border border-brand-offwhite 
-          rounded-xl py-2 px-4 w-full h-fit flex flex-col justify-between items-start cursor-pointer '
-        >
-            <div className='flex items-center justify-start gap-4'>
-                <div className='p-1 bg-brand-offwhite rounded-lg' >
-                    <img src={AddCustomer} alt="image" />
-                </div>
-                <div>
-                    <h3 className='text-brand-primary font-semibold font-park mb-2'>
-                        Add Customer
-                    </h3>
-                    <p className='text-brand-muted font-light text-[10px]'>
-                        Set up customer profile and details
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        {/* CARD 3 */}
-        <Link to={'/admin/orders'} className='bg-brand-white border border-brand-offwhite 
-          rounded-xl py-2 px-4 w-full h-fit flex flex-col justify-between items-start '
-        >
-            <div className='flex items-center justify-start gap-4'>
-                <div className='p-1 bg-brand-offwhite rounded-lg' >
-                    <img src={ViewOrder} alt="image" />
-                </div>
-                <div>
-                    <h3 className='text-brand-primary font-semibold font-park mb-2'>
-                        View Order History
-                    </h3>
-                    <p className='text-brand-muted font-light text-[10px]'>
-                        Access past orders and details
-                    </p>
-                </div>
-            </div>
-        </Link>
-
-        {/* CARD 4 */}
-      <div
+    <>
+      {/* <button
+        type="button"
         onClick={openDeadlineModal}
-        className="bg-brand-white border border-brand-offwhite rounded-xl py-2 px-4 cursor-pointer"
+        className="inline-flex items-center gap-2 rounded-lg border border-brand-body bg-transparent px-4 py-2 text-sm font-semibold text-brand-body transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-blue/50 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue/30"
       >
-        <div className="flex gap-4">
-          <div className="p-1 bg-brand-offwhite rounded-lg">
-            <img src={System} alt="" />
-          </div>
-          <div>
-            <h3 className="font-semibold font-park">
-              Manage Order Deadline
-            </h3>
-            <p className="text-[10px] text-brand-muted">
-              Cut Off:{" "}
-              <span className="text-brand-royalblue font-medium">
-                {cutoffText}
-              </span>
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-  )
-}
+        Update Cut-Off
+        <ExternalLink size={16} />
+      </button> */}
 
-export default CardButtons
+      <button
+        type="button"
+        onClick={(e) => {
+          const btn = e.currentTarget;
+          const r = btn.getBoundingClientRect();
+
+          // Button center in viewport
+          const btnCx = r.left + r.width / 2;
+          const btnCy = r.top + r.height / 2;
+
+          // Viewport center (where modal lands)
+          const vpCx = window.innerWidth / 2;
+          const vpCy = window.innerHeight / 2;
+
+          // Modal dimensions (approximate or measure)
+          const modalW = 520;
+          const modalH = 400; // rough height, adjust to yours
+
+          // Origin % relative to modal box
+          const ox = 50 + ((btnCx - vpCx) / modalW) * 100;
+          const oy = 50 + ((btnCy - vpCy) / modalH) * 100;
+
+          // Inject as CSS custom property on :root
+          document.documentElement.style.setProperty(
+            "--modal-origin-x",
+            `${ox}%`,
+          );
+          document.documentElement.style.setProperty(
+            "--modal-origin-y",
+            `${oy}%`,
+          );
+
+          openAddCustomerModal(); // or setOpen(true)
+        }}
+        className="inline-flex items-center gap-2 rounded-lg bg-brand-lightblue px-6 py-2 text-sm font-semibold text-brand-blackish transition-all duration-200 hover:-translate-y-0.5 hover:bg-brand-lightblue/80 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue/30"
+      >
+        Add Customer
+      </button>
+    </>
+  );
+};
+
+export default CardButtons;

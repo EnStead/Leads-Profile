@@ -42,7 +42,7 @@ const Pagination = ({ page, totalPages, onPageChange, loading }) => {
     <div className="flex items-center justify-center gap-2 mt-6">
       {/* PREVIOUS */}
       <button
-        className="px-3 py-2 border rounded-lg disabled:opacity-50"
+        className="px-3 py-2 text-brand-label border border-brand-body rounded-lg disabled:opacity-50 transition-colors duration-200 hover:bg-brand-white hover:text-brand-blackish disabled:hover:bg-transparent disabled:hover:text-brand-label"
         onClick={() => onPageChange(page - 1)}
         disabled={page === 1 || loading}
       >
@@ -54,7 +54,7 @@ const Pagination = ({ page, totalPages, onPageChange, loading }) => {
         num === "..." ? (
           <span
             key={`dots-${index}`}
-            className="px-3 py-2 text-brand-subtext"
+            className="px-3 py-2 text-brand-body"
           >
             …
           </span>
@@ -62,10 +62,10 @@ const Pagination = ({ page, totalPages, onPageChange, loading }) => {
           <button
             key={num}
             onClick={() => onPageChange(num)}
-            className={`px-3 py-2 rounded-lg border ${
+            className={`px-3 py-2 rounded-lg border transition-colors duration-200 ${
               num === page
-                ? "bg-brand-primary text-white"
-                : "bg-white text-brand-subtext"
+                ? "bg-brand-blackish text-brand-white"
+                : "bg-brand-white text-brand-body hover:bg-brand-gray/20 hover:text-brand-primary"
             }`}
           >
             {num}
@@ -75,7 +75,7 @@ const Pagination = ({ page, totalPages, onPageChange, loading }) => {
 
       {/* NEXT */}
       <button
-        className="px-3 py-2 border rounded-lg disabled:opacity-50"
+        className="px-3 py-2 text-brand-label border border-brand-body rounded-lg disabled:opacity-50 transition-colors duration-200 hover:bg-gray-50 hover:text-brand-primary disabled:hover:bg-transparent disabled:hover:text-inherit"
         onClick={() => onPageChange(page + 1)}
         disabled={page === totalPages || loading}
       >

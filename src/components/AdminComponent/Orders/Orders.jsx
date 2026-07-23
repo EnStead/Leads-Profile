@@ -2,18 +2,33 @@ import { useEffect, useState } from "react";
 import Table from "./Table";
 import OrderDetailsModal from "./OrderModal";
 import CreateOrder from "../Home/CreateOrder";
-import { useDashboard } from "../../../context/DashboardContext";
+import { useAdminDashboard } from "../../../context/DashboardContext";
 import { Search } from "lucide-react";
 
 const Orders = () => {
   const [isOrderDetailsOpen, setIsOrderDetailsOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const { orderSearch, setOrderSearch, setSearchTerm } = useDashboard();
+  const {
+    orderSearch,
+    setOrderSearch,
+    setSearchTerm,
+    setSelectedAdminOrderHistoryId,
+  } = useAdminDashboard();
   const [orderToEdit, setOrderToEdit] = useState(null);
   const [isCreateEditOpen, setIsCreateEditOpen] = useState(false);
   const openOrderDetailsModal = (order) => {
+    setSelectedAdminOrderHistoryId(order?._id || order?.id || "");
     setIsOrderDetailsOpen(true);
     setSelectedOrder(order);
+  };
+
+  const handleOrderDetailsOpenChange = (nextOpen) => {
+    setIsOrderDetailsOpen(nextOpen);
+
+    if (!nextOpen) {
+      setSelectedAdminOrderHistoryId("");
+      setSelectedOrder(null);
+    }
   };
 
   const openEditOrder = (order) => {
@@ -52,10 +67,10 @@ const Orders = () => {
     <section>
       <div className="xsm:flex justify-between items-center">
         <div>
-          <h2 className="text-brand-primary font-park font-bold text-xl mb-2">
-            Order Transactions
+          <h2 className="text-brand-blackish font-park font-bold text-xl mb-2">
+            Order & Delivery
           </h2>
-          <p className="text-brand-subtext">
+          <p className="text-brand-body">
             Manage customer orders here. Track payment status, progress and
             delivery.
           </p>
@@ -69,7 +84,9 @@ const Orders = () => {
               value={orderSearch}
               onChange={(e) => setOrderSearch(e.target.value)}
               onKeyDown={handleKeyDown}
-              className="w-full px-4 py-2 pr-12 border bg-brand-white border-t-0 border-x-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-gray"
+              className={`w-full px-4 py-2 pr-12 text-brand-body border bg-brand-white rounded-xl focus:outline-none  transition-colors ${
+                orderSearch.trim().length > 0 ? "border-brand-blackish" : "border-brand-placeholder"
+              }`}
             />
             <button
               onClick={handleSearch}
@@ -94,7 +111,7 @@ const Orders = () => {
 
       <OrderDetailsModal
         open={isOrderDetailsOpen}
-        onOpenChange={setIsOrderDetailsOpen}
+        onOpenChange={handleOrderDetailsOpenChange}
         order={selectedOrder}
         onEdit={openEditOrder}
       />
