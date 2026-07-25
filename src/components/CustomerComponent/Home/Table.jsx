@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import Recent from "../../../assets/Recent.svg";
-import FunnelIcon from "../../../assets/funnel.svg";
+import FunnelIcon from "../../../assets/Funnel.svg";
 import { MoveRight, Ellipsis, Dot, Eclipse } from "lucide-react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { useClientDashboard } from "../../../context/DashboardContext";
