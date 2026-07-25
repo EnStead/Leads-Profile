@@ -1,5 +1,5 @@
-import GlassUserIcon from "../../../../assets/glassusericon.svg";
-import BlueUserIcon from "../../../../assets/blueusericon.svg";
+import GlassUserIcon from "../../../../assets/GlassUserIcon.svg";
+import BlueUserIcon from "../../../../assets/BlueUserIcon.svg";
   
 const SummaryPanel = ({ rows, showReviewNote = true }) => (
   <div className="relative flex h-full min-h-0 flex-col overflow-hidden rounded-xl bg-brand-lightblue p-6">

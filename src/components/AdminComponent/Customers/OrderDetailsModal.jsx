@@ -2,8 +2,8 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { Plus, Trash2, X } from "lucide-react";
 import { useAdminDashboard } from "../../../context/DashboardContext";
 import Avater from "../../../assets/Avater.jpg";
-import BlueUserIcon from "../../../assets/blueusericon.svg";
-import GlassUserIcon from "../../../assets/glassusericon.svg";
+import BlueUserIcon from "../../../assets/BlueUserIcon.svg";
+import GlassUserIcon from "../../../assets/GlassUserIcon.svg";
 import {
   getProfileImageSrc,
   PROFILE_BG_TONES,
