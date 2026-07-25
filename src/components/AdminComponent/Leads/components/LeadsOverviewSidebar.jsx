@@ -1,7 +1,7 @@
 import { TrendingDown, TrendingUp } from "lucide-react";
 import usaFlag from "../../../../assets/usa.webp";
 import canadaFlag from "../../../../assets/canada.png";
-import Semi from "../../../../assets/semi.svg";
+import Semi from "../../../../assets/Semi.svg";
 import cop from "../../../../assets/Cop.svg";
 import GsapCounter from "./GsapCounter";
 
