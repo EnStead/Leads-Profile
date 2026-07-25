@@ -3,8 +3,8 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { Check, Search, X } from "lucide-react";
 import { gsap } from "gsap";
 import Avater from "../../../assets/Avater.jpg";
-import GlassUserIcon from "../../../assets/glassusericon.svg";
-import BlueUserIcon from "../../../assets/blueusericon.svg";
+import GlassUserIcon from "../../../assets/Glassusericon.svg";
+import BlueUserIcon from "../../../assets/Blueusericon.svg";
 import UserBlue from "../../../assets/UserBlue.svg";
 import { useAdminDashboard } from "../../../context/DashboardContext";
 import { useAdminAuth } from "../../../context/AdminContext";
@@ -16,7 +16,7 @@ import StepBankCriteria from "../../CustomerComponent/Home/create-order-modal/St
 import StepCountry from "../../CustomerComponent/Home/create-order-modal/StepCountry";
 import StepDelivery from "../../CustomerComponent/Home/create-order-modal/StepDelivery";
 import StepHeader from "../../CustomerComponent/Home/create-order-modal/StepHeader";
-import SendIcon from "../../../assets/send.svg";
+import SendIcon from "../../../assets/Send.svg";
 import {
   getProfileImageSrc,
   PROFILE_BG_TONES,
