@@ -36,7 +36,7 @@ const ThemePill = ({ size = "md" }) => {
     audioRef.current.volume = 0.5
     audioRef.current.playbackRate = 3.0 // Play the audio twice as fast
     return () => {
-      audioRef.current = null
+      audioRef.current = null 
     }
   }, [])
 
