@@ -113,14 +113,14 @@ const OrderDetails = () => {
     { key: "dateTime", label: "Date & Time" },
     { key: "firstName", label: "First Name" },
     { key: "lastName", label: "Last Name" },
-    { key: "email", label: "Email" },
+    { key: "email", label: "Email Address" },
     { key: "phone", label: "Phone" },
     { key: "city", label: "City" },
     { key: "address", label: "Address" },
     { key: "state", label: "State" },
-    { key: "zipCode", label: "Zip" },
+    { key: "zipCode", label: "ZIP Code" },
     { key: "bankName", label: "Bank" },
-    { key: "loanAmount", label: "Loan Amount" },
+    { key: "loanAmount", label: "Amount Requested" },
     { key: "birthday", label: "Birthday" },
   ];
 
