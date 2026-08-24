@@ -48,7 +48,13 @@ const OrderModal = ({ open, onOpenChange, order, onEdit }) => {
     { key: "bankName", label: "Bank" },
     { key: "loanAmount", label: "Amount Requested" },
     { key: "birthday", label: "Birthday" },
-    { key: "address", label: "Address" },
+    { key: "address", label: "Address" },    
+    { key: "incomeSource", label: "Income Source" },
+    { key: "jobTitle", label: "Job Title" },
+    { key: "payFrequency", label: "Pay frequency" },
+    { key: "rentOrOwn", label: "Rent or Own" },
+    { key: "monthlyNet", label: "Monthly Net Income" },
+    { key: "timeEmployed", label: "Time Employed" },
   ];
 
   const handleDownloadCSV = async () => {
