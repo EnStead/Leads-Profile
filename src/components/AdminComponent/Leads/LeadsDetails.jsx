@@ -89,7 +89,13 @@ const LeadsDetails = () => {
     { key: "bankName", label: "Bank" },
     { key: "loanAmount", label: "Amount Requested" },
     { key: "birthday", label: "Birthday" },
-    { key: "address", label: "Address" },
+    { key: "address", label: "Address" },    
+    { key: "incomeSource", label: "Income Source" },
+    { key: "jobTitle", label: "Job Title" },
+    { key: "payFrequency", label: "Pay frequency" },
+    { key: "rentOrOwn", label: "Rent or Own" },
+    { key: "monthlyNet", label: "Monthly Net Income" },
+    { key: "timeEmployed", label: "Time Employed" },
   ];
 
   const [downloadingDay, setDownloadingDay] = useState(null); // stores the dayKey being downloaded
@@ -303,6 +309,12 @@ const LeadsDetails = () => {
                 "Bank",
                 "Loan Amount",
                 "Birthday",
+                "Income Source",
+                "Job Title",
+                "Pay Frequency",
+                "Rent or Own",
+                "Monthly Net",
+                "Time Employed"
               ].map((header) => (
                 <th
                   key={header}
@@ -368,6 +380,24 @@ const LeadsDetails = () => {
                   </td>
                   <td className="p-3 font-light text-brand-subtext text-sm">
                     {formatDate(lead.birthday)}
+                  </td>
+                  <td className="p-3 font-light text-brand-subtext capitalize text-sm">
+                    {lead.incomeSource}
+                  </td>
+                  <td className="p-3 font-light text-brand-subtext capitalize text-sm">
+                    {lead.jobTitle}
+                  </td>
+                  <td className="p-3 font-light text-brand-subtext capitalize text-sm">
+                    {lead.payFrequency}
+                  </td>
+                  <td className="p-3 font-light text-brand-subtext capitalize text-sm">
+                    {lead.rentOrOwn}
+                  </td>
+                  <td className="p-3 font-light text-brand-subtext capitalize text-sm">
+                    {lead.monthlyNet}
+                  </td>
+                  <td className="p-3 font-light text-brand-subtext capitalize text-sm">
+                    {lead.timeEmployed}
                   </td>
                 </tr>
               ))
