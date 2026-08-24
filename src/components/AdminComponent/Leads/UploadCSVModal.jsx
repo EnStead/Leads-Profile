@@ -31,6 +31,12 @@ const HEADER_ALIASES = {
   loanAmount: ["loan_amount", "loanamount", "loan", "amount_requested"],
   birthday: ["birthday", "dob", "date_of_birth"],
   email: ["email", "email_address"],
+  incomeSource: ["income_source", "incomesource"],
+  jobTitle: ["job_title", "jobtitle"],
+  payFrequency: ["pay_frequency", "payfrequency"],
+  rentOrOwn: ["rent_or_own", "rentorown"],
+  monthlyNet: ["monthly_net_income", "monthlynetincome"],
+  timeEmployed: ["time_employed", "timeemployed"],
 };
 
 const getValue = (row, field) => {
@@ -109,7 +115,8 @@ const normalizeLead = (row, index) => {
     getValue(row, "email") || getValue(row, "firstName") || `#${index + 1}`;
   const birthdayValue = clean(getValue(row, "birthday"));
   const rawMonthlyIncome = clean(getValue(row, "loanAmount"));
-
+  const rawMonthlyNet = clean(getValue(row, "monthlyNet"));
+  
   const dateTime = parseDateString(
     clean(getValue(row, "dateTime")),
     index,
@@ -142,6 +149,12 @@ const normalizeLead = (row, index) => {
     birthday: birthdayValue
       ? parseDateString(birthdayValue, index, rowIdentifier)
       : null,
+    incomeSource: clean(getValue(row, "incomeSource")),
+    jobTitle: clean(getValue(row, "jobTitle")),
+    payFrequency: clean(getValue(row, "payFrequency")),
+    rentOrOwn: clean(getValue(row, "rentOrOwn")),
+    monthlyNet: parseNumber(rawMonthlyNet),
+    timeEmployed: clean(getValue(row, "timeEmployed")),
   };
 
   for (const field of REQUIRED_FIELDS) {
