@@ -24,6 +24,12 @@ const LeadsOverview = () => {
     { key: "bankName", label: "Bank" },
     { key: "loanAmount", label: "Amount Requested" },
     { key: "birthday", label: "Birthday" },
+    { key: "incomeSource", label: "Income Source" },
+    { key: "jobTitle", label: "Job Title" },
+    { key: "payFrequency", label: "Pay frequency" },
+    { key: "rentOrOwn", label: "Rent or Own" },
+    { key: "monthlyNet", label: "Monthly Net Income" },
+    { key: "timeEmployed", label: "Time Employed" },
   ];
 
   const downloadCSV = async (dayKey, totalLeads) => {
