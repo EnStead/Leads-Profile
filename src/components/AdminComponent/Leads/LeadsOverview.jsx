@@ -7,9 +7,6 @@ import { useAdminAuth } from "../../../context/AdminContext";
 import { useState } from "react";
 import EmptyState from "../../../utility/EmptyState";
 
-const LeadsOverview = () => {
-  const { user } = useAdminAuth(); // Admin user
-  const [downloadingDay, setDownloadingDay] = useState(null); // stores the dayKey being downloaded
 
     const formatDate = (dateString) => {
     const options = {
@@ -33,6 +30,11 @@ const LeadsOverview = () => {
     day: "numeric",
   });
 };
+
+
+const LeadsOverview = () => {
+  const { user } = useAdminAuth(); // Admin user
+  const [downloadingDay, setDownloadingDay] = useState(null); // stores the dayKey being downloaded
 
   const CSV_FIELDS = [
     {
