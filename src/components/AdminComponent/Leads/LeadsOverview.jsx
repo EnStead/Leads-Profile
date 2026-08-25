@@ -59,7 +59,15 @@ const LeadsOverview = () => {
       const csvRows = [
         headers.join(","),
         ...leads.map((lead) =>
-          CSV_FIELDS.map((f) => `"${lead[f.key] ?? ""}"`).join(",")
+          CSV_FIELDS.map((field) => {
+            let value = lead[field.key] ?? "";
+      
+            if (field.key === "birthday") {
+              value = formatBirthday(value);
+            }
+      
+            return `"${value}"`;
+          }).join(",")
         ),
       ];
 
@@ -100,6 +108,16 @@ const LeadsOverview = () => {
 
     return new Date(dateString).toLocaleString(undefined, options);
   };
+
+  const formatBirthday = (dateString) => {
+  if (!dateString) return "";
+
+  return new Date(dateString).toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+};
 
   if (allLeadsLoading) {
     return (
