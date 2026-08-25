@@ -37,7 +37,7 @@ const LeadsOverview = () => {
   const CSV_FIELDS = [
     {
       key: "dateTime",
-      label: "Date & Time",
+      label: "Date & Tim",
       formatter: formatDate,
     }
     { key: "firstName", label: "First Name" },
