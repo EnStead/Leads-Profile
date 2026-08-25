@@ -24,6 +24,29 @@ const formatTime = (hour, minute) => {
   return `${formattedHour}:${String(minute).padStart(2, "0")} ${period}`;
 };
 
+const formatDateTime = (dateString) => {
+  if (!dateString) return "";
+
+  return new Date(dateString).toLocaleString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+};
+
+const formatBirthday = (dateString) => {
+  if (!dateString) return "";
+
+  return new Date(dateString).toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+};
+
 const OrderDetails = () => {
   const navigate = useNavigate();
   const { id: orderId } = useParams();
@@ -109,26 +132,34 @@ const OrderDetails = () => {
     }
   };
 
-  const CSV_FIELDS = [
-    { key: "dateTime", label: "Date & Time" },
-    { key: "firstName", label: "First Name" },
-    { key: "lastName", label: "Last Name" },
-    { key: "email", label: "Email Address" },
-    { key: "phone", label: "Phone" },
-    { key: "city", label: "City" },
-    { key: "address", label: "Address" },
-    { key: "state", label: "State" },
-    { key: "zipCode", label: "ZIP Code" },
-    { key: "bankName", label: "Bank" },
-    { key: "loanAmount", label: "Amount Requested" },
-    { key: "birthday", label: "Birthday" },    
-    { key: "incomeSource", label: "Income Source" },
-    { key: "jobTitle", label: "Job Title" },
-    { key: "payFrequency", label: "Pay frequency" },
-    { key: "rentOrOwn", label: "Rent or Own" },
-    { key: "monthlyNet", label: "Monthly Net Income" },
-    { key: "timeEmployed", label: "Time Employed" },
-  ];
+const CSV_FIELDS = [
+  {
+    key: "createdAt",
+    label: "Date & Time",
+    formatter: formatDateTime,
+  },
+  { key: "firstName", label: "First Name" },
+  { key: "lastName", label: "Last Name" },
+  { key: "email", label: "Email Address" },
+  { key: "phone", label: "Phone" },
+  { key: "city", label: "City" },
+  { key: "address", label: "Address" },
+  { key: "state", label: "State" },
+  { key: "zipCode", label: "ZIP Code" },
+  { key: "bankName", label: "Bank" },
+  { key: "loanAmount", label: "Amount Requested" },
+  {
+    key: "birthday",
+    label: "Birthday",
+    formatter: formatBirthday,
+  },
+  { key: "incomeSource", label: "Income Source" },
+  { key: "jobTitle", label: "Job Title" },
+  { key: "payFrequency", label: "Pay frequency" },
+  { key: "rentOrOwn", label: "Rent or Own" },
+  { key: "monthlyNet", label: "Monthly Net Income" },
+  { key: "timeEmployed", label: "Time Employed" },
+];
 
   // --- Last updated time ---
   const lastUpdated = OrderDetailsData?.[0]?.updatedAt
@@ -166,7 +197,14 @@ const OrderDetails = () => {
       const csvRows = [
         headers.join(","),
         ...leads.map((lead) =>
-          CSV_FIELDS.map((f) => `"${lead[f.key] ?? ""}"`).join(",")
+          CSV_FIELDS.map((field) => {
+            const rawValue = lead[field.key] ?? "";
+            const value = field.formatter
+              ? field.formatter(rawValue)
+              : rawValue;
+      
+            return `"${value}"`;
+          }).join(",")
         ),
       ];
 
