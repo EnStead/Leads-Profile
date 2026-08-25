@@ -121,7 +121,13 @@ const OrderDetails = () => {
     { key: "zipCode", label: "ZIP Code" },
     { key: "bankName", label: "Bank" },
     { key: "loanAmount", label: "Amount Requested" },
-    { key: "birthday", label: "Birthday" },
+    { key: "birthday", label: "Birthday" },    
+    { key: "incomeSource", label: "Income Source" },
+    { key: "jobTitle", label: "Job Title" },
+    { key: "payFrequency", label: "Pay frequency" },
+    { key: "rentOrOwn", label: "Rent or Own" },
+    { key: "monthlyNet", label: "Monthly Net Income" },
+    { key: "timeEmployed", label: "Time Employed" },
   ];
 
   // --- Last updated time ---
@@ -345,6 +351,12 @@ const OrderDetails = () => {
                 "Bank",
                 "Loan Amount",
                 "Birthday",
+                "Income Source",
+                "Job Title",
+                "Pay Frequency",
+                "Rent or Own",
+                "Monthly Net",
+                "Time Employed"
               ].map((header) => (
                 <th
                   key={header}
@@ -415,6 +427,24 @@ const OrderDetails = () => {
                   </td>
                   <td className="p-3 font-light text-brand-subtext text-sm">
                     {new Date(lead.birthday).toLocaleDateString()}
+                  </td>
+                  <td className="p-3 font-light text-brand-subtext capitalize text-sm">
+                    {lead.incomeSource}
+                  </td>
+                  <td className="p-3 font-light text-brand-subtext capitalize text-sm">
+                    {lead.jobTitle}
+                  </td>
+                  <td className="p-3 font-light text-brand-subtext capitalize text-sm">
+                    {lead.payFrequency}
+                  </td>
+                  <td className="p-3 font-light text-brand-subtext capitalize text-sm">
+                    {lead.rentOrOwn}
+                  </td>
+                  <td className="p-3 font-light text-brand-subtext capitalize text-sm">
+                    {lead.monthlyNet}
+                  </td>
+                  <td className="p-3 font-light text-brand-subtext capitalize text-sm">
+                    {lead.timeEmployed}
                   </td>
                 </tr>
               ))
