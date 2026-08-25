@@ -42,13 +42,13 @@ const Cards = () => {
     { key: "state", label: "State" },
     { key: "zipCode", label: "ZIP Code" },
     { key: "bankName", label: "Bank" },
-    { key: "incomeSource", label: "Source" },
-    { key: "monthlyNetIncome", label: "Monthly Income" },
-    { key: "subId", label: "SubId" },
-    { key: "subId2", label: "SubId2" },
+    { key: "incomeSource", label: "Income Source" },
+    { key: "monthlyNet", label: "Monthly Net Income" },
     { key: "birthday", label: "Birthday" },
     { key: "timeEmployed", label: "Time Employed" },
     { key: "rentOrOwn", label: "Rent Or Own" },
+    { key: "jobTitle", label: "Job Title" },
+    { key: "payFrequency", label: "Pay frequency" },
   ];
 
   const [downloadingDay, setDownloadingDay] = useState(null);
