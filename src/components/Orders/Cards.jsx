@@ -10,6 +10,29 @@ import { useAuth } from "../../context/AuthContext";
 import { useState } from "react";
 import api from "../../utility/axios";
 
+const formatDate = (dateString) => {
+  if (!dateString) return "";
+
+  return new Date(dateString).toLocaleString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+};
+
+const formatBirthday = (dateString) => {
+  if (!dateString) return "";
+
+  return new Date(dateString).toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+};
+
 const Cards = () => {
   const { allOrdersData, allOrdersLoading, allOrdersError, page, setSearchParams, } = useDashboard();
 
@@ -32,24 +55,32 @@ const Cards = () => {
 
   const { user } = useAuth(); //user
 
-  const CSV_FIELDS = [
-    { key: "dateTime", label: "Date & Time" },
-    { key: "firstName", label: "First Name" },
-    { key: "lastName", label: "Last Name" },
-    { key: "email", label: "Email Address" },
-    { key: "phone", label: "Phone" },
-    { key: "city", label: "City" },
-    { key: "state", label: "State" },
-    { key: "zipCode", label: "ZIP Code" },
-    { key: "bankName", label: "Bank" },
-    { key: "incomeSource", label: "Income Source" },
-    { key: "monthlyNet", label: "Monthly Net Income" },
-    { key: "birthday", label: "Birthday" },
-    { key: "timeEmployed", label: "Time Employed" },
-    { key: "rentOrOwn", label: "Rent Or Own" },
-    { key: "jobTitle", label: "Job Title" },
-    { key: "payFrequency", label: "Pay frequency" },
-  ];
+const CSV_FIELDS = [
+  {
+    key: "dateTime",
+    label: "Date & Time",
+    formatter: formatDate,
+  },
+  { key: "firstName", label: "First Name" },
+  { key: "lastName", label: "Last Name" },
+  { key: "email", label: "Email Address" },
+  { key: "phone", label: "Phone" },
+  { key: "city", label: "City" },
+  { key: "state", label: "State" },
+  { key: "zipCode", label: "ZIP Code" },
+  { key: "bankName", label: "Bank" },
+  { key: "incomeSource", label: "Income Source" },
+  { key: "monthlyNet", label: "Monthly Net Income" },
+  {
+    key: "birthday",
+    label: "Birthday",
+    formatter: formatBirthday,
+  },
+  { key: "timeEmployed", label: "Time Employed" },
+  { key: "rentOrOwn", label: "Rent Or Own" },
+  { key: "jobTitle", label: "Job Title" },
+  { key: "payFrequency", label: "Pay frequency" },
+];
 
   const [downloadingDay, setDownloadingDay] = useState(null);
 
@@ -93,8 +124,15 @@ const Cards = () => {
 
       const csvRows = [
         headers.join(","),
-        ...leads.map((lead) =>
-          CSV_FIELDS.map((f) => `"${lead[f.key] ?? ""}"`).join(",")
+        ...allLeads.map((lead) =>
+          CSV_FIELDS.map((field) => {
+            const rawValue = lead[field.key] ?? "";
+            const value = field.formatter
+              ? field.formatter(rawValue)
+              : rawValue;
+      
+            return `"${value}"`;
+          }).join(",")
         ),
       ];
 
@@ -117,16 +155,6 @@ const Cards = () => {
     }
   };
 
-  const formatDate = (dateString) => {
-    const options = {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    };
-    return new Date(dateString).toLocaleString(undefined, options);
-  };
 
   if (allOrdersLoading) {
     return (
