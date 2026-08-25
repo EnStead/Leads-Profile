@@ -11,8 +11,35 @@ const LeadsOverview = () => {
   const { user } = useAdminAuth(); // Admin user
   const [downloadingDay, setDownloadingDay] = useState(null); // stores the dayKey being downloaded
 
+    const formatDate = (dateString) => {
+    const options = {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true, // AM / PM
+    };
+
+    return new Date(dateString).toLocaleString(undefined, options);
+  };
+
+  const formatBirthday = (dateString) => {
+  if (!dateString) return "";
+
+  return new Date(dateString).toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+};
+
   const CSV_FIELDS = [
-    { key: "dateTime", label: "Date & Time" },
+    {
+      key: "dateTime",
+      label: "Date & Time",
+      formatter: formatDate,
+    }
     { key: "firstName", label: "First Name" },
     { key: "lastName", label: "Last Name" },
     { key: "email", label: "Email Address" },
@@ -23,7 +50,11 @@ const LeadsOverview = () => {
     { key: "zipCode", label: "ZIP Code" },
     { key: "bankName", label: "Bank" },
     { key: "loanAmount", label: "Amount Requested" },
-    { key: "birthday", label: "Birthday" },
+    {
+    key: "birthday",
+    label: "Birthday",
+    formatter: formatBirthday,
+    },
     { key: "incomeSource", label: "Income Source" },
     { key: "jobTitle", label: "Job Title" },
     { key: "payFrequency", label: "Pay frequency" },
@@ -60,11 +91,10 @@ const LeadsOverview = () => {
         headers.join(","),
         ...leads.map((lead) =>
           CSV_FIELDS.map((field) => {
-            let value = lead[field.key] ?? "";
-      
-            if (field.key === "birthday") {
-              value = formatBirthday(value);
-            }
+            const rawValue = lead[field.key] ?? "";
+            const value = field.formatter
+              ? field.formatter(rawValue)
+              : rawValue;
       
             return `"${value}"`;
           }).join(",")
