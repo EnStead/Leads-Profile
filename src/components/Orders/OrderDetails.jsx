@@ -134,7 +134,7 @@ const OrderDetails = () => {
 
 const CSV_FIELDS = [
   {
-    key: "createdAt",
+    key: "dateTime",
     label: "Date & Time",
   },
   { key: "firstName", label: "First Name" },
