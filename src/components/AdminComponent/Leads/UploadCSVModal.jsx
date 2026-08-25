@@ -107,6 +107,20 @@ const parseDateString = (value, rowIndex, rowIdentifier) => {
 
 const clean = (v) => (v === "" || v === undefined ? null : v);
 
+const parseNumber = (value) => {
+  if (value === null || value === undefined || value === "") {
+    return 0;
+  }
+
+  if (typeof value === "number") {
+    return value;
+  }
+
+  const cleaned = String(value).replace(/,/g, "").trim();
+  const number = Number(cleaned);
+
+  return Number.isNaN(number) ? 0 : number;
+};
 
 const REQUIRED_FIELDS = ["dateTime", "firstName", "lastName", "email"];
 
