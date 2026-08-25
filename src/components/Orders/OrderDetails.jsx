@@ -136,7 +136,6 @@ const CSV_FIELDS = [
   {
     key: "createdAt",
     label: "Date & Time",
-    formatter: formatDateTime,
   },
   { key: "firstName", label: "First Name" },
   { key: "lastName", label: "Last Name" },
