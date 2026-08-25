@@ -37,7 +37,7 @@ const LeadsOverview = () => {
   const CSV_FIELDS = [
     {
       key: "dateTime",
-      label: "Date & Tim",
+      label: "Date & Time",
       formatter: formatDate,
     }
     { key: "firstName", label: "First Name" },
@@ -125,29 +125,6 @@ const LeadsOverview = () => {
     setPage,
   } = useDashboard();
 
-
-  const formatDate = (dateString) => {
-    const options = {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true, // AM / PM
-    };
-
-    return new Date(dateString).toLocaleString(undefined, options);
-  };
-
-  const formatBirthday = (dateString) => {
-  if (!dateString) return "";
-
-  return new Date(dateString).toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-};
 
   if (allLeadsLoading) {
     return (
